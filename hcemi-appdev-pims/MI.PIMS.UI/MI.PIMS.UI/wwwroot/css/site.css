@@ -1,0 +1,638 @@
+﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+a.navbar-brand {
+  white-space: normal;
+  text-align: center;
+  word-break: break-all;
+}
+
+/* Provide sufficient contrast against white background */
+a {
+  color: #0366d6;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+/*=======================
+   Global Font Start
+=========================*/
+html {
+  font-size: 13px;
+}
+@media (min-width: 768px) {
+  html {
+    font-size: 13px;
+  }
+}
+
+.border-top {
+  border-top: 1px solid #e5e5e5;
+}
+.border-bottom {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy {
+  font-size: 1rem;
+  line-height: inherit;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 60px; /* Vertically center the text there */
+}
+
+.required::after {
+    content: "*";
+    color: red;
+    font-weight: bold;
+}
+/*=======================
+        Custom CSS
+=========================*/
+.logo-font {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Set padding to keep content from hitting the edges */
+/*.body-content {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+    width: 98% !important;
+}*/
+input[type=text]:disabled {
+    background: #dddddd;
+}
+
+/*=======================
+   Global screen width
+=========================*/
+@media (min-width: 1000px) {
+    .container {
+        max-width: 100%;
+    }
+}
+
+.container2 {
+    padding-left: 35px;
+    padding-right: 35px;
+}
+
+.container-fluid {
+    margin-right: auto;
+    margin-left: auto;
+    max-width: 100%; /* or 950px */
+}
+
+.border-bottom {
+    border-bottom-color:red;
+}
+
+.search-border {
+    border: solid 1px;
+    border-color: #D8D8D8;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.search-border-sm {
+    border: solid 1px;
+    border-color: #D8D8D8;
+}
+
+.section-heading {
+    background-color: #f8f9fa; /*#0B3861 section-heading*/
+    /*color: white !important;*/
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 3px;
+    /*margin-bottom: 10px;*/
+    font-weight: 500;
+    border-top: solid 1px #D8D8D8;
+    border-right: solid 1px #D8D8D8;
+    border-left: solid 1px #D8D8D8;
+}
+
+.section-border {
+    border: solid 1px;
+    border-color: #D8D8D8;
+    padding: 20px;
+}
+
+.jumbotron {
+    color: white !important;
+    /*    background: rgb(119,143,167);
+    background: linear-gradient(90deg, rgba(119,143,167,1) 63%, rgba(242,242,242,1) 94%);*/
+    background: #0B243B;
+    /*    background: linear-gradient(90deg, rgba(35,82,124,1) 63%, rgba(242,242,242,1) 94%);*/
+    border-radius: 0px;
+}
+
+.grid-column-button {
+    color: #007bff !important;
+}
+
+.grid-column-button:hover {
+    color: white !important;
+}
+
+.my-border-2 {
+    border: solid 1.5px;
+    padding: 20px;
+    padding-top: 10px;
+    border: 1.5px solid #E6E6E6;
+    height: 150px;
+    width: 370px;
+    float: left;
+    margin-left: 10px;
+    transition: 0.4s;
+}
+
+.my-border-2:hover {
+    border: 1.5px solid #A4A4A4;
+    /*transform: scale(1.02, 1.02);*/
+    /*border-color: #2E9AFE;*/
+    /*box-shadow: 5px 5px 30px 5px #eee, -5px -5px 30px 5px #eee;*/
+    /*box-shadow: 5px 5px 30px 15px #0B3861, -5px -5px 30px 15px #0B3861;*/
+}
+.my-card-2 {
+    border: solid 1.5px;
+    padding: 20px;
+    padding-top: 10px;
+    border: 1.5px solid #D8D8D8;
+    height: 230px;
+    width: 340px;
+    float: left;
+    margin-left: 15px;
+    transition: 0.4s;
+}
+
+
+.btn-menu-panel {
+    width: 135px !important;
+}
+
+.my-card-2:hover {
+    /*border: 1.5px solid #A4A4A4;*/
+    transform: scale(1.02, 1.02);
+    border-color: #A4A4A4;
+    box-shadow: 5px 5px 30px 5px #eee, -5px -5px 30px 5px #eee;
+    /*box-shadow: 5px 5px 30px 15px #0B3861, -5px -5px 30px 15px #0B3861;*/
+}
+
+/*======================
+    Breadcrumb
+=======================*/
+.breadcrumb-background {
+    /* background: #0B3861;*/
+    /*   background: rgb(8,75,138);*/
+    background: white;
+    /*    background: #1A5276;*/
+    width: 100%;
+    padding-left:10px;
+/*    font-weight:bold;*/
+
+
+}
+
+.breadcrumb-item-font {
+    color: #084B8A;
+
+}
+
+.breadcrumb-item-font:hover {
+    color: #084B8A;
+}
+
+.breadcrumb {
+    color: black;
+    border-radius: 0px;
+}
+
+.breadcrumb-item:active {
+    color: black !important;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    display: inline-block;
+    padding-right: .5rem;
+    color: black;
+    content: "/";
+}
+
+/* COLORS*/
+
+.color-red {
+   /* color: red;*/
+    color: #FE2E2E !important;
+}
+
+.bg-red {
+    background: #FE2E2E !important;
+}
+
+.color-yellow {
+    /*color: rgba(255, 238, 0, 1);*/
+    color: #FFBF00 !important;
+}
+
+
+
+
+.color-gray {
+    color: gray;
+}
+
+.color-green {
+    /*color: green;*/
+    color: #58D68D !important;
+}
+
+.color-dark-green {
+    /*color: green;*/
+    color: #42b272 !important;
+}
+
+.bg-green {
+    background: #58D68D !important;
+}
+
+.color-darkblue {
+    color: darkblue;
+}
+
+.color-blue {
+    color: blue;
+}
+
+.color-dodgerblue {
+    color: dodgerblue
+}
+
+.color-theme {
+    color: rgba(122, 146, 169, 1);
+}
+
+.color-gray {
+    color: gray;
+}
+
+.color-darkorange {
+    color: darkorange;
+}
+
+.color-info {
+    color: #17a2b8; 
+}
+
+.color-danger {
+    color: #dc3545;
+}
+
+.color-success {
+    color: #28a745;
+}
+
+.color-warning {
+    color: #ffc107;
+}
+/* END COLOR*/
+
+/*FONT SIZE*/
+.font-size-1-5em {
+    font-size: 1.5em !important;
+}
+
+.font-size-2em {
+    font-size: 2em !important;
+}
+
+.font-size-3em {
+    font-size: 3em !important;
+}
+
+.font-size-4em {
+    font-size: 4em !important;
+}
+
+.font-modal-weight {
+    font-weight: 500;
+}
+
+/*END FONT*/
+
+
+.border-bottom-ccc {
+    border-bottom: 1px solid #ccc;
+}
+
+.margin-0 {
+    margin: 0px;
+}
+
+.margin-right-10 {
+    margin-right: 10px;
+}
+
+/*=====================================
+     The side navigation menu 
+======================================*/
+.sidenav {
+    height: 100%; /* 100% Full-height */
+    width: 0; /* 0 width - change this with JavaScript */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Stay on top */
+    top: 0; /* Stay at the top */
+    left: 0;
+    color: white;
+    background-color: #0B3861; /* white*/
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 20px; /* Place content 60px from the top */
+    transition: 0.1s; /* 0.5 second transition effect to slide in the sidenav */
+    z-index: 11000;
+}
+
+/*===========================================
+     The side navigation menu Parent Font
+=============================================*/
+.sidenav-font-parent {
+    color: white;
+    font-size: 16px;
+    background-color: #0174DF;
+    padding-left: 15px !important;
+    width: 330px;
+    border-radius: 2px;
+/*    border-bottom: solid 1px #bdbdbd;*/
+    /*    font-weight: bold;*/
+    /*  font-family: Arial*/
+}
+
+.sidenav-font-parent:hover {
+    color: #FFFF00;
+    border-bottom: 2px;
+/*    border-bottom: solid 1px #bdbdbd;*/
+    cursor: initial;
+}
+
+.sidenav-font-parent:after {
+    display: block;
+    content: '';
+/*    border-bottom: solid 3px #019fb6;*/
+    transform: scaleX(0);
+    transition: transform 150ms ease-in-out;
+    width: 70%
+}
+
+.sidenav-font-parent:hover:after {
+    transform: scaleX(1);
+}
+
+/*===========================================
+     The side navigation menu Child Font
+=============================================*/
+.sidenav-font-child {
+    color: white;
+    font-size: 14px;
+/*    font-weight: bold;*/
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif
+}
+
+.sidenav-font-child:hover {
+    color: #FFFF00 !important;
+    border-bottom: 2px;
+    border-bottom-color: red;
+}
+
+.sidenav-font-child:after {
+    display: block;
+    content: '';
+    border-bottom: solid 3px #019fb6;
+    transform: scaleX(0);
+    transition: transform 150ms ease-in-out;
+    width: 70%
+}
+
+.sidenav-font-child:hover:after {
+    transform: scaleX(1);
+}
+
+/*=====================================
+    Overlay CSS
+======================================*/
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 10000;
+    background-color: rgba(0,0,0,0.3);
+}
+
+.my-form-font {
+    font-size: 12px;
+}
+
+.my-heading {
+    background-color: #0B3861;
+    text-align: center;
+    padding: 5px;
+    border-radius: 3px;
+    font-size: 16px;
+    font-weight: bold;
+    border: solid 2px #01A9DB;
+    color: white;
+    /*    box-shadow: 3px 6px 3px grey;*/
+    /*box-shadow: 20px 20px 50px 10px pink inset;*/
+}
+
+.line {
+   margin-top:-20px;
+}
+
+
+.well {
+    min-height: 20px;
+    padding: 15px;
+    margin-bottom: 10px;
+    background-color: #0B3861;
+    color: white !important;
+    border: 1px solid #e3e3e3;
+    border-radius: 3px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+    border: solid 2px #01A9DB;
+}
+
+/*.modal-header, .modal-body, .modal-footer {
+    padding: 1rem 2rem 2rem 2rem;
+}*/
+
+/*  MODAL CSS 
+    =========
+*/
+.modal-body-container {
+    padding: 0.5rem 2.5rem 0.5rem 2.5rem;
+}
+
+.modal-content {
+    border: solid 1px #01A9DB;
+}
+
+/* KENDO UI */
+/*=========*/
+
+.k-widget.k-tooltip-validation {
+    display: none !important;
+}
+
+.k-state-focus{
+    box-shadow: 0 0 0 3px #01A9DB !important; /* Change to your desired color */
+}
+
+.window-footer {
+   /* position: absolute;*/
+    bottom: 0;
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    padding: 19px 0 10px;
+    text-align: right;
+    border-top: 1px solid #e5e5e5;
+}
+
+/* BOOTSTRAP */
+.grid-link {
+    color: #007bff !important;
+    text-decoration: underline !important;
+}
+
+.required::after {
+    content: "*";
+    color: red;
+    font-weight: bold;
+}
+
+.my-row-padding {
+    padding: 5px;
+}
+
+.my-row-space {
+    width: 10px;
+}
+
+@media only screen and (max-width: 1280px) {
+    .scans-title {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 1180px) {
+    .banner-title {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 900px) {
+    .scans-env {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 1000px) and (min-width: 550px) {
+    .addnew-screen {
+        width: 100% !important;
+    }
+}
+
+
+.label-tag-red, .label-tag-INACTIVE {
+    border-radius: 4px;
+    background: #FA5858;
+    padding-left: 10px;
+    padding-right: 10px;
+    color: white;
+    font-size: 11px;
+    text-align: center;
+}
+
+
+.label-tag-green, .label-tag-ACTIVE {
+    border-radius: 4px;
+    background: #01DFA5;
+    padding-left: 10px;
+    padding-right: 10px;
+    color: white;
+    font-size: 11px;
+    text-align: center;
+}
+
+.label-tag-orange {
+    border-radius: 4px;
+    background: #FF8000;
+    padding-left: 10px;
+    padding-right: 10px;
+    color: white;
+    font-size: 11px;
+    text-align: center;
+}
+
+.label-tag-pink {
+    border-radius: 4px;
+    background: #F8E0E0;
+    padding-left: 10px;
+    padding-right: 10px;
+    border: solid 1px;
+    color: red;
+    font-size: 11px;
+    text-align: center;
+}
+
+.label-tag-gold {
+    border-radius: 4px;
+    background: gold;
+    padding-left: 10px;
+    padding-right: 10px;
+    color: black;
+    font-size: 11px;
+    text-align: center;
+}
+
+/*Swal z-index setting*/
+/* For SweetAlert2 (if you're using it) */
+.swal2-container {
+    z-index: 100000 !important;
+}

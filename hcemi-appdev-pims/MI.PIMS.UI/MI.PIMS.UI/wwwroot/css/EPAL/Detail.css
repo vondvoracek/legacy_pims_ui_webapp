@@ -1,0 +1,73 @@
+﻿.cell-padding {
+    padding-bottom: 5px;
+}
+
+.detail-heading-section {
+    background-color: #F2F2F2;
+    padding-left: 40px;
+    padding-right: 40px;
+    padding-top: 15px;
+    padding-bottom: 10px;
+    border: solid 1px #E6E6E6;
+    font-size: 12px;
+    /*  margin-left:25px;
+             margin-right:25px;*/
+    /*border-radius: 5px;*/
+}
+
+.detail-tab-section {
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 15px;
+    padding-bottom: 10px;
+    font-size: 12px;
+}
+
+.tab-section {
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    padding-bottom: 40px;
+    border-left: solid 1.5px #E6E6E6;
+    border-right: solid 1.5px #E6E6E6;
+    border-bottom: solid 1.5px #E6E6E6;
+}
+
+a.active.nav-link {
+    background-color: #f8f9fa !important;
+    font-weight: bold;
+}
+
+.k-dropdown .k-dropdown-wrap {
+    border-color: #e4e7eb;
+    color: #212529;
+    background-color: white;
+    transition: color .2s ease,background-color .2s ease,border-color .2s ease,box-shadow .2s ease;
+}
+
+
+.design-missing {
+    background: #A4A4A4 !important;
+    color: white !important;
+    border: 1px solid;
+}
+
+.design-missing.active.nav-link {
+    background: #A4A4A4 !important;
+    font-weight: bold;
+}
+
+.unknown {
+    color: red !important;
+}
+
+.edit-epal-icon {
+    cursor: pointer;
+    font-size: 15px;
+    margin-top: 4px;
+}
+
+    .edit-epal-icon:hover {
+        transform: scale(1.3);
+    }
