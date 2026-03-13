@@ -1,0 +1,12 @@
+apiVersion: v1
+metadata:
+  askId: AIDE_0075538
+  caAgileId: 366199378300ud
+  projectKey: com.optum.ecp.pims:pims-ui-webapp
+  projectFriendlyName: pims-ui-webapp
+  projectName: pims-ui-webapp
+  componentType: code
+  targetQG: GATE_00
+  domain: policy-integration-management-system
+  system: pims
+  

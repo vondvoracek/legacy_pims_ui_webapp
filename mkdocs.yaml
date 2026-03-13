@@ -1,0 +1,13 @@
+site_name: 'pims-ui-webapp'
+repo_name: 'pims-ui-webapp'
+repo_url: 'https://github.com/optum-ecp/pims-ui-webapp'
+nav:
+  - Overview: index.md
+  - Setup: setup.md
+  - Architecture: architecture.md
+  - API: api.md
+  - Dependencies: dependencies.md
+  - Observability: observability.md
+  - Support: support.md
+plugins:
+  - techdocs-core
