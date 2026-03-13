@@ -1,0 +1,92 @@
+﻿@model MI.PIMS.BO.Dtos.Ref_Modifier_Dto
+
+@(
+Html.Kendo().MultiColumnComboBoxFor(m => m)                
+    .DataTextField("MODIFIER")
+    .DataValueField("MODIFIER")
+    .Filter("contains")
+    .IgnoreCase(true)
+    .FilterFields(new string[] { "MODIFIER", "MOD_DESC"})
+    .Placeholder("Please type or open dropdown to select Modifier...")
+    .Columns(columns =>
+    {
+        columns.Add().Field("MODIFIER").Title("Code").Width("60px");
+        columns.Add().Field("MOD_DESC").Title("Description").Width("350px");
+    })                
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true", required="required", title = "Please type of open dropdown to select Modifier..." })
+    .Height(400)
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetRefModifiersByFilter", "Home", new { Area = "EPAL" });
+        })
+        .ServerFiltering(true);
+    })
+)
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        var modifier_mcc = $("#MODIFIER").data("kendoMultiColumnComboBox");
+        modifier_mcc.bind("select", onModifierSelect);
+        modifier_mcc.bind("close", onModifierClose);
+
+        function onModifierSelect(e) {
+            if (e.dataItem) {
+                var dataItem = e.dataItem;
+                var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid");
+                var gridModel = grid.dataItem($(this.element).closest("tr"));
+                                
+                //debugger;
+                //Check if data base been already entered with same DIAG_CD in the grid
+                if (isDuplicateMOD_DESC(grid, dataItem.MODIFIER)) {
+             
+                    MICore.Notification.warning('Duplicate entries', 'Selected modifier already exists!');      
+                    ModifiersController.grid.deleteRowSilently(e);
+                
+                } else {
+                    if (dataItem.MODIFIER != '') {
+                        gridModel.MODIFIER = dataItem.MODIFIER;
+                    }
+
+                     gridModel.MOD_DESC = dataItem.MOD_DESC;
+                }    
+                grid.refresh();
+                DetailController.dirtyform.dirtycheck();
+            }
+        };
+
+        function onModifierClose(e) {
+            var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+            var gridModel = grid.dataItem($(this.element).closest("tr"))
+            if (e.dataItem == undefined && (gridModel.MODIFIER == '' || gridModel.MODIFIER == undefined)) {                
+                refreshMOD_DESC(this.element);
+            }
+        };
+
+        function isDuplicateMOD_DESC(grid, value) {        
+            var data = grid.dataSource._data;
+            var duplicate = false;
+            jQuery.each(data, function (index, rowData) {
+                if (rowData.MODIFIER == value) {
+                    return duplicate = true;    
+                }
+            });
+
+            return duplicate;
+        }
+
+        function refreshMOD_DESC(element){                
+            var $MOD_DESC = $("#MODIFIER").data("kendoMultiColumnComboBox");
+            var grid = $(element).closest("tr").closest(".k-grid").data("kendoGrid");
+            var gridModel = grid.dataItem($(element).closest("tr"));            
+
+            gridModel.MODIFIER = '';
+            gridModel.MOD_DESC = '';
+            
+            $MOD_DESC.select(-1);
+            $MOD_DESC.refresh();
+            
+        }
+    });
+</script>

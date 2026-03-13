@@ -1,0 +1,47 @@
+﻿@model MI.PIMS.BO.Dtos.INCL_EXCL_CD_Dto
+
+ @(Html.Kendo().MultiColumnComboBoxFor(m => m)                
+    .DataTextField("DESC")
+    .DataValueField("DESC")
+    .Filter("contains")
+    .FilterFields(new string[] { "INCL_EXCL_CD", "DESC"})
+    .Columns(columns =>
+    {
+        columns.Add().Field("INCL_EXCL_CD").Title("Name").Width("100px");
+        columns.Add().Field("DESC").Title("Description").Width("200px");
+    })                
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true", required="required" })
+    .Height(400)
+    .DataSource(source => source
+        .Custom()
+        .Transport(transport => transport
+        .Read(read =>
+        {
+            read.Action("GetInclExclCDs", "Home", new { Area = "EPAL" });
+        }))
+    )
+)
+
+  
+<script>
+$(document).ready(function() {    
+    var incl_excl_cd = $("#INCL_EXCL_CD_DESC").data("kendoMultiColumnComboBox");
+    incl_excl_cd.bind("select", onINCL_EXCL_CD_DESCSelect);    
+
+    function onINCL_EXCL_CD_DESCSelect(e) {        
+        if (e.dataItem) {
+            var dataItem = e.dataItem;
+            var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+            var gridModel = grid.dataItem($(this.element).closest("tr"))          
+            
+            if (dataItem.INCL_EXCL_CD != '') {
+                    gridModel.INCL_EXCL_CD = dataItem.INCL_EXCL_CD; 
+                }
+            gridModel.INCL_EXCL_CD_DESC = dataItem.DESC;            
+            
+            grid.refresh();
+            DetailController.dirtyform.dirtycheck();
+        }
+    };
+});
+</script>

@@ -1,0 +1,48 @@
+﻿@using Kendo.Mvc.UI;
+@using MI.PIMS.BO.Dtos
+@model MI.PIMS.BO.Dtos.IQ_GDLN_Dto
+
+@(Html.Kendo().MultiColumnComboBoxFor(m => m)
+    .DataTextField("IQ_GDLN_DESC")
+    .DataValueField("IQ_GDLN_ID")
+    .Filter("contains")
+    .FilterFields(new string[] { "IQ_GDLN_DESC", "IQ_GDLN_ID" })
+    .Columns(columns =>
+    {
+        columns.Add().Field("IQ_GDLN_ID").Title("Code").Width("200px");
+        columns.Add().Field("IQ_GDLN_DESC").Title("Description").Width("300px");
+    })
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true" })
+    .Height(400)
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetIQ_GDLN", "Home", new { Area = "DPOC" });
+        })
+        .ServerFiltering(true);
+    })
+)
+
+<script>
+    $(document).ready(function () {
+        var iq_gdln = $("#IQ_GDLN_DESC").data("kendoMultiColumnComboBox");
+        iq_gdln.bind("select", onIQ_GDLNSelect);
+
+        function onIQ_GDLNSelect(e) {
+            if (e.dataItem) {
+                var dataItem = e.dataItem;
+                var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+                var gridModel = grid.dataItem($(this.element).closest("tr"))
+
+                if (dataItem.IQ_GDLN_ID != '') {
+                    gridModel.IQ_GDLN_ID = dataItem.IQ_GDLN_ID;
+                }
+                gridModel.IQ_GDLN_DESC = dataItem.IQ_GDLN_DESC;
+
+                grid.refresh();
+                DetailController.dirtyform.dirtycheck();
+            }
+        };
+    });
+</script>

@@ -1,0 +1,48 @@
+﻿@using Kendo.Mvc.UI;
+@using MI.PIMS.BO.Dtos
+@model MI.PIMS.BO.Dtos.POS_INCL_EXCL_CD_Dto
+
+@(Html.Kendo().MultiColumnComboBoxFor(m => m)
+    .DataTextField("POS_INCL_EXCL_DESC")
+    .DataValueField("POS_INCL_EXCL_CD")
+    .Filter("contains")
+    .FilterFields(new string[] { "POS_INCL_EXCL_DESC", "POS_INCL_EXCL_CD" })
+    .Columns(columns =>
+    {
+        columns.Add().Field("POS_INCL_EXCL_CD").Title("Code").Width("200px");
+        columns.Add().Field("POS_INCL_EXCL_DESC").Title("Description").Width("300px");
+    })
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true" })
+    .Height(400)
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetPOS_INCL_EXCL_CD", "GuidelineSummary", new { Area = "DPOC" });
+        })
+        .ServerFiltering(false);
+    })
+)
+
+<script>
+    $(document).ready(function () {
+        var dtq_rsn = $("#POS_INCL_EXCL_DESC").data("kendoMultiColumnComboBox");
+        dtq_rsn.bind("select", onPOS_INCL_EXCLSelect);
+
+        function onPOS_INCL_EXCLSelect(e) {
+            if (e.dataItem) {
+                var dataItem = e.dataItem;
+                var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+                var gridModel = grid.dataItem($(this.element).closest("tr"))
+                
+                if (dataItem.POS_INCL_EXCL_CD != '') {
+                    gridModel.POS_INCL_EXCL_CD = dataItem.POS_INCL_EXCL_CD;
+                }
+                gridModel.POS_INCL_EXCL_DESC = dataItem.POS_INCL_EXCL_DESC;
+
+                grid.refresh();
+                DetailController.dirtyform.dirtycheck();
+            }
+        };
+    });
+</script>

@@ -1,0 +1,46 @@
+﻿@using MI.PIMS.BO.Dtos
+@model MI.PIMS.BO.Dtos.DTQ_TYPE_Dto
+
+@(Html.Kendo().MultiColumnComboBoxFor(m => m)
+    .DataTextField("DTQ_TYPE_DESC")
+    .DataValueField("DTQ_TYPE")
+    .Filter("contains")
+    .FilterFields(new string[] { "DTQ_TYPE_DESC", "DTQ_TYPE" })
+    .Columns(columns =>
+    {
+        columns.Add().Field("DTQ_TYPE").Title("Code").Width("200px");
+        columns.Add().Field("DTQ_TYPE_DESC").Title("Description").Width("300px");
+    })
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true" })
+    .Height(400)
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetDTQ_TYPE", "Home", new { Area = "DPOC" });
+        })
+        .ServerFiltering(true);
+    })
+)
+
+<script>
+    $(document).ready(function () {
+        var dtq_nm = $("#DTQ_TYPE_DESC").data("kendoMultiColumnComboBox");
+        dtq_nm.bind("select", onDTQ_NMSelect);
+
+        function onDTQ_NMSelect(e) {
+            if (e.dataItem) {
+                var dataItem = e.dataItem;
+                var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+                var gridModel = grid.dataItem($(this.element).closest("tr"))
+
+                if (dataItem.DTQ_TYPE != '') {
+                    gridModel.DTQ_TYPE = dataItem.DTQ_TYPE;
+                }
+                gridModel.DTQ_TYPE_DESC = dataItem.DTQ_TYPE_DESC;
+                grid.refresh();
+                DetailController.dirtyform.dirtycheck();
+            }
+        };
+    });
+</script>

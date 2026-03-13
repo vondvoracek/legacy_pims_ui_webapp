@@ -1,0 +1,70 @@
+﻿@using MI.PIMS.BO.Dtos
+@model MI.PIMS.BO.Dtos.EPAL_Procs_Diagnoses_V_Dto
+
+
+
+@(Html.Kendo().MultiColumnComboBoxFor(m => m)
+    .DataTextField("LIST_NAME")
+    .DataValueField("LIST_NAME")
+    .Filter("contains")
+    .FilterFields(new string[] { "LIST_NAME" })
+    .Columns(columns =>
+    {
+        columns.Add().Field("LIST_NAME").Title("LIST_NAME").Width("500px");
+        @*        columns.Add().Field("LIST_NAME").Title("LIST_NAME").Width("300px");  *@
+    })
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true" })
+    .Height(400)
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetPIMS_DiagnosisList", "Home", new { Area = "EPAL" });
+        })
+        .ServerFiltering(false);
+    })
+)
+
+
+
+
+<script>
+    $(document).ready(function () {
+        var listname = $("#LIST_NAME").data("kendoMultiColumnComboBox");
+        listname.bind("select", onLIST_NAMESelect);
+
+        function onLIST_NAMESelect(e) {
+            if (e.dataItem) {
+                var dataItem = e.dataItem;
+                var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+                var gridModel = grid.dataItem($(this.element).closest("tr"))
+
+                if (isDuplicateDL(grid, dataItem.LIST_NAME)) {
+
+                    MICore.Notification.warning('Duplicate entries', 'Selected Diagnosis list already exists!');
+                    DPOC_ConfigController.grid.deleteRowSilently(e);
+
+                } else {
+                    if (dataItem.LIST_NAME != '') {
+                        gridModel.LIST_NAME = dataItem.LIST_NAME;
+                    }
+                }
+
+                grid.refresh();
+                DetailController.dirtyform.dirtycheck();
+            }
+        };
+
+        function isDuplicateDL(grid, value) {
+            var data = grid.dataSource._data;
+            var dupDL = false;
+            jQuery.each(data, function (index, rowData) {
+                if (rowData.LIST_NAME == value) {
+                    return dupDL = true;
+                }
+            });
+
+            return dupDL;
+        }
+    });
+</script>

@@ -1,0 +1,109 @@
+﻿@model MI.PIMS.BO.Dtos.Ref_Diagnoses_T_Dto
+
+@(Html.Kendo().MultiColumnComboBoxFor(m => m)           
+    .AutoBind(false)
+    .MinLength(2)
+    .DataTextField("DIAG_CD_DESC")
+    .DataValueField("DIAG_CD")
+    .Filter("contains")    
+    .IgnoreCase(true)
+    .FilterFields(new string[] { "DIAG_CD"})
+    .Placeholder("Please type atleast 2/4 characters to search Diagnosis code(s)/Description...")
+    .Columns(columns =>
+    {
+        columns.Add().Field("DIAG_CD").Title("Name").Width("100px");
+        columns.Add().Field("DIAG_CD_DESC").Title("Description").Width("400px");
+        columns.Add().Field("DIAG_CD_TYPE").Title("ICD Version").Width("150px");
+    })                
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true", title = "Please type atleast 2 characters to search Diagnosis code(s) and 4 characters to search Code or Description..." })
+    .Height(400)    
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetRefDiagnosesByFilter", "Home", new { Area = "EPAL" });
+        })
+        .ServerFiltering(true);
+    })
+)
+
+<script>
+$(document).ready(function() {    
+    var diagcd_mcc = $("#DIAG_CD").data("kendoMultiColumnComboBox");
+    diagcd_mcc.bind("select", onSelect);
+    diagcd_mcc.bind("close", onClose);
+    diagcd_mcc.bind("change", onDiagChange);
+
+    function onSelect(e) {
+        if (e.dataItem) {
+            var dataItem = e.dataItem;
+            var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+            var gridModel = grid.dataItem($(this.element).closest("tr"))          
+            
+            //Check if data base been already entered with same DIAG_CD in the grid            
+            if (isDuplicateDiag_CD(grid, dataItem.DIAG_CD)) {
+            
+                MICore.Notification.warning('Duplicate entries', 'Selected diagnosis code already exists!');                
+                DiagCodesController.grid.deleteRowSilently(e);
+            
+            } else {
+                if (dataItem.DIAG_CD != '') { 
+                    gridModel.DIAG_CD = dataItem.DIAG_CD;
+                }
+                if (gridModel.DIAG_CD_TYPE != undefined) {
+                    gridModel.DIAG_CD_TYPE = dataItem.DIAG_CD_TYPE;
+                    gridModel.DIAG_CD_DESC = dataItem.DIAG_CD_DESC;
+                }
+            }            
+            grid.refresh();
+            DetailController.dirtyform.dirtycheck();
+        }
+    };
+
+    function onClose(e) {
+        var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+        var gridModel = grid.dataItem($(this.element).closest("tr"))        
+        if (e.dataItem == undefined && (gridModel.DIAG_CD == '' || gridModel.DIAG_CD == undefined))
+        {
+            refreshDiag_CD(this.element);
+        }
+    };
+
+    function isDuplicateDiag_CD(grid, value) {        
+        var data = grid.dataSource._data;
+        var duplicate = false;
+        jQuery.each(data, function (index, rowData) {
+            if (rowData.DIAG_CD == value) {
+                return duplicate = true;    
+            }
+        });
+
+        return duplicate;
+    }
+
+    function refreshDiag_CD(element){                
+        var $Diag_CD = $("#DIAG_CD").data("kendoMultiColumnComboBox");
+        var grid = $(element).closest("tr").closest(".k-grid").data("kendoGrid");
+        var gridModel = grid.dataItem($(element).closest("tr"));      
+
+        gridModel.DIAG_CD = '';
+        if (gridModel.DIAG_DESC != undefined) {
+            gridModel.DIAG_DESC = '';
+        }        
+
+        $Diag_CD.select(-1);
+        $Diag_CD.refresh();
+    }
+
+    // If Diagnosis code is unselected or cleared then clear the description as well
+    function onDiagChange(element){
+        var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid");
+        var gridModel = grid.dataItem($(this.element).closest("tr"));      
+
+        if(gridModel.DIAG_CD == '' || gridModel.DIAG_CD == null){
+            gridModel.DIAG_CD_DESC = '';
+        }
+        grid.refresh();
+    }
+});
+</script>

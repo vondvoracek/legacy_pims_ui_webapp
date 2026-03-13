@@ -1,0 +1,73 @@
+﻿@using MI.PIMS.BO.Dtos
+@model MI.PIMS.BO.Dtos.Prog_Mgd_By_Dto
+
+ @(Html.Kendo().MultiColumnComboBoxFor(m => m)                
+    .DataTextField("DESC")
+    .DataValueField("PROG_MGD_BY")
+    .Filter("contains")
+    .FilterFields(new string[] { "DESC", "PROG_MGD_BY" })
+    .Columns(columns =>
+    {
+        columns.Add().Field("PROG_MGD_BY").Title("Code").Width("200px");        
+        columns.Add().Field("DESC").Title("Description").Width("300px");        
+    })                
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true"})
+    .Height(400)
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetProgMgdBy", "Home", new { Area = "EPAL" });
+        })
+        .ServerFiltering(true);
+    })
+)
+  
+<script>
+$(document).ready(function() {    
+    var prog_mgd_by = $("#PROG_MGD_BY").data("kendoMultiColumnComboBox");
+    prog_mgd_by.bind("select", onPROG_MGD_BYSelect);    
+    prog_mgd_by.bind("change", onPROG_MGD_BYChange);    
+
+    function onPROG_MGD_BYSelect(e) {        
+        if (e.dataItem) {
+            var dataItem = e.dataItem;
+            var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+            var gridModel = grid.dataItem($(this.element).closest("tr"))
+
+            // Removed duplicate entry check because of BUG 69386 MFQ 8/18/2023
+            /*if (isDuplicatePROG_MGD_BY(grid, dataItem.PROG_MGD_BY)) {                
+                MICore.Notification.warning('Duplicate entries', 'Selected Program Managed By already exists!');                
+            }
+            else {
+                if (dataItem.PROG_MGD_BY != '') {                                        
+                    gridModel.PROG_MGD_BY = dataItem.PROG_MGD_BY;
+                }
+            } */
+            if (dataItem.PROG_MGD_BY != '') {
+                gridModel.PROG_MGD_BY = dataItem.PROG_MGD_BY;
+            }                
+            
+            ProgMgdByController.grid.verifyPMBbyIndicator();
+            grid.refresh();
+            DetailController.dirtyform.dirtycheck();
+        }            
+    };
+
+    function isDuplicatePROG_MGD_BY(grid, value) {        
+        var data = grid.dataSource._data;
+        var duplicate = false;
+        jQuery.each(data, function (index, rowData) {
+                if (rowData.PROG_MGD_BY == value && rowData.PMB_EXP_DT.length > 0) {
+                return duplicate = true;    
+            }
+        });
+
+        return duplicate;
+    }
+
+    function onPROG_MGD_BYChange(e) {
+        ProgMgdByController.grid.verifyPMBbyIndicator();
+    }
+});
+</script>

@@ -1,0 +1,21 @@
+@model DateTime?
+
+@(Html.Kendo().DatePickerFor(m => m).Format("MM/dd/yyyy")
+                        .ParseFormats(new string[] {"MMddyyyy", 
+                                                    "MMddyy",
+                                                    "MM.dd.yyyy", 
+                                                    "MM.dd.yy",
+                                                    "MM.d.yyyy",
+                                                    "M.d.yy",
+                                                    "M.d.yyyy",
+                                                    "MM/dd/yyyy", 
+                                                    "MM/dd/yy",
+                                                    "MM/d/yyyy",
+                                                    "M/d/yy",
+                                                    "M/d/yyyy",
+                                                    "MM-dd-yyyy", 
+                                                    "MM-dd-yy",
+                                                    "MM-d-yyyy",
+                                                    "M-d-yy",
+                                                    "M-d-yyyy"
+                                                    }) )

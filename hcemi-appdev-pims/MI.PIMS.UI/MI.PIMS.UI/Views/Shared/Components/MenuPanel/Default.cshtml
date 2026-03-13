@@ -1,0 +1,104 @@
+﻿<!------------------------------
+    Menu Panel Component
+-------------------------------->
+@model IEnumerable<MI.PIMS.BO.Dtos.MenuAccessDto>
+
+@if (Model != null)
+{
+    foreach (var item in Model)
+    {
+        @if (item.Page_ID.Contains("M_"))
+        {
+            <div class="my-card-2" style="margin: 10px;">
+                <div style="text-decoration: none;">
+
+                    <table style="width:100%;">
+                        <tr>
+                            <td colspan="2">
+                                <span id="titleText" style="display:block;   font-size:18px; text-overflow: ellipsis;width: 290px;overflow: hidden; white-space: nowrap;" title="">
+                                    @item.Title
+                                </span>
+                                <hr style="margin-top:-1px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p style="display:block; color:black; height:75px; width: 290px;" title="">
+                                    @foreach (var item2 in Model)
+                                    {
+                                        @if (@item.Page_ID == @item2.Module_ID_String)
+                                        {
+                                            @if (@item.Title == @item2.Title)
+                                            {
+                                                @if (@item2.Page_ID == "25" || @item2.Page_ID == "26" || @item2.Page_ID == "27" || @item2.Page_ID == "32")
+                                                {
+                                                   
+                                                    <a id="linkBtn" href="@item2.URLPath" target="_blank" title="Click here to go to @item2.Page_Label!" class="btn btn-outline-primary btn-menu-panel ">
+                                                        @item2.Page_Label
+                                                    </a>
+
+                                                }
+                                                else
+                                                {
+                                                    <a id="linkBtn" href="@Url.Action(item.Title,item.Controller, new { area = @item.Area})" title="Click here to go to @item2.Page_Label!" class="btn btn-outline-primary btn-menu-panel ">
+                                                        @item2.Page_Label
+                                                    </a>
+
+                                                }
+
+
+                                            }
+                                            else if (@item.Title != @item2.Title)
+                                            {
+                                                @if (@item2.Page_ID == "25" || @item2.Page_ID == "26" || @item2.Page_ID == "27" || @item2.Page_ID == "32")
+                                                {
+                                                    <a id="linkBtn" href="@item2.URLPath" target="_blank" title="Click here to go to @item2.Page_Label!" class="btn btn-outline-primary btn-menu-panel ">
+                                                        @item2.Page_Label
+                                                    </a>
+
+                                                }
+                                                else
+                                                {
+                                                    <a id="linkBtn" href="@Url.Action(@item2.Title,@item2.Controller, new { area = @item2.Area })" title="Click here to go to @item2.Page_Label!" class="btn btn-outline-primary btn-menu-panel ">
+                                                        @item2.Page_Label
+                                                    </a>
+                                                
+                                                }
+                                             
+                                            }
+                                        }
+                                    }
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        }
+    }
+}
+<style type="text/css">
+    .btn-menu-panel {
+        min-width: 125px;
+        font-size: 12px;
+        padding: 10px;
+        cursor: pointer;
+        margin: 4px;
+    }
+</style>
+<script>
+    $(document).on("click", "#linkBtn", function(e){
+      const appInsightsClient = new TelemetryLogger();
+      if(appInsightsClient.isAppInsightsEnabled("Client.Home")) {
+          var titleStr = $(this).closest('.my-card-2').find('#titleText').first().get(0).innerText;
+          var buttonStr = $(this).context.innerText;
+
+          const logProperties = new LogInfo(e.target.id, MS_ID, titleStr + " " + buttonStr + " Button click");
+          appInsightsClient.trackEvent('Client.Home.' + (titleStr + buttonStr).replaceAll(' ', ''), logProperties);
+      }
+    });
+</script>
+
+
+
+

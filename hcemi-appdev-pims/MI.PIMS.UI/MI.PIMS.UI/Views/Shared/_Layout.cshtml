@@ -1,0 +1,173 @@
+﻿@using MI.PIMS.UI.Common
+@using Microsoft.AspNetCore.Http;
+@using System.Web;
+@using Newtonsoft.Json;
+
+@inject IHttpContextAccessor _httpContextAccessor
+@inject Helper _helper;
+@inject GenericGlobal _genericGlobal;
+@inject MIUrlHelper _mIUrlHelper;
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  
+    @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+    @{
+        var tokens = Antiforgery.GetAndStoreTokens(ViewContext.HttpContext);
+    }
+    <meta name="request-verification-token" content="@tokens.RequestToken" />
+
+ 
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    @* <meta http-equiv='cache-control' content='no-cache'> *@
+    <meta http-equiv="Cache-Control" content="public, max-age=31536000">
+    <title>@ViewData["Title"] - (PIMS) Policy Integration Management System</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.css" />
+    <link rel="stylesheet" href="~/lib/limonte-sweetalert2/sweetalert2.css" />
+    <link href="@Url.Content("~/lib/kendo-ui/styles/kendo.bootstrap-v4.min.css")" rel="stylesheet" type="text/css" />    
+
+    <script src="@Url.Content("~/lib/kendo-ui/js/jquery.min.js")"></script>
+    <script src="@Url.Content("~/lib/kendo-ui/js/jszip.min.js")"></script>
+    <script src="@Url.Content("~/lib/kendo-ui/js/kendo.all.min.js")"></script>
+    <script src="@Url.Content("~/lib/kendo-ui/js/kendo.aspnetmvc.min.js")"></script>
+    <script src="@Url.Content("~/lib/limonte-sweetalert2/sweetalert2.js")"></script>
+    
+    @*User Story 132075 MFQ 4/30/2025*@
+    @* <script src="@Url.Content("~/lib/jquery-ui/jquery-ui.min.js")"></script> *@
+
+    <script type="text/javascript" src="https://js.monitor.azure.com/scripts/b/ai.2.min.js"></script>
+    <script src="@Url.Content("~/js/Telemetry/LogInfo.js")" asp-append-version="true"></script>
+    <script src="@Url.Content("~/js/Telemetry/TelemetryLogger.js")" asp-append-version="true"></script>
+
+    <script type="text/javascript">
+        var VIRTUAL_DIRECTORY = '@_helper.VirtualDirectory';
+        var ENVIRONMENT = '@_helper.Environment';
+        var MS_ID = '@_helper.MS_ID.ToString()';
+        var BaseApiUrls = @(Html.Raw(JsonConvert.DeserializeObject(_mIUrlHelper.BaseApiUrls.ToString())));
+        var RECORD_ENTRY_METHOD = '@_helper.RecordEntryMethod';
+    </script>
+
+    <script type="text/javascript">
+        var appInsights = window.appInsights || (function (config) {
+            var ai = new Microsoft.ApplicationInsights.ApplicationInsights({ config: config });
+            ai.loadAppInsights();
+
+            ai.setAuthenticatedUserContext("@_helper.MS_ID");
+            
+            window.appInsights = ai;
+            return ai;
+        })({
+            connectionString: '@Configuration["ApplicationInsights:ConnectionString"]',
+            enableAutoRouteTracking: true,
+            disableAjaxTracking: false,
+            enableCorsCorrelation: true
+        });
+        var insightsEnabled = '@Configuration["ApplicationInsights:Enable"]';
+
+        appInsights.trackPageView();
+    </script>
+    
+    <!--*** It should be placed after all other libraries initiation, since we might be using above libraries in below js files ***-->
+    <script src="@Url.Content("~/js/site.js")" asp-append-version="true"></script>
+    <script src="@Url.Content("~/js/mi.core.js")" asp-append-version="true"></script>
+    <script src="@Url.Content("~/js/MI.App.js")" asp-append-version="true"></script>
+    <script src="@Url.Content("~/js/EIS-Security.js")" asp-append-version="true"></script> 
+    <script src="@Url.Content("~/js/UserAccessHist.js")" asp-append-version="true"></script>
+
+<style>
+    @@keyframes blink {
+        0%m 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+        .loading-header {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 12px;
+            font-weight: bold;
+            color: #0080FF; /* Cool cyan */
+            text-shadow: 1px 1px 2px #004d60;
+            animation: blink 1s infinite;
+            margin-right: 20px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+</style>
+
+</head>
+
+<body>
+    <input id="logout-url" type="hidden" value="@Url.Action("Logout","Home", new {Area = ""})" />
+    @await Component.InvokeAsync("Navbar3", new { ms_id = _helper.MS_ID })
+
+    <div style="background: #0080FF; height: 4px;">
+    </div>
+    <div class="main-content">
+        @RenderBody()
+        <div class="push"></div>
+    </div>
+    <div class="clearfix"></div>
+    <br />
+    <footer id="footer" class=" footer text-muted">
+        <div class="container">
+            <p class="logo-font ">&copy; @DateTime.Now.Year - Powered by HCE Medical Informatics (@_helper.GetAppVersion)</p>
+        </div>
+    </footer>    
+    <partial name="~/Areas/EPAL/Views/Shared/_ValidateAddNewRecord.cshtml" />
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/purify.min.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+
+    <!--Valdiate session for 8 hours in-activity -->
+    @await Component.InvokeAsync("SessionValidator")
+    @Html.Hidden("UserAccessHistAddUrl", Url.Action("Add", "UserAccessHist", new { Area = ""}))
+    @Html.Hidden("HomeUrl", HttpUtility.UrlEncode(Url.Action("Index", "Home", new { Area = ""})))
+    @Html.Hidden("LogOutUrl", HttpUtility.UrlEncode(Url.Action("Logout", "Home", new { Area = ""})))
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".main-content").kendoValidator({
+                rules: {
+                    dateValidation: function (element) {
+                        var dp = element.data("kendoDatePicker") || element.data("kendoDateTimePicker");
+                        if (dp != undefined) {
+                            var value = $(element).val();
+                            var date = kendo.parseDate(value);
+                            if (!date) {
+                                $(element).val('')
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                }
+            }).data("kendoValidator");
+        });
+    </script>
+    @Html.Hidden("dpoc-urls", _mIUrlHelper.DPOCUrls.ToString())
+    <script type="text/javascript">
+        $(function () {
+            MIApp.Common.ApiEPRepository.set('dpoc-urls', 'DpocUrls');
+        });
+    </script>
+
+    <script type="text/javascript">
+
+        var usStates = @Html.Raw(JsonConvert.SerializeObject(_genericGlobal.States))
+        function getStateName(stateCd) {
+          for (var i = 0; i < usStates.length; i++) {
+            if (usStates[i].STATE_CD === stateCd) {
+              return usStates[i].DESC;
+            }
+          }
+          return null; // or return "Unknown"
+        }
+
+    </script>
+</body>
+</html>                                

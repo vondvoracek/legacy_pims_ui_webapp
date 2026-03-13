@@ -1,0 +1,176 @@
+﻿<!------------------------------
+    Navbar3 Component
+-------------------------------->
+@using MI.PIMS.UI.Common
+@using System.Security.Principal
+@model IEnumerable<MI.PIMS.BO.Dtos.MenuAccessDto>
+@inject Helper _helper;
+
+<style>
+    [data-initials]:before {
+        background: #23527c;
+        color: white;
+        opacity: 1;
+        content: attr(data-initials);
+        display: inline-block;
+        font-weight: bold;
+        border-radius: 50%;
+        vertical-align: middle;
+        margin-right: 0.5em;
+        width: 35px;
+        height: 35px;
+        line-height: 35px;
+        text-align: center;
+        font-size: 12px;
+    }
+
+    .fa {
+        top: 15px;
+        right: 30px;
+    }
+
+    li {
+        cursor: pointer;
+    }
+
+    ul {
+        list-style-type: none;
+    }
+</style>
+<header>
+    <nav id="navbarHeader" class="navbar" style="height:65px;">
+        <div class="container">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <a id="btnHome" href="/" style="cursor:pointer;">
+                            <img style="height: 60px; padding-bottom: 10px; margin-left: 1px;" src="~/images/UHCLogo.jpg" />
+                        </a>
+                    </td>
+                    <td style="text-align:center;">
+                        @if (_helper.Environment == "Local" || _helper.Environment == "Development" || _helper.Environment == "Stage")
+                        {
+                            <span class="banner-title">
+                                Environment:
+                            </span>
+                            <span class="banner-title" style="color: red;">
+                                @_helper.Environment
+                            </span>
+                        }
+                    <h4 style=" font-weight:bold; font-size:20px; color:#23527c; font-family:Calibri; font-variant-caps:petite-caps" class="lead banner-title">Policy Integration Management System (PIMS)</h4>
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                        <div style="float:right;">
+                            <table>
+                                <tr>
+                                    <td>
+                                        @if (User.Identity?.IsAuthenticated == true)
+                                        {
+                                            <div class="scans-env" style=" margin-bottom: 2px; margin-right: 10px; padding-left: 5px;" data-initials="@Model.FirstOrDefault()?.UserInitials">
+                                                Hello,  @Model?.FirstOrDefault()?.Display_Name
+                                                &nbsp;
+                                                <a class="btn btn-sm btn-outline-primary" title="Click to sign out." asp-area="MicrosoftIdentity" asp-controller="Account" asp-action="SignOut"> <i class="fas fa-sign-out-alt"></i> Log Out</a>
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </nav>
+</header>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+   @* <a class="navbar-brand" href="#">Navbar</a>*@
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon container"></span>
+        </button>
+
+
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent" style="padding-left:15px;">
+        <ul class="navbar-nav mr-auto">
+            @*<li class="nav-item active">
+                <a id="btnHome" class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            </li>*@
+            @if (Model != null)
+            {
+                foreach (var item in Model)
+                {
+                    @if (item.Page_ID.Contains("M_"))
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle " href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color:white;">
+                                @item.Title
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                @foreach (var item2 in Model)
+                                {
+                                    @if (@item.Page_ID == @item2.Module_ID_String)
+                                    {
+                                        @if (@item.Title == @item2.Title)
+                                        {
+
+                                            @if (@item2.Page_ID == "25" || @item2.Page_ID == "26" || @item2.Page_ID == "27" || @item2.Page_ID == "32")
+                                            {
+                                                <a class="dropdown-item nav-drop-custom" title="@item.Description" target="_blank" href="@item2.URLPath">@item2.Page_Label</a>
+
+                                            }
+
+                                            else
+                                            {
+                                                <a class="dropdown-item nav-drop-custom" title="@item.Description" href="@Url.Action(@item.Title, @item.Controller, new { area = @item.Area })">@item2.Page_Label</a>
+                                            
+                                            }
+
+                                        }
+                                        else if (@item.Title != @item2.Title)
+                                        {
+                                            @if (@item2.Page_ID == "25" || @item2.Page_ID == "26" || @item2.Page_ID == "27" || @item2.Page_ID == "32")
+                                            {
+                                                <a class="dropdown-item nav-drop-custom" title="@item.Description" target="_blank" href="@item2.URLPath">@item2.Page_Label</a>
+
+                                            }
+                                            else
+                                            {
+                                                <a class="dropdown-item nav-drop-custom" title="@item2.Description" href="@Url.Action(@item2.Title,@item2.Controller, new { area = @item2.Area })">@item2.Page_Label</a>
+                                            
+                                            }                                        
+                                        }
+                                    }
+                                }
+                            </div>
+                        </li>
+
+                    }
+                }
+            }
+        </ul>
+
+
+    </div>
+</nav>
+
+
+<style>
+        .nav-drop-custom:hover {
+        background-color:#E6E6E6;
+    }
+</style>
+
+<script>
+    $(document).on("click", ".dropdown-item", function(e){
+      const appInsightsClient = new TelemetryLogger();
+      if(appInsightsClient.isAppInsightsEnabled("Client.TopMenu")) {
+          var titleStr = $(this).closest('.dropdown').find('.dropdown-toggle').first().text().trim();
+          var buttonStr = $(this).get(0).innerText;
+          const logProperties = new LogInfo(e.target.id, MS_ID, titleStr + " " + buttonStr + " Menu click");
+          appInsightsClient.trackEvent('Client.TopMenu.' + (titleStr + buttonStr).replaceAll(' ', ''), logProperties);
+      }
+    });
+</script>

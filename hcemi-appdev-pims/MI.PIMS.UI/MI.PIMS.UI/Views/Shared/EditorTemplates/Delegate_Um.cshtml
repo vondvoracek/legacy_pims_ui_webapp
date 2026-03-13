@@ -1,0 +1,47 @@
+﻿@using MI.PIMS.BO.Dtos
+@model MI.PIMS.BO.Dtos.Delegate_Um_Dto
+
+ @(Html.Kendo().MultiColumnComboBoxFor(m => m)                
+    .DataTextField("DESC")
+    .DataValueField("DELEGATED_UM")
+    .Filter("contains")
+    .FilterFields(new string[] { "DESC", "DELEGATED_UM" })
+    .Columns(columns =>
+    {
+        columns.Add().Field("DELEGATED_UM").Title("Code").Width("300px");        
+        columns.Add().Field("DESC").Title("Description").Width("300px");        
+    })                
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true"})
+    .Height(400)
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetDelegateUms", "Home", new { Area = "EPAL" });
+        })
+        .ServerFiltering(true);
+    })
+)
+
+  
+<script>
+$(document).ready(function() {    
+    var delegate_um = $("#DELEGATED_UM").data("kendoMultiColumnComboBox");
+    delegate_um.bind("select", onDELEGATE_UMSelect);    
+
+    function onDELEGATE_UMSelect(e) {        
+        if (e.dataItem) {
+            var dataItem = e.dataItem;
+            var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+            var gridModel = grid.dataItem($(this.element).closest("tr"))          
+            
+            if (dataItem.DELEGATED_UM != '') {
+                gridModel.DELEGATED_UM = dataItem.DELEGATED_UM; 
+            }            
+            
+            grid.refresh();
+            DetailController.dirtyform.dirtycheck();
+        }
+    };
+});
+</script>

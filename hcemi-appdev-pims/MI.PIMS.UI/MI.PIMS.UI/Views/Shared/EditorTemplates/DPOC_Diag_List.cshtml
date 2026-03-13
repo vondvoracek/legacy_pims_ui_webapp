@@ -1,0 +1,65 @@
+﻿@using MI.PIMS.BO.Dtos
+@model MI.PIMS.BO.Dtos.DPOC_REF_ALL_DIAG_CD_LISTS_V
+
+@(Html.Kendo().MultiColumnComboBoxFor(m => m)
+    .DataTextField("display_listname")
+    .DataValueField("display_listname")
+    .Filter("contains")
+    .FilterFields(new string[] { "display_listname" })
+    .Columns(columns =>
+    {
+        columns.Add().Field("display_listname").Title("LIST NAME").Width("500px");
+    })
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true" })
+    .Height(400)
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetDPOC_DiagnosisList", "GuidelineDiagnosis", new { Area = "DPOC" });
+        })
+        .ServerFiltering(false);
+    })
+)
+
+
+<script>
+    $(document).ready(function () {
+        var listname = $("#LIST_NAME").data("kendoMultiColumnComboBox");
+        listname.bind("select", onLIST_NAMESelect);
+
+        function onLIST_NAMESelect(e) {
+            if (e.dataItem) {
+                var dataItem = e.dataItem;
+                var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+                var gridModel = grid.dataItem($(this.element).closest("tr"))
+
+                if (isDuplicateDL(grid, dataItem.display_listname)) {
+
+                    MICore.Notification.warning('Duplicate entries', 'Selected Diagnosis list already exists!');
+                    DPOC_ConfigController.grid.deleteRowSilently(e);
+
+                } else {
+                    if (dataItem.display_listname != '') {
+                        gridModel.LIST_NAME = dataItem.display_listname;
+                    }
+                }
+
+                grid.refresh();
+                DetailController.dirtyform.dirtycheck();
+            }
+        };
+
+        function isDuplicateDL(grid, value) {
+            var data = grid.dataSource._data;
+            var dupDL = false;
+            jQuery.each(data, function (index, rowData) {
+                if (rowData.display_listname == value) {
+                    return dupDL = true;
+                }
+            });
+
+            return dupDL;
+        }
+    });
+</script>

@@ -1,0 +1,123 @@
+﻿<!------------------------------
+    Navbar2 Component
+-------------------------------->
+@model IEnumerable<MI.PIMS.BO.Dtos.MenuAccessDto>
+@using MI.PIMS.UI.Common
+@inject Helper _helper;
+
+<style>
+    [data-initials]:before {
+        background: #23527c;
+        color: white;
+        opacity: 1;
+        content: attr(data-initials);
+        display: inline-block;
+        font-weight: bold;
+        border-radius: 50%;
+        vertical-align: middle;
+        margin-right: 0.5em;
+        width: 35px;
+        height: 35px;
+        line-height: 35px;
+        text-align: center;
+        font-size: 12px;
+    }
+
+    .fa {
+        top: 15px;
+        right: 30px;
+    }
+
+    li {
+        cursor: pointer;
+    }
+
+    ul {
+        list-style-type: none;
+    }
+</style>
+<header>
+    <nav id="navbarHeader" class="navbar" style="height:65px;">
+        <div class="container">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <a id="btnHome" style="cursor:pointer;">
+                            <img style="height: 60px; padding-bottom: 10px; margin-left: 1px;" src="~/images/UHCLogo.jpg" />
+                        </a>
+
+                    </td>
+                    <td style="text-align:center;">
+
+                        @if (_helper.Environment == "Local" || _helper.Environment == "Development" || _helper.Environment == "Stage")
+                        {
+                            <span class="banner-title">
+                                Environment:
+                            </span>
+                            <span class="banner-title" style="color: red;">
+                                @_helper.Environment
+                            </span>
+                        }
+
+                    <h4 style=" font-weight:bold; font-size:20px; color:#23527c; font-family:Calibri; font-variant-caps:petite-caps" class="lead banner-title">Policy Integration Management System (PIMS)</h4>
+
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                        <div style="float:right;">
+                            <table>
+                                <tr>
+                                    <td>
+                                    </td>
+                                    <td>
+                                        @if (Model != null)
+                                        {
+                                            foreach (var item in Model)
+                                            {
+                                                @if (item.Page_ID.Contains("M_"))
+                                                {
+
+                                                    @foreach (var item2 in Model)
+                                                    {
+                                                        @if (@item.Page_ID == @item2.Module_ID_String)
+                                                        {
+                                                            @if (@item.Title == @item2.Title)
+                                                            {
+                                                                <a style="padding-left:8px;" title="@item.Description" href="@Url.Action("","Home", new { area = @item.Title.Replace(" ", "") })"> <i class="@item.URLImage"></i></a>
+                                                            }
+                                                            else if (@item.Title != @item2.Title)
+                                                            {
+                                                                <a style="padding-left: 8px;" title="@item2.Description" href="@Url.Action(@item2.Title.Replace(" ", ""),"Home", new { area = @item.Title.Replace(" ", "") })"><i class="@item2.URLImage"></i></a>
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="scans-env" style=" margin-bottom: 2px; margin-right: 10px; padding-left: 5px;" data-initials="@Model.First().UserInitials">
+                                            Hello,  @Model.First().Display_Name
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </nav>
+</header>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#btnHome").click(function () {
+            redirectToHome();
+            //window.location.href = VIRTUAL_DIRECTORY + "/";
+        })
+
+    });
+</script>

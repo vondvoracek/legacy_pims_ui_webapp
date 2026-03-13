@@ -1,0 +1,58 @@
+﻿@(Html.Kendo().MultiSelectFor(m => m)
+    .DataTextField("STATE_CD")
+    .DataValueField("STATE_CD")
+    .ValuePrimitive(true)
+    .AutoClose(false)
+    .Filter("contains")
+    .TagMode(MultiSelectTagMode.Multiple)
+    .ClearButton(true)
+    .DataSource(source => source
+        .Custom()
+        .Transport(transport => transport
+        .Read(read =>
+        {
+            read.Action("GetStateCDs", "Home", new { Area = "EPAL" });
+        }))
+    )
+)
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var state_mcc = $("#STATES_APPL").data("kendoMultiSelect");
+        //debugger;
+        if (state_mcc != undefined) {
+            state_mcc.bind("open", onOpen);
+            state_mcc.bind("close", onClose);
+        }
+
+        function onOpen(e){
+            var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+            var gridModel = grid.dataItem($(this.element).closest("tr"))
+            if (e.dataItem == undefined && (gridModel.STATES_APPL != '' || gridModel.STATES_APPL != undefined)) {
+                var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+                var gridModel = grid.dataItem($(this.element).closest("tr"))
+
+                const statesArray = gridModel.STATES_APPL.split(",").map(v => v.trim());
+                const ms = $("#STATES_APPL").data("kendoMultiSelect");
+                ms.value(statesArray);
+            }
+        }
+
+        function onClose(e) {
+            //debugger;
+            var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+            var gridModel = grid.dataItem($(this.element).closest("tr"))
+
+            if(gridModel.STATES_APPL != ''){
+                var selectedStates = gridModel.STATES_APPL.split(",").map(v => v.trim());
+                selectedStates.sort();
+                //debugger;
+                gridModel.STATES_APPL = selectedStates.join(',');
+            }
+
+            grid.refresh();
+            DetailController.dirtyform.dirtycheck();
+
+        }
+    });
+</script>

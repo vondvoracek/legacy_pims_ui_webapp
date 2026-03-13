@@ -1,0 +1,51 @@
+﻿@using Microsoft.AspNetCore.Http;
+@using MI.PIMS.UI.Common
+@using System.Web;
+@using Newtonsoft.Json;
+@inject Helper _helper;
+@inject MI.PIMS.UI.Common.MIUrlHelper _mIUrlHelper;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - PIMS</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.css" />
+    <link href="https://fonts.googleapis.com/css?family=Nunito:400,700" rel="stylesheet">
+    <link href="~/css/ErrorHandler/style.css" rel="stylesheet" />
+
+    <script src="@Url.Content("~/lib/kendo-ui/js/jquery.min.js")"></script>
+    <script src="@Url.Content("~/js/MI.App.js")" asp-append-version="true"></script>
+
+    <script type="text/javascript">
+        var VIRTUAL_DIRECTORY = '@_helper.VirtualDirectory';
+        var ENVIRONMENT = '@_helper.Environment';
+        var MS_ID = '@_helper.MS_ID';
+        var BaseApiUrls = @(Html.Raw(JsonConvert.DeserializeObject(_mIUrlHelper.BaseApiUrls.ToString())));
+    </script>
+
+    <!--*** It should be placed after all other libraries initiation, since we might be using above libraries in below js files ***-->
+    <script src="~/js/ErrorHandler/Controller.js"></script>
+</head>
+
+<body>    
+    <div style="background: rgb(0,145,255); height: 4px;">
+    </div>
+    <div class="main-content">
+        @RenderBody()
+        <div class="push"></div>
+    </div>
+    <div class="clearfix"></div>
+    <br />
+    <footer class=" footer text-muted">
+        <div class="container">
+            <p class="logo-font ">&copy; @DateTime.Now.Year - Powered by HCE Medical Informatics</p>
+        </div>
+    </footer>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>    
+    @RenderSection("Scripts", required: false)
+    @Html.Hidden("HomeUrl",  HttpUtility.UrlEncode(Url.Action("Index", "Home", new { Area = ""})));
+</body>
+</html>

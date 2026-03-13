@@ -1,0 +1,45 @@
+﻿@model MI.PIMS.BO.Dtos.Int_Ext_CD_Dto
+
+ @(Html.Kendo().MultiColumnComboBoxFor(m => m)                
+    .DataTextField("INT_EXT_CD")
+    .DataValueField("INT_EXT_CD")
+    .Filter("contains")
+    .FilterFields(new string[] { "INT_EXT_CD"})
+    .Columns(columns =>
+    {
+        columns.Add().Field("INT_EXT_CD").Title("Name").Width("200px");        
+    })                
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true", required="required" })
+    .Height(400)
+    .DataSource(source => source
+        .Custom()
+        .Transport(transport => transport
+        .Read(read =>
+        {
+            read.Action("GetIntExtCDs", "Home", new { Area = "EPAL" });
+        }))
+    )
+)
+
+  
+<script>
+$(document).ready(function() {    
+    var int_ext_cd = $("#INT_EXT_CD").data("kendoMultiColumnComboBox");
+    int_ext_cd.bind("select", onINT_EXT_CDSelect);    
+
+    function onINT_EXT_CDSelect(e) {        
+        if (e.dataItem) {
+            var dataItem = e.dataItem;
+            var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+            var gridModel = grid.dataItem($(this.element).closest("tr"))          
+            
+            if (dataItem.INT_EXT_CD != '') {
+                gridModel.INT_EXT_CD = dataItem.INT_EXT_CD; 
+            }                  
+            
+            grid.refresh();
+            DetailController.dirtyform.dirtycheck();
+        }
+    };
+});
+</script>

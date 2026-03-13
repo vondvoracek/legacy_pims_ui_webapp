@@ -1,0 +1,51 @@
+﻿@using Kendo.Mvc.UI;
+@using MI.PIMS.BO.Dtos
+@* @model MI.PIMS.BO.Dtos.POS_INCL_EXCL_CD_Dto *@
+
+@(Html.Kendo().MultiColumnComboBoxFor(m => m)
+    .DataTextField("VV_CD")
+    .DataValueField("VV_CD")
+    .Filter("contains")
+    .FilterFields(new string[] { "VV_CD", "VV_CD" })
+    .Columns(columns =>
+    {
+        columns.Add().Field("VV_CD").Title("Description").Width("200px");
+    })
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true" })
+    .Height(400)
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetPIMSValidValues", "Home", new { Area = "DPOC" }).Data("DPOC_GuidelineSummaryController.controls.param.GSSOSProvTINExl");
+        })
+        .ServerFiltering(false);
+    })
+)
+
+<script>
+    $(document).ready(function () {
+        var dpoc_sos_prov_tin_excl = $("#DPOC_SOS_PROVIDER_TIN_EXCL").data("kendoMultiColumnComboBox");
+        dpoc_sos_prov_tin_excl.bind("select", onGSSOSProvTINExlSelect);
+
+        function onGSSOSProvTINExlSelect(e) {
+            if (e.dataItem) {
+                var dataItem = e.dataItem;
+                var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+                var gridModel = grid.dataItem($(this.element).closest("tr"))
+
+                if (dataItem.VV_CD != '') {
+                    gridModel.DPOC_SOS_PROVIDER_TIN_EXCL = dataItem.VV_CD;
+                }
+                gridModel.DPOC_SOS_PROVIDER_TIN_EXCL = dataItem.VV_CD;
+
+                grid.refresh();
+                DetailController.dirtyform.dirtycheck();
+            }
+        };
+    });
+</script>
+
+
+
+

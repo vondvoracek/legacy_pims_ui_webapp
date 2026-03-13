@@ -1,0 +1,91 @@
+﻿@model MI.PIMS.BO.Dtos.Allwd_plc_of_svc_Dto
+
+@(Html.Kendo().MultiColumnComboBoxFor(m => m)
+    .AutoBind(false)
+    .DataTextField("CODE")
+    .DataValueField("CODE")
+    .Filter("contains")
+    .FilterFields(new string[] { "CODE", "ALLWD_PLC_OF_SVC"})
+    .Placeholder("Please type or open dropdown to select Place of service...")
+    .Columns(columns =>
+    {
+        columns.Add().Field("CODE").Title("Code").Width("60px");
+        columns.Add().Field("ALLWD_PLC_OF_SVC").Title("Description").Width("350px");
+    })
+    .HtmlAttributes(new { style = "width:100%;", required="required", title="Please type of open dropdown to select Place of service..."})
+    .Height(400)
+    .DataSource(source => source
+        .Custom()
+        .Transport(transport => transport
+        .Read(read =>
+        {
+            read.Action("GetAllwdPlcOfSvcs", "Home", new { Area = "EPAL" });
+        }))
+    )
+)
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        var placeofservice_mcc = $("#CODE").data("kendoMultiColumnComboBox");
+        placeofservice_mcc.bind("select", onPOSSelect);
+        placeofservice_mcc.bind("close", onPOSClose);
+
+        function onPOSSelect(e) {
+            if (e.dataItem) {
+                var dataItem = e.dataItem;
+                var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+                var gridModel = grid.dataItem($(this.element).closest("tr"))
+                                
+                //Check if data base been already entered with same DIAG_CD in the grid
+                if (isDuplicateALLWD_PLC_OF_SVC(grid, dataItem.CODE)) {
+                
+                    MICore.Notification.warning('Duplicate entries', 'Selected place of service code already exists!');
+                    AllocatedPlacesController.grid.deleteRowSilently(e);
+
+                } else {
+                    if (dataItem.CODE != '') {
+                        gridModel.CODE = dataItem.CODE;   
+                    }
+                        
+                    gridModel.ALLWD_PLC_OF_SVC = dataItem.ALLWD_PLC_OF_SVC;
+                                                         
+                }    
+                grid.refresh();
+                DetailController.dirtyform.dirtycheck();
+            }
+        };
+
+        function onPOSClose(e) {            
+            var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+            var gridModel = grid.dataItem($(this.element).closest("tr"))
+            if (e.dataItem == undefined && (gridModel.CODE == '' || gridModel.CODE == undefined)) {                
+                refreshALLWD_PLC_OF_SVC(this.element);
+            }
+        };
+
+        function isDuplicateALLWD_PLC_OF_SVC(grid, value) {        
+            var data = grid.dataSource._data;
+            var duplicate = false;
+            
+            jQuery.each(data, function (index, rowData) {
+                if (rowData.CODE == value) {
+                    return duplicate = true;    
+                }
+            });
+
+            return duplicate;
+        }
+
+        function refreshALLWD_PLC_OF_SVC(element){                
+            var $ALLWD_PLC_OF_SVC = $("#CODE").data("kendoMultiColumnComboBox");
+            var grid = $(element).closest("tr").closest(".k-grid").data("kendoGrid");
+            var gridModel = grid.dataItem($(element).closest("tr"));      
+
+            gridModel.CODE = '';            
+            gridModel.ALLWD_PLC_OF_SVC = '';
+            
+            $ALLWD_PLC_OF_SVC.select(-1);
+            $ALLWD_PLC_OF_SVC.refresh();
+        }
+    });
+</script>

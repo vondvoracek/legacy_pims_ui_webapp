@@ -1,0 +1,37 @@
+﻿@using MI.PIMS.UI.Common
+@using Microsoft.AspNetCore.Http
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+    Layout = "~/Views/Shared/_LayoutErrorHandler.cshtml";
+}
+
+@{
+    var refNo = Context.Request.Query["refNo"];
+}
+
+<div id="error-type">
+    <div class="error-type">
+        <div class="error-type-number"></div>    
+        <h2>Oops! Forbidden</h2>
+        <br />
+        <p>You are forbidden access this page.</p>
+        <br /> 
+        <p>We track these errors automatically, but if the problem persists feel free to contact us. In the meantime, try clicking the button below to go back home.</p>
+        <br /> 
+        <br /> <br /> 
+        <span style="font-size: 14px;">
+             You do not have access rights to PIMS. 
+              <br /> <br />
+
+            Reference No: @refNo;
+             For administration support, please send an email to <b>PIMS_Operations_Team@ds.uhc.com</b> 
+             <br /> <br />
+             or 
+            <br /> <br />
+             click the link below. 
+              <br /> 
+        </span>
+        <a style="font-size:14px; text-decoration:underline" target="_blank" href="mailto:PIMS_Operations_Team@ds.uhc.com?subject=PIMS Support">PIMS Operations Team</a>         
+    </div>
+</div>

@@ -1,0 +1,44 @@
+﻿@model MI.PIMS.BO.Dtos.St_App_Ind_Dto
+
+@(Html.Kendo().MultiColumnComboBoxFor(m => m)
+    .DataTextField("ST_APP_IND")
+    .DataValueField("ST_APP_IND")
+    .Filter("contains")
+    .FilterFields(new string[] { "ST_APP_IND" })
+    .Columns(columns =>
+    {
+        columns.Add().Field("ST_APP_IND").Title("Name").Width("200px");
+    })                
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true", required="required"})
+    .Height(400)
+    .DataSource(source => source
+        .Custom()
+        .Transport(transport => transport
+        .Read(read =>
+        {
+            read.Action("GetStAppInds", "Home", new { Area = "EPAL" });
+        }))
+    )
+)
+
+<script>
+$(document).ready(function() {    
+    var st_app_ind = $("#PMB_BASED_ON_ST_APP_IND").data("kendoMultiColumnComboBox");
+    st_app_ind.bind("select", onST_APP_INDSelect);    
+
+    function onST_APP_INDSelect(e) {        
+        if (e.dataItem) {
+            var dataItem = e.dataItem;
+            var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+            var gridModel = grid.dataItem($(this.element).closest("tr"))          
+            
+            if (dataItem.ST_APP_IND != '') {
+                gridModel.PMB_BASED_ON_ST_APP_IND = dataItem.ST_APP_IND; 
+            }                  
+            
+            grid.refresh();
+            DetailController.dirtyform.dirtycheck();
+        }
+    };
+});
+</script>

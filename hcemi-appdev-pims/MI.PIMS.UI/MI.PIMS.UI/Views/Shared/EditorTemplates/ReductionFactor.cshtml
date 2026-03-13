@@ -1,0 +1,92 @@
+﻿@using Kendo.Mvc.UI
+@model MI.PIMS.BO.Dtos.Ret_Factor_DD_Dto
+
+
+@(Html.Kendo().MultiColumnComboBoxFor(m => m)           
+    //.AutoBind(false)
+    //.MinLength(2)
+    .DataTextField("FACTOR_DESC_RED")
+    .DataValueField("FACTOR_NM_RED")
+    .Filter("contains")    
+    .IgnoreCase(true)
+    .FilterFields(new string[] { "FACTOR_NM_RED" })
+    .Placeholder("Please select Reduction code(s)/Description...")
+    .Columns(columns =>
+    {
+        columns.Add().Field("FACTOR_NM_RED").Title("Code").Width("100px");
+        columns.Add().Field("FACTOR_DESC_RED").Title("Description").Width("400px");
+    })                
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true", required="required"})
+    .Height(400)    
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetReductionFactors", "Home", new { Area = "EPAL" });
+        })
+        .ServerFiltering(true);
+    })
+)
+
+<script>
+$(document).ready(function() {
+    var Reduction_mcc = $("#FACTOR_NM_RED").data("kendoMultiColumnComboBox");
+    Reduction_mcc.bind("select", onSelect);
+    Reduction_mcc.bind("close", onClose);
+
+    function onSelect(e) {
+        if (e.dataItem) {
+            var dataItem = e.dataItem;
+            var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+            var gridModel = grid.dataItem($(this.element).closest("tr"))          
+            
+            //Check if data base been already entered with same DIAG_CD in the grid
+            if (isDuplicateFACTOR_NM(grid, dataItem.FACTOR_NM_RED)) {
+            
+                MICore.Notification.warning('Duplicate entries', 'Selected Reduction code already exists!');                
+                _RetRedFactorController.gridReduction.deleteRowSilently(e);
+            
+            } else {
+                if (dataItem.FACTOR_NM_RED != '') { 
+                    gridModel.FACTOR_NM_RED = dataItem.FACTOR_NM_RED;
+                }
+                gridModel.FACTOR_DESC_RED = dataItem.FACTOR_DESC_RED;
+            }            
+            grid.refresh();
+            DetailController.dirtyform.dirtycheck();
+        }
+    };
+
+    function onClose(e) {
+        var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+        var gridModel = grid.dataItem($(this.element).closest("tr"))        
+        if (e.dataItem == undefined && (gridModel.FACTOR_NM_RED == '' || gridModel.FACTOR_NM_RED == undefined)){
+            refreshFACTOR_NM(this.element);
+        }
+    };
+
+    function isDuplicateFACTOR_NM(grid, value) {        
+        var data = grid.dataSource._data;
+        var duplicate = false;
+        jQuery.each(data, function (index, rowData) {
+            if (rowData.FACTOR_NM_RED == value) {
+                return duplicate = true;    
+            }
+        });
+
+        return duplicate;
+    }
+
+    function refreshFACTOR_NM(element){                
+        var $FACTOR_NM = $("#FACTOR_NM_RED").data("kendoMultiColumnComboBox");
+        var grid = $(element).closest("tr").closest(".k-grid").data("kendoGrid");
+        var gridModel = grid.dataItem($(element).closest("tr"));      
+
+        gridModel.FACTOR_NM_RED = '';
+        gridModel.FACTOR_DESC_RED = '';
+
+        $FACTOR_NM.select(-1);
+        $FACTOR_NM.refresh();
+    }
+});
+</script>

@@ -1,0 +1,48 @@
+﻿@using MI.PIMS.BO.Dtos
+@model MI.PIMS.BO.Dtos.ATS_ISSUE_GOV_Dto
+
+ @(Html.Kendo().MultiColumnComboBoxFor(m => m)                
+    .DataTextField("DESC")
+    .DataValueField("ATS_ISSUE_GOV_CD")
+    .Filter("contains")
+    .FilterFields(new string[] { "ATS_ISSUE_GOV_CD", "DESC" })
+    .Columns(columns =>
+    {
+        //columns.Add().Field("ATS_ISSUE_GOV_CD").Title("Name").Width("150px");        
+        columns.Add().Field("DESC").Title("Description").Width("200px");
+    })                
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true"})
+    .Height(400)
+    .DataSource(source => source
+        .Custom()
+        .Transport(transport => transport
+        .Read(read =>
+        {
+            read.Action("GetStateIssueGov", "Home", new { Area = "EPAL" });
+        }))
+    )
+)
+
+  
+<script>
+$(document).ready(function() {    
+    var ats_issue_gov = $("#ATS_ISSUE_GOV_DESC").data("kendoMultiColumnComboBox");
+    ats_issue_gov.bind("select", onATS_ISSUE_GOVSelect);    
+
+    function onATS_ISSUE_GOVSelect(e) {        
+        if (e.dataItem) {            
+            var dataItem = e.dataItem;
+            var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+            var gridModel = grid.dataItem($(this.element).closest("tr"))          
+            
+            if (dataItem.ATS_ISSUE_GOV_CD != '') {
+                gridModel.ATS_ISSUE_GOV = dataItem.ATS_ISSUE_GOV_CD; 
+                gridModel.ATS_ISSUE_GOV_DESC = dataItem.DESC; 
+            }            
+            
+            grid.refresh();
+            DetailController.dirtyform.dirtycheck();
+        }
+    };
+});
+</script>

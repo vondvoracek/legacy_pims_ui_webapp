@@ -1,0 +1,46 @@
+﻿@model MI.PIMS.BO.Dtos.DX_Ind_Dto
+
+ @(Html.Kendo().MultiColumnComboBoxFor(m => m)                
+    .DataTextField("DX_IND")
+    .DataValueField("DX_IND")
+    .Filter("contains")
+    .Value("No")
+    .FilterFields(new string[] { "DX_IND"})
+    .Columns(columns =>
+    {
+        columns.Add().Field("DX_IND").Title("Name").Width("200px");
+    })                
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true", required="required" })
+    .Height(400)
+    .DataSource(source => source
+        .Custom()
+        .Transport(transport => transport
+        .Read(read =>
+        {
+            read.Action("GetDXInds", "Home", new { Area = "EPAL" });
+        }))
+    )
+)
+
+  
+<script>
+$(document).ready(function() {    
+    var dx_ind = $("#PMB_BASED_ON_DX_IND").data("kendoMultiColumnComboBox");
+    dx_ind.bind("select", onDX_INDSelect);    
+
+    function onDX_INDSelect(e) {        
+        if (e.dataItem) {
+            var dataItem = e.dataItem;
+            var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+            var gridModel = grid.dataItem($(this.element).closest("tr"))          
+            
+            if (dataItem.DX_IND != '') {
+                    gridModel.PMB_BASED_ON_DX_IND = dataItem.DX_IND; 
+                }                  
+            
+            grid.refresh();
+            DetailController.dirtyform.dirtycheck();
+        }
+    };
+});
+</script>

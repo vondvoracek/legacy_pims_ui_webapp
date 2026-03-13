@@ -1,0 +1,30 @@
+﻿@using Microsoft.AspNetCore.Http;
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+    Layout = "~/Views/Shared/_LayoutErrorHandler.cshtml";
+}
+
+<div id="error-type">
+    <div class="error-type">
+        <div class="error-type-number"></div>
+        @*<h1>404</h1>*@
+        <h2>Oops! Record Not Found</h2>
+        <br /> 
+        <p>@($"{Model.Message}")</p>
+        <p>Sorry but the record you are looking for either does not exist, has been removed, has changed or is temporarily unavailable.</p>
+    @*    <a href="javascript:void()" id="backToHome">Back to home</a>*@
+            <p>We track these errors automatically, but if the problem persists feel free to contact us. In the meantime, try clicking the button below to go back home.</p>
+        <a class="btn btn-sm btn-outline-primary" href="javascript:void()" id="backToHome">Back to home</a>
+         <br /> <br /> 
+            <span style="font-size: 14px;">
+             For administration support, please send an email to <b>PIMS_Operations_Team@ds.uhc.com</b> 
+             <br /> <br />
+             or 
+             <br /> <br />
+             click the link below. 
+             <br /> 
+        </span>
+        <a style="font-size:14px; text-decoration:underline" target="_blank" href="mailto:PIMS_Operations_Team@ds.uhc.com?subject=PIMS Support">PIMS Operations Team</a> 
+    </div>
+</div>

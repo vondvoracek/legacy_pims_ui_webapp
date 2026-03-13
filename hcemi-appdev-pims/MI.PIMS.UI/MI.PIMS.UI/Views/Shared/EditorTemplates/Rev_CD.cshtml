@@ -1,0 +1,88 @@
+﻿@model MI.PIMS.BO.Dtos.Ref_Revenue_T_Dto
+
+ @(Html.Kendo().MultiColumnComboBoxFor(m => m)           
+    .DataTextField("REV_CD")
+    .DataValueField("REV_CD")
+    .Filter("contains")
+    .FilterFields(new string[] { "REV_CD", "REV_CD_DESC"})
+    .Placeholder("Please type or open dropdown to select Revenue code(s)...")
+    .Columns(columns =>
+    {
+        columns.Add().Field("REV_CD").Title("Name").Width("100px");
+        columns.Add().Field("REV_CD_DESC").Title("Description").Width("300px");
+        columns.Add().Field("REV_CD_EFF_DT").Title("Revenue Effective Date").Width("175px");
+    })                
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true", required="required" , title="Please type atleast 2 characters to search Revenue code(s)..."})
+    .Height(400)
+    .DataSource(source => 
+    {
+        source.Read(read =>
+        {
+            read.Action("GetRefRevenuesByFilter", "Home", new { Area = "EPAL" });
+        }).ServerFiltering(true);
+    })
+)
+        
+<script>
+$(document).ready(function() {    
+    var rev_cd_cb = $("#REV_CD").data("kendoMultiColumnComboBox");
+    rev_cd_cb.bind("select", onRevSelect);
+    rev_cd_cb.bind("close", onRevClose);
+
+    function onRevSelect(e) {
+        if (e.dataItem) {
+            var dataItem = e.dataItem;
+            var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+            var gridModel = grid.dataItem($(this.element).closest("tr"))          
+            
+            //Check if data base been already entered with same DIAG_CD in the grid
+            if (isDuplicateRevCD(grid, dataItem.REV_CD)) {
+
+                MICore.Notification.warning('Duplicate entries', 'Selected revenue code already exists!');
+                RevCodesController.grid.deleteRowSilently(e);
+            
+            } else {
+                if (dataItem.REV_CD != '') {
+                    gridModel.REV_CD = dataItem.REV_CD; 
+                }
+                gridModel.REV_CD_DESC = dataItem.REV_CD_DESC;                                
+            }            
+            grid.refresh();
+            DetailController.dirtyform.dirtycheck();
+        }
+    };
+
+    function onRevClose(e) {
+        var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+        var gridModel = grid.dataItem($(this.element).closest("tr"))        
+        if (e.dataItem == undefined && (gridModel.REV_CD == '' || gridModel.REV_CD == undefined))
+        {
+            refreshRevCD(this.element);
+        }
+    };
+
+    function isDuplicateRevCD(grid, value) {        
+        var data = grid.dataSource._data;
+        var duplicate = false;
+        jQuery.each(data, function (index, rowData) {
+            if (rowData.REV_CD == value) {
+                return duplicate = true;    
+            }
+        });
+
+        return duplicate;
+    }
+
+    function refreshRevCD(element){                
+        var $REV_CD = $("#REV_CD").data("kendoMultiColumnComboBox");
+        var grid = $(element).closest("tr").closest(".k-grid").data("kendoGrid");
+        var gridModel = grid.dataItem($(element).closest("tr"));      
+
+        gridModel.REV_CD = '';
+        gridModel.REV_CD_DESC = '';            
+            
+        $REV_CD.select(-1);
+        $REV_CD.refresh();
+    }
+});
+</script>

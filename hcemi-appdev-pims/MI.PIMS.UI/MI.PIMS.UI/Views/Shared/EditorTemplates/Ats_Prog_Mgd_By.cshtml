@@ -1,0 +1,92 @@
+﻿@using MI.PIMS.BO.Dtos
+@model MI.PIMS.BO.Dtos.Prog_Mgd_By_Dto
+
+@(Html.Kendo().MultiColumnComboBoxFor(m => m)
+    .DataTextField("DESC")
+    .DataValueField("PROG_MGD_BY")
+    .Filter("contains")
+    .FilterFields(new string[] { "DESC", "PROG_MGD_BY" })
+    .Columns(columns =>
+    {
+        columns.Add().Field("PROG_MGD_BY").Title("Code").Width("200px");
+        columns.Add().Field("DESC").Title("Description").Width("300px");
+    })
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true" })
+    .Height(400)
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetProgMgdBy", "Home", new { Area = "EPAL" });
+        })
+        .ServerFiltering(true);
+    })
+)
+
+<script>
+    $(document).ready(function () {
+        var ats_prog_mgd_by = $("#ATS_PROG_MGD_BY").data("kendoMultiColumnComboBox");
+        ats_prog_mgd_by.bind("select", onATS_PROG_MGD_BYSelect);
+        ats_prog_mgd_by.bind("change", onATS_PROG_MGD_BYChange);
+
+        function onATS_PROG_MGD_BYSelect(e) {
+
+            if (e.dataItem) {
+                var dataItem = e.dataItem;
+                var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+                var gridModel = grid.dataItem($(this.element).closest("tr"))
+
+                if (dataItem.PROG_MGD_BY != '') {
+                    gridModel.ATS_PROG_MGD_BY = dataItem.PROG_MGD_BY;
+                    progMgdByExistInState(dataItem.PROG_MGD_BY);
+                }
+
+                ProgMgdByController.grid.verifyPMBbyIndicator();
+                grid.refresh();
+                DetailController.dirtyform.dirtycheck();
+            }
+        };
+
+        function progMgdByExistInState(ats_prog_mgd_by) {
+            var $progMgdByGrid = $("#grid_ProgMgdBy").data("kendoGrid");
+            var prog_mgd_by_exist = false;
+            var progMgdByData = $progMgdByGrid.dataSource._data;
+            jQuery.each(progMgdByData, function (index, progMgdByItem) {
+                if (progMgdByItem.PROG_MGD_BY == ats_prog_mgd_by) {
+                    prog_mgd_by_exist = true;
+                    return;
+                }
+            });
+
+            if (!prog_mgd_by_exist) {
+                addNewProgMgdBy(ats_prog_mgd_by);
+            }
+            else {
+                ProgMgdByController.grid.updateRow(ats_prog_mgd_by, "stateinfo", "Yes");
+            }
+
+            return prog_mgd_by_exist;
+        }
+
+        function addNewProgMgdBy(prog_mgd_by) {
+            var $progMgdByGrid = $("#grid_ProgMgdBy").data("kendoGrid");
+
+            $progMgdByGrid.dataSource.add({
+                DELEGATED_UM: null,
+                PROG_MGD_BY: prog_mgd_by,
+                INT_EXT_CD: null,
+                PMB_EFF_DT: null,
+                PMB_EXP_DT: null,
+                PMB_BASED_ON_DX_IND: 'No',
+                PMB_BASED_ON_ST_APP_IND: 'Yes',
+                PMB_BASED_ON_AGE_MIN: null,
+                PMB_BASED_ON_AGE_MAX: null
+            });
+
+        }
+
+        function onATS_PROG_MGD_BYChange(e) {
+            ProgMgdByController.grid.verifyPMBbyIndicator();
+        }
+    });
+</script>

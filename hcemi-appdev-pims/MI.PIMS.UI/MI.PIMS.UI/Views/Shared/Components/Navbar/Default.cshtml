@@ -1,0 +1,168 @@
+﻿<!------------------------------
+    Navbar Component
+-------------------------------->
+@model IEnumerable<MI.PIMS.BO.Dtos.MenuAccessDto>
+@using MI.PIMS.UI.Common
+@inject Helper _helper;
+
+<style>
+    [data-initials]:before {
+        background: #23527c;
+        color: white;
+        opacity: 1;
+        content: attr(data-initials);
+        display: inline-block;
+        font-weight: bold;
+        border-radius: 50%;
+        vertical-align: middle;
+        margin-right: 0.5em;
+        width: 35px;
+        height: 35px;
+        line-height: 35px;
+        text-align: center;
+        font-size: 12px;
+    }
+
+    .fa {
+        top: 15px;
+        right: 30px;
+    }
+
+    li {
+        cursor: pointer;
+    }
+
+    ul {
+        list-style-type: none;
+    }
+</style>
+<header>
+    <nav id="navbarHeader" class="navbar" style="height:65px;">
+        <div class="container">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <a id="btnShowSidebar" style="cursor:pointer;">
+                            <i style="color: #585858;" class="fas fa-bars fa-2x"></i>
+                            &nbsp;&nbsp;
+                            <img style="height:60px; padding-bottom: 10px;" src="~/images/UHCLogo.jpg" />
+                        </a>
+                    </td>
+                    <td style="text-align:center;">
+                        <h4 style=" font-weight:400; font-size:18px; color:#424242; font: times new roman, serif; font-variant-caps:petite-caps" class="lead scans-title">Policy Integration Management System (PIMS) (CTT)</h4>
+                    </td>
+                    <td>
+                        <div style="float:right;" class="scans-env">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <div style="margin-bottom:4px; margin-right:10px;">
+                                            Environment: <span style="color: red; font-weight: bold;">@_helper.Environment</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div style=" margin-bottom:2px; margin-right:5px;" data-initials="@Model.First().UserInitials">  Hello,  @Model.First().Display_Name </div>
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </nav>
+</header>
+<div id="mySidenav" class="sidenav">
+    <div>
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div style="padding-left:25px; ">
+                    <table style="width:100%">
+                        <tr>
+                            <td>
+                                <h4 class="modal-title">
+                                    Menu Options
+                                    &nbsp;
+                                </h4>
+                            </td>
+                            <td>
+                                <div style=" padding-right:20px;">
+                                    <button title="Close" type="button" id="btnCloseNav" class="close ml-3 float-right">
+                                        <i style="color: white;" class="fas fa-1x fa-times-circle"></i>
+                                    </button>                               
+                                    <a title="Home" href="/" id="btnHome" class="close float-right">
+                                        <i style="color: white;" class="fas fa-1x fa-home"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr style="background-color:white;" />
+    <div>
+        <ul class="navbar-nav" style="padding-left:25px;">
+            @if (Model != null)
+            {
+                foreach (var item in Model)
+                {
+                    @if (item.Page_ID.Contains("M_"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link sidenav-font-parent">
+                                @item.Title
+                            </a>
+                            <ul>
+                                @foreach (var item2 in Model)
+                                {
+                                    @if (@item.Page_ID == @item2.Module_ID_String)
+                                    {
+                                        @if (@item.Title == @item2.Title)
+                                        {
+                                            <li><a class="nav-link sidenav-font-child" href="@Url.Action("","Home", new { area = @item.Title.Replace(" ", "") })">@item2.Title</a></li>
+                                        }
+                                        else if (@item.Title != @item2.Title)
+                                        {
+                                            <li><a class="nav-link sidenav-font-child" href="@Url.Action(@item2.Title.Replace(" ", ""),"Home", new { area = @item.Title.Replace(" ", "") })">@item2.Title</a></li>
+                                        }
+                                    }
+                                }
+                            </ul>
+                        </li>
+                    }
+                }
+            }
+        </ul>
+    </div>
+    <footer id="footer" class=" footer text-muted">
+        <div class="container">
+            <p class="logo-font" style="color:#D8D8D8 !important; font-size:11px;">&copy; @DateTime.Now.Year - Powered by HCE Medical Informatics</p>
+        </div>
+    </footer>
+</div>
+
+<div id="MyOverlay"></div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+
+        $("#btnShowSidebar").click(function () {
+            $("#MyOverlay").removeClass('Hidden');
+            $("#MyOverlay").addClass('overlay');
+            document.getElementById("mySidenav").style.width = "380px";
+        })
+
+        $("#btnCloseNav").click(function () {
+            document.getElementById("mySidenav").style.width = "0";
+            $("#MyOverlay").removeClass('overlay');
+            $("#MyOverlay").addClass('Hidden');
+        })
+    });
+</script>

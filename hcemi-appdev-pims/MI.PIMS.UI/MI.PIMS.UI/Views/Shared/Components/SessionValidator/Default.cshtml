@@ -1,0 +1,119 @@
+﻿<script src="@Url.Content("~/lib/idle-timer/idle-timer.js")"></script>
+
+<div class="modal fade" id="mdSessionExpirationWarning" tabindex="-1" role="dialog" aria-labelledby="mdSessionExpirationWarningLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Session Expiration Warning</h4>
+            </div>
+            <div class="modal-body">
+                <p>You've been inactive for a while. For your security, we'll log you out automatically. Click "Stay Online" to continue your session. </p>
+                <p>Your session will expire in <span class="bold" id="sessionSecondsRemaining">120</span> seconds.</p>
+            </div>
+            <div class="modal-footer">
+                <button id="extendSession" type="button" class="btn btn-default btn-success" data-dismiss="modal">Stay Online</button>
+                <button id="logoutSession" type="button" class="btn btn-default" data-dismiss="modal">Logout</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="mdlLoggedOut" tabindex="-1" role="dialog" aria-labelledby="mdSessionExpirationWarningLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">You have been logged out</h4>
+            </div>
+            <div class="modal-body">
+                <p>Your session has expired.</p>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    (function($) {
+        var
+            session = {
+                //Logout Settings
+                //inactiveTimeout: 10000,     //(ms) The time until we display a warning message (10000ms = 10 sec)
+                inactiveTimeout: 28800000,     //(ms) The time until we display a warning message (28800000ms = 8 hrs)
+                warningTimeout: 7000,      //(ms) The time until we log them out
+                minWarning: 5000,           //(ms) If they come back to page (on mobile), The minumum amount, before we just log them out
+                warningStart: null,         //Date time the warning was started
+                warningTimer: null,         //Timer running every second to countdown to logout
+                logout: function() {       //Logout function once warningTimeout has expired
+                    //window.location = settings.autologout.logouturl;
+                    //$("#mdlLoggedOut").modal("show");                    
+                    window.location = $('#logout-url').val();//MIApp.Common.UI.logouturl;
+                },
+
+                //Keepalive Settings
+                keepaliveTimer: null,
+                keepaliveUrl: "",
+                keepaliveInterval: 120000,     //(ms) the interval to call said url
+                keepAlive: function() {
+                    $.ajax({ 
+                        url: session.keepaliveUrl,
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+                }
+            }
+            ;
+
+
+        $(document).on("idle.idleTimer", function(event, elem, obj) {
+            //Get time when user was last active
+            var
+                diff = (+new Date()) - obj.lastActive - obj.timeout,
+                warning = (+new Date()) - diff;
+
+            //On mobile js is paused, so see if this was triggered while we were sleeping
+            if (diff >= session.warningTimeout || warning <= session.minWarning) {
+                //$("#mdlLoggedOut").modal("show");
+                session.logout();
+            } else {
+                //Show dialog, and note the time                   
+                $('#sessionSecondsRemaining').html(getHHMMSS(Math.round((session.warningTimeout - diff) / 1000)));
+                $("#mdSessionExpirationWarning").modal("show");
+                session.warningStart = (+new Date()) - diff;
+
+                //Update counter downer every second
+                session.warningTimer = setInterval(function() {
+                    var remaining = Math.round((session.warningTimeout / 1000) - (((+new Date()) - session.warningStart) / 1000));
+                    if (remaining >= 0) {                        
+                        $('#sessionSecondsRemaining').html(getHHMMSS(remaining));
+                    } else {
+                        session.logout();
+                    }
+                }, 60000)
+            }
+        });
+
+        // create a timer to keep server session alive, independent of idle timer
+        session.keepaliveTimer = setInterval(function() {
+            session.keepAlive();
+        }, session.keepaliveInterval);
+
+        //User clicked ok to extend session
+        $("#extendSession").click(function() {
+            clearTimeout(session.warningTimer);
+        });
+        //User clicked logout
+        $("#logoutSession").click(function() {
+            session.logout();
+        });
+
+        //Set up the timer, if inactive for 10 seconds log them out
+        $(document).idleTimer(session.inactiveTimeout);
+
+        function getHHMMSS(seconds) {
+            if (seconds < 3600)
+                return new Date(seconds * 1000).toISOString().substring(14, 19) // MM:SS
+            else
+                return new Date(seconds * 1000).toISOString().substring(11, 16); // HH:MM:SS
+        }
+    })(jQuery);
+</script>

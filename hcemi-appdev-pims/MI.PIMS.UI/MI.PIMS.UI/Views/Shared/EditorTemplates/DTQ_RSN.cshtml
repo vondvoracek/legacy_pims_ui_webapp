@@ -1,0 +1,48 @@
+﻿@using Kendo.Mvc.UI;
+@using MI.PIMS.BO.Dtos
+@model MI.PIMS.BO.Dtos.DTQ_RSN_Dto
+
+@(Html.Kendo().MultiColumnComboBoxFor(m => m)
+    .DataTextField("DTQ_RSN")
+    .DataValueField("DTQ_RSN")
+    .Filter("contains")
+    .FilterFields(new string[] { "DTQ_RSN_DESC", "DTQ_RSN" })
+    .Columns(columns =>
+    {
+        columns.Add().Field("DTQ_RSN").Title("Code").Width("200px");
+        columns.Add().Field("DTQ_RSN_DESC").Title("Description").Width("300px");
+    })
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true" })
+    .Height(400)
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetDTQ_RSN", "Home", new { Area = "DPOC" });
+        })
+        .ServerFiltering(true);
+    })
+)
+
+<script>
+    $(document).ready(function () {
+        var dtq_rsn = $("#DTQ_RSN").data("kendoMultiColumnComboBox");
+        dtq_rsn.bind("select", onDTQ_RSNSelect);
+
+        function onDTQ_RSNSelect(e) {
+            if (e.dataItem) {
+                var dataItem = e.dataItem;
+                var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+                var gridModel = grid.dataItem($(this.element).closest("tr"))
+                
+                if (dataItem.DTQ_RSN != '') {
+                    gridModel.DTQ_RSN = dataItem.DTQ_RSN;
+                }
+                gridModel.DTQ_RSN_DESC = dataItem.DTQ_RSN_DESC;
+
+                grid.refresh();
+                DetailController.dirtyform.dirtycheck();
+            }
+        };
+    });
+</script>

@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Maintenance - Clear Cache";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="nav-md">
+    <div class="container body">
+        <div class="main_container">
+            <div class="col-md-12">
+                <div class="col-middle">
+                    <div class="text-center">
+                        <h2 class="text-danger">Cache Cleared!</h2>
+
+                        <p>
+                            <span id="status" style="font: 12px;font-weight:bold;" class="text-success">@ViewBag.Message</span>
+                        </p>
+                        <div class="mid_center">
+                            <button class="btn btn-dark" onclick="redirectToHome()">Back to Home</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

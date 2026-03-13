@@ -1,0 +1,66 @@
+﻿@using Kendo.Mvc.UI;
+@using MI.PIMS.BO.Dtos;
+@model MI.PIMS.BO.Dtos.PLC_OF_SVC_CD_Dto;
+
+@(Html.Kendo().MultiColumnComboBoxFor(m => m)
+    .DataTextField("PLC_OF_SVC_DESC")
+    .DataValueField("PLC_OF_SVC_CD")
+    .Filter("contains")
+    .FilterFields(new string[] { "PLC_OF_SVC_DESC", "PLC_OF_SVC_CD" })
+    .Columns(columns =>
+    {
+        columns.Add().Field("PLC_OF_SVC_CD").Title("Code").Width("200px");
+        columns.Add().Field("PLC_OF_SVC_DESC").Title("Description").Width("300px");
+    })
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true" })
+    .Height(400)
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetPLC_OF_SVC_CD", "Home", new { Area = "DPOC" });
+        })
+        .ServerFiltering(true);
+    })
+)
+
+<script>
+    $(document).ready(function () {
+        var dtq_rsn = $("#PLC_OF_SVC_CD").data("kendoMultiColumnComboBox");
+        dtq_rsn.bind("select", onPLC_OF_SVCSelect);
+
+        function onPLC_OF_SVCSelect(e) {
+            if (e.dataItem) {
+                var dataItem = e.dataItem;
+                var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+                var gridModel = grid.dataItem($(this.element).closest("tr"))
+
+                if (isDuplicatePOS(grid, dataItem.PLC_OF_SVC_CD)) {
+
+                    MICore.Notification.warning('Duplicate entries', 'Selected POS already exists!');
+                    DiagCodesController.grid.deleteRowSilently(e);
+
+                } else {
+                    if (dataItem.PLC_OF_SVC_CD != '') {
+                        gridModel.PLC_OF_SVC_CD = dataItem.PLC_OF_SVC_CD;
+                    }
+                    gridModel.PLC_OF_SVC_DESC = dataItem.PLC_OF_SVC_DESC;
+                }
+                grid.refresh();
+                DetailController.dirtyform.dirtycheck();
+            }
+        };
+
+        function isDuplicatePOS(grid, value) {
+            var data = grid.dataSource._data;
+            var dupPos = false;
+            jQuery.each(data, function (index, rowData) {
+                if (rowData.PLC_OF_SVC_CD == value) {
+                    return dupPos = true;
+                }
+            });
+
+            return dupPos;
+        }
+    });
+</script>

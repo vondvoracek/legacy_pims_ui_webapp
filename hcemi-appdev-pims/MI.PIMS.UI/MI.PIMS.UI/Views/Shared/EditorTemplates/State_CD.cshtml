@@ -1,0 +1,89 @@
+﻿@model MI.PIMS.BO.Dtos.State_CD_Dto
+
+@(Html.Kendo().MultiColumnComboBoxFor(m => m)
+    .DataTextField("DESC")
+    .DataValueField("STATE_CD")
+    .Filter("contains")
+    .FilterFields(new string[] { "STATE_CD", "DESC" })
+    .Columns(columns =>
+    {
+        columns.Add().Field("STATE_CD").Title("ID").Width("60px");
+        columns.Add().Field("DESC").Title("Description").Width("350px");
+    })
+    .HtmlAttributes(new { style = "width:100%;", required = "required", data_value_primitive = "true" })
+    .Height(400)
+    .DataSource(source => source
+        .Custom()
+        .Transport(transport => transport
+        .Read(read =>
+        {
+            read.Action("GetStateCDs", "Home", new { Area = "EPAL" });
+        }))
+    )
+)
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var state_mcc = $("#STATE_NAME").data("kendoMultiColumnComboBox");
+        if (state_mcc != undefined) {
+            state_mcc.bind("select", onSelect);
+            state_mcc.bind("close", onClose);
+        }
+
+        function onSelect(e) {
+            if (e.dataItem) {
+                var dataItem = e.dataItem;
+                var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+                var gridModel = grid.dataItem($(this.element).closest("tr"))
+
+                //Check if data base been already entered with same DIAG_CD in the grid
+                if (isDuplicateState_CD(grid, dataItem.STATE_CD)) {
+                    MICore.Notification.warning('Duplicate entries', 'Selected state already exists!');
+                    StateInfoController.grid.deleteRowSilently(e);
+                } else {
+                    if (dataItem.STATE_CD != '')
+                        gridModel.STATE_CD = dataItem.STATE_CD;
+                    gridModel.STATE_NAME = dataItem.DESC;
+                    grid.refresh();
+                    DetailController.dirtyform.dirtycheck();
+                }
+            }
+        };
+
+        function onClose(e) {
+            var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+            var gridModel = grid.dataItem($(this.element).closest("tr"))
+            if (e.dataItem == undefined && (gridModel.STATE_CD == '' || gridModel.STATE_CD == undefined)) {
+                refreshState_CD(this.element);
+            }
+        };
+
+        function isDuplicateState_CD(grid, value) {
+            var data = grid.dataSource._data;
+            var duplicate = false;
+
+            if (data.length > 1) {
+                jQuery.each(data, function (index, rowData) {
+                    if (rowData.STATE_CD == value) {
+                        return duplicate = true;
+                    }
+                });
+            }
+
+            return duplicate;
+        }
+
+        function refreshState_CD(element) {
+            var $STATE_NAME = $("#STATE_NAME").data("kendoMultiColumnComboBox");
+            var grid = $(element).closest("tr").closest(".k-grid").data("kendoGrid");
+            var gridModel = grid.dataItem($(element).closest("tr"));
+
+            gridModel.STATE_CD = '';
+            gridModel.STATE_NAME = '';
+
+            $STATE_NAME.select(-1);
+            $STATE_NAME.refresh();
+        }
+    });
+</script>

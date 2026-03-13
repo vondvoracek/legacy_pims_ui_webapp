@@ -1,0 +1,23 @@
+﻿@model MI.PIMS.BO.Dtos.State_Mandated_Ind_Dto
+
+ @(Html.Kendo().MultiColumnComboBoxFor(m => m)                
+    .DataTextField("DESC")
+    .DataValueField("STATE_MANDATED_IND")
+    .Filter("contains")
+    .FilterFields(new string[] { "STATE_MANDATED_IND" , "DESC"})
+    .Columns(columns =>
+    {
+        columns.Add().Field("STATE_MANDATED_IND").Title("Name").Width("100px");
+        columns.Add().Field("DESC").Title("Description").Width("200px");
+    })                
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true" })
+    .Height(400)
+    .DataSource(source => source
+        .Custom()
+        .Transport(transport => transport
+        .Read(read =>
+        {
+            read.Action("GetStateMandatedInds", "Home", new { Area = "EPAL" });
+        }))
+    )
+)

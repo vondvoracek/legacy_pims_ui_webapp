@@ -1,0 +1,49 @@
+﻿@using Kendo.Mvc.UI;
+@using MI.PIMS.BO.Dtos
+@model MI.PIMS.BO.Dtos.Allwd_plc_of_svc_Dto
+
+@(Html.Kendo().MultiColumnComboBoxFor(m => m)
+    .DataTextField("CODE")
+    .DataValueField("CODE")
+    .Filter("contains")
+    .FilterFields(new string[] { "CODE", "ALLWD_PLC_OF_SVC" })
+    .Columns(columns =>
+    {
+        columns.Add().Field("CODE").Title("Code").Width("200px");
+        columns.Add().Field("ALLWD_PLC_OF_SVC").Title("Description").Width("300px");
+    })
+    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true" })
+    .Height(400)
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetAllwdPlcOfSvcs", "Home", new { Area = "EPAL" });
+        })
+        .ServerFiltering(true);
+    })
+)
+
+<script>
+    $(document).ready(function () {
+        var pos_appl = $("#DTQ_POS_APPL").data("kendoMultiColumnComboBox");
+        pos_appl.bind("select", onPOS_APPL_DESCSelect);
+
+        function onPOS_APPL_DESCSelect(e) {
+            if (e.dataItem) {
+                var dataItem = e.dataItem;
+                var grid = $(this.element).closest("tr").closest(".k-grid").data("kendoGrid")
+                var gridModel = grid.dataItem($(this.element).closest("tr"))
+
+                if (dataItem.CODE != '') {
+                    gridModel.DTQ_POS_APPL = dataItem.CODE;
+                }
+                if (gridModel.POS_APPL_DESC != undefined)
+                    gridModel.POS_APPL_DESC = dataItem.ALLWD_PLC_OF_SVC;
+
+                grid.refresh();
+                DetailController.dirtyform.dirtycheck();
+            }
+        };
+    });
+</script>
