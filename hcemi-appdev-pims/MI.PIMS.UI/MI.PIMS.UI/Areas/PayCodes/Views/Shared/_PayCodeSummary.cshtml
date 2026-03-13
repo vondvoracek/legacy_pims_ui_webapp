@@ -1,0 +1,460 @@
+﻿@model MI.PIMS.BO.Dtos.PayCode_Procedures_T_Dto
+@using Kendo.Mvc.UI
+@using MI.PIMS.UI;
+<script src="~/js/PayCode/PayCodeSummary.js" asp-append-version="true"></script>
+
+<style>
+    
+    
+    .PayCodeSummary div label{
+         font-weight: bolder;
+    }
+    .PayCodeSummaryRow div label{
+         font-weight: bolder;
+         
+    }
+    
+</style>
+<input type="hidden" id="PCS_PAYC_BUS_SEG_CD" value="@Model.PAYC_BUS_SEG_CD" />
+<div class="container tab-section">
+    <h5>
+        Pay Code Summary
+    </h5>
+    <hr />    
+    <!-- Row 1 -->
+    @if (Model.IS_EDITABLE == true)
+    {
+        <div class="form-row PayCodeSummary">
+            <div class="form-group col-sm-2 col-md-3 col-lg-2">
+                <label for="dpPayCodeEffectiveDate" class="required">Pay Code Effective Date:</label>
+                <input type="hidden" readonly id="txtPayCodeEffectiveDate" value="@Model.PAYC_EFF_DT" />
+                @(
+                Html.Kendo().DatePicker()
+                            .Name("dpPayCodeEffectiveDate")
+                            .Value(@Model.PAYC_EFF_DT)
+                            .Format("MM/dd/yyyy")
+                            .ParseFormats(new string[] {"MMddyyyy",
+                                "MMddyy",
+                                "MM.dd.yyyy",
+                                "MM.dd.yy",
+                                "MM.d.yyyy",
+                                "M.d.yy",
+                                "M.d.yyyy",
+                                "MM/dd/yyyy",
+                                "MM/dd/yy",
+                                "MM/d/yyyy",
+                                "M/d/yy",
+                                "M/d/yyyy",
+                                "MM-dd-yyyy",
+                                "MM-dd-yy",
+                                "MM-d-yyyy",
+                                "M-d-yy",
+                                "M-d-yyyy"
+                            })
+                            .Enable(((string)ViewData["PageType"] == @Roles.PayCodeReadOnly.ToString() ? false : true))
+                            .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                            )
+            </div>
+            <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                <label for="ddlPayCodeStatus">Pay Code Expiration Date:</label><br />
+                <input type="hidden" readonly id="txtPayCodeExpirationDate" value="@Model.PAYC_EXP_DT" />
+                @(
+                Html.Kendo().DatePicker()
+                            .Name("dpPayCodeExpirationDate")
+                            .Value(@Model.PAYC_EXP_DT)
+                            .Format("MM/dd/yyyy")
+                            .ParseFormats(new string[] {"MMddyyyy",
+                                "MMddyy",
+                                "MM.dd.yyyy",
+                                "MM.dd.yy",
+                                "MM.d.yyyy",
+                                "M.d.yy",
+                                "M.d.yyyy",
+                                "MM/dd/yyyy",
+                                "MM/dd/yy",
+                                "MM/d/yyyy",
+                                "M/d/yy",
+                                "M/d/yyyy",
+                                "MM-dd-yyyy",
+                                "MM-dd-yy",
+                                "MM-d-yyyy",
+                                "M-d-yy",
+                                "M-d-yyyy"
+                            })
+                    .Enable(((string)ViewData["PageType"] == @Roles.PayCodeReadOnly.ToString() ? false : true))
+                            .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                            )
+            </div>
+            <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                <label for="msPlan">PreDetermination Eff Date:</label>
+                @(
+                Html.Kendo().DatePicker()
+                            .Name("dpPayCodePreDeterminationEffDate")
+                            .Value(@Model.EPAL_PRE_DET_EFF_DT)
+                            .Format("MM/dd/yyyy")
+                            .Enable(false)
+                            .ParseFormats(new string[] {"MMddyyyy",
+                                "MMddyy",
+                                "MM.dd.yyyy",
+                                "MM.dd.yy",
+                                "MM.d.yyyy",
+                                "M.d.yy",
+                                "M.d.yyyy",
+                                "MM/dd/yyyy",
+                                "MM/dd/yy",
+                                "MM/d/yyyy",
+                                "M/d/yy",
+                                "M/d/yyyy",
+                                "MM-dd-yyyy",
+                                "MM-dd-yy",
+                                "MM-d-yyyy",
+                                "M-d-yy",
+                                "M-d-yyyy"
+                            })
+                            //.Enable(((string)ViewData["PageType"] == @Roles.PayCodeReadOnly.ToString() ? false : true))
+                            .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                            )
+            </div>
+            <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                <label for="msProduct">PreDetermination Exp Date:</label>
+                <input type="hidden" readonly id="txtNDBPCS" />
+
+  
+                @(
+                Html.Kendo().DatePicker()
+                            .Name("dpPayCodePreDeterminationExpDate")
+                            .Value(@Model.EPAL_PRE_DET_EXP_DT)
+                            .Format("MM/dd/yyyy")
+                            .Enable(false)
+                            .ParseFormats(new string[] {"MMddyyyy",
+                                "MMddyy",
+                                "MM.dd.yyyy",
+                                "MM.dd.yy",
+                                "MM.d.yyyy",
+                                "M.d.yy",
+                                "M.d.yyyy",
+                                "MM/dd/yyyy",
+                                "MM/dd/yy",
+                                "MM/d/yyyy",
+                                "M/d/yy",
+                                "M/d/yyyy",
+                                "MM-dd-yyyy",
+                                "MM-dd-yy",
+                                "MM-d-yyyy",
+                                "M-d-yy",
+                                "M-d-yyyy"
+                            })
+                            //.Enable(((string)ViewData["PageType"] == @Roles.PayCodeReadOnly.ToString() ? false : true))
+                            .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                            )
+            </div>
+            <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                <label>Prior Auth Eff Date:</label>
+                <input type="text" class="form-control" readonly value="@String.Format("{0:MM/dd/yyyy}", Model.EPAL_PRIOR_AUTH_EFF_DT)" />
+            </div>
+            <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                <label>Prior Auth Exp Date:</label>
+                <input type="text" class="form-control" readonly value="@String.Format("{0:MM/dd/yyyy}", Model.EPAL_PRIOR_AUTH_EXP_DT)" />
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="form-row PayCodeSummary">
+            <div class="form-group col-sm-2 col-md-3 col-lg-2">
+                <label for="txtPayCodeEffectiveDate">Pay Code Effective Date:</label>
+                <input type="text" class="form-control" readonly id="txtPayCodeEffectiveDate" name="txtPayCodeEffectiveDate" value="@Model.PAYC_EFF_DT?.ToString("MM/dd/yyyy")">
+            </div>
+            <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                <label for="txtPayCodeExpirationDate">Pay Code Expiration Date:</label><br />
+                <input type="text" class="form-control" readonly id="txtPayCodeExpirationDate" name="txtPayCodeExpirationDate" value="@Model.PAYC_EXP_DT?.ToString("MM/dd/yyyy")">
+            </div>
+            <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                <label for="txtPayCodePreDeterminationEffDate">PreDetermination Eff Date:</label>
+                <input type="text" class="form-control" readonly id="txtPayCodePreDeterminationEffDate" name="txtPayCodePreDeterminationEffDate" value="@Model.EPAL_PRE_DET_EFF_DT?.ToString("MM/dd/yyyy")">
+            </div>
+            <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                <label for="txtPayCodePreDeterminationExpDate">PreDetermination Exp Date:</label>
+                <input type="text" class="form-control" readonly id="txtPayCodePreDeterminationExpDate" name="txtPayCodePreDeterminationExpDate" value="@Model.EPAL_PRE_DET_EXP_DT?.ToString("MM/dd/yyyy")">
+            </div>
+            <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                <label>Prior Auth Eff Date:</label>
+                <input type="text" class="form-control" readonly value="@String.Format("{0:MM/dd/yyyy}", Model.EPAL_PRIOR_AUTH_EFF_DT)" />
+            </div>
+            <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                <label>Prior Auth Exp Date:</label>
+                <input type="text" class="form-control" readonly value="@String.Format("{0:MM/dd/yyyy}", Model.EPAL_PRIOR_AUTH_EXP_DT)" />
+            </div>
+        </div>
+    }
+
+
+
+    <!-- Row 2 -->
+    <div class="form-row PayCodeSummaryRow">
+        
+        <div class="form-group col-sm-1 col-md-1 col-lg-1">
+            <label for="txtPayCodeStatus">Pay Code Status:</label>
+            <input type="text" class="form-control" readonly id="txtPayCodeStatus" name="txtPayCodeStatus" value="@Model.PAYC_STATUS">
+        </div>
+
+        <div class="form-group col-sm-2 col-md-2 col-lg-2">
+            <label for="ddKLPCS" class="@(Model.PAYC_BUS_SEG_CD == "EnI" || Model.PAYC_BUS_SEG_CD == "IFP" ? "required ddKLPCS_label": "ddKLPCS_label")">KL PCS:</label>
+            @(
+                Html.Kendo().DropDownList()
+                    .Name("ddKLPCS")
+                    .DataTextField("VV_CD")
+                    .DataValueField("VV_CD").HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                    .Value(@Model.PAYC_KL_PCS)
+                    .Enable(@Model.IS_EDITABLE)
+                    .OptionLabel("------")
+                    .Events(events => events.Change("PayCodeSummaryController.dropdown.onChangeKLPCS"))
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("PayCodeSummaryController.multiSelect.param.KLPCS");
+                        })
+                        .ServerFiltering(false);
+                    })
+             )
+        </div>
+        <div class="form-group col-sm-1 col-md-1 col-lg-1">
+            <label for="ddNDBPCS" class="@(Model.PAYC_BUS_SEG_CD == "EnI" && Model.PAYC_NDB_PCS != null ? "required ddNDBPCS_label": "ddNDBPCS_label")">NDB PCS:</label>
+            @(
+                Html.Kendo().DropDownList()
+                    .Name("ddNDBPCS")
+                    .DataTextField("VV_CD")
+                    .DataValueField("VV_CD").HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                    .Value(@Model.PAYC_NDB_PCS)
+                    .Enable(@Model.IS_EDITABLE)
+                    .OptionLabel("------")
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("PayCodeSummaryController.multiSelect.param.NDBPCS");
+                        })
+                        .ServerFiltering(false);
+                    })
+            )
+        </div>
+        <div class="form-group col-sm-1 col-md-1 col-lg-1">
+            <label for="ddNDBRemarkCode">NDB Remark Code:</label>
+            @(
+                Html.Kendo().DropDownList()
+                        .Name("ddNDBRemarkCode")
+                        .DataTextField("VV_CD")
+                        .DataValueField("VV_CD").HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                        .Value(@Model.PAYC_NDB_REMARK_CD)
+                        .OptionLabel("------")
+                        .Enable(@Model.IS_EDITABLE)
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("PayCodeSummaryController.multiSelect.param.NDBRemarkCode");
+                            })
+                            .ServerFiltering(false);
+                        })
+                        )
+        </div>
+        <div class="form-group col-sm-1 col-md-1 col-lg-1">
+            <label for="ddClinicaliCES" class="required">Clinical iCES/CES:</label>
+            @(
+                Html.Kendo().DropDownList()
+                    .Name("ddClinicaliCES")
+                    .DataTextField("VV_CD")
+                    .DataValueField("VV_CD").HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                    .Value(@Model.PAYC_ICES_IND)
+                    .Enable(@Model.IS_EDITABLE)
+                    .Events(events => events.Change("PayCodeSummaryController.dropdown.onChange_ClinicaliCES"))
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("PayCodeSummaryController.multiSelect.param.ClinicaliCES");
+                        })
+                        .ServerFiltering(false);
+                    })
+            )
+        </div>
+        <div class="form-group col-sm-2 col-md-2 col-lg-2">
+            <label for="ddClinicaliCESName" class="ddClinicaliCESName_label">Clinical iCES/CES Name:</label>
+            @(
+                Html.Kendo().MultiSelect()
+                    .Name("ddClinicaliCESName")
+                    .DataTextField("VV_CD")
+                    .DataValueField("VV_CD").HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                    .Value(@Model.PAYC_ICES_EDIT_NAME != null ? @Model.PAYC_ICES_EDIT_NAME.Split(",") : null)
+                    .Enable(@Model.IS_EDITABLE == true && @Model.PAYC_ICES_IND == "Yes" ? true: false)
+                    .Placeholder("------")
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetPIMSValidValuesVVCdOnly", "Home", new { Area = "EPAL" }).Data("PayCodeSummaryController.multiSelect.param.ClinicaliCESName2");
+                        })
+                        .ServerFiltering(false);
+                    })
+            )
+        </div>
+        <div class="form-group col-sm-2 col-md-2 col-lg-2">
+            <label for="ddClinicaliCESAction" class="ddClinicaliCESAction_label">Clinical iCES/CES Action:</label>
+            @(
+                Html.Kendo().DropDownList()
+                    .Name("ddClinicaliCESAction")
+                    .DataTextField("VV_CD")
+                    .DataValueField("VV_CD").HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                    .Value(@Model.PAYC_ICES_EDIT_ACTION)
+                    .Enable(@Model.IS_EDITABLE == true && @Model.PAYC_ICES_IND == "Yes" ? true : false)
+                    .OptionLabel("------")
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("PayCodeSummaryController.multiSelect.param.ClinicaliCESAction");
+                        })
+                        .ServerFiltering(false);
+                    })
+            )
+        </div>
+        <div class="form-group col-sm-1 col-md-1 col-lg-1">
+            <label for="txtProcedureCode">Prior Auth Status:</label>
+            <input type="text" class="form-control" readonly value="@Model.EPAL_STATUS" />
+        </div>
+        <div class="form-group col-sm-1 col-md-1 col-lg-1">
+            <label for="txtDXIndicator">DX Indicator:</label>
+            <input type="text" class="form-control" id="txtDXIndicator" name="txtDXIndicator" value="@Model.EPAL_DX_IND" readonly>
+        </div>
+    </div>
+
+    <!-- Row 3 -->
+    <div class="form-row PayCodeSummaryRow">
+
+        <div class="form-group col-sm-1 col-md-1 col-lg-1">
+            <label>Pre-D:</label><br/>
+            <input type="text" class="form-control" readonly value="@Model.PAYC_PRE_D" />
+        </div>
+        <div class="form-group col-sm-2 col-md-2 col-lg-2">
+            <label for="ddBifurcatedProcess" class="required ddBifurcatedProcess_label">Bifurcated Process:</label>
+            @(
+                Html.Kendo().DropDownList()
+                    .Name("ddBifurcatedProcess")
+                    .DataTextField("VV_CD")
+                    .DataValueField("VV_CD").HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                    .Value(@Model.PAGE_TYPE == PayCodePageView.AddDetail.ToString() ? "No" : @Model.PAYC_BIFURCATED)
+                    .Enable(@Model.IS_EDITABLE)
+                    //.OptionLabel("------")
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("PayCodeSummaryController.multiSelect.param.BifurcatedProcess");
+                        })
+                        .ServerFiltering(false);
+                    })
+            )
+        </div>
+        <div class="form-group col-sm-2 col-md-2 col-lg-2">
+            <label for="ddNS88Compliance" class="required ddNS88Compliance_label">NS-88/Compliance:</label>
+            @(
+                Html.Kendo().DropDownList()
+                        .Name("ddNS88Compliance")
+                        .DataTextField("VV_CD")
+                        .DataValueField("VV_CD").HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                        .Value(@Model.PAGE_TYPE == PayCodePageView.AddDetail.ToString() ? "No" : @Model.PAYC_NS88_COMPLIANCE)
+                        .Enable(@Model.IS_EDITABLE)
+                        //.OptionLabel("------")
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("PayCodeSummaryController.multiSelect.param.NS88Compliance");
+                            })
+                            .ServerFiltering(false);
+                        })
+                        )
+        </div>
+        <div class="form-group col-sm-3 col-md-3 col-lg-3">
+            <label for="ddAdditionalEdits">Additional Edits:</label>
+            @(
+                Html.Kendo().MultiSelect()
+                .Name("ddAdditionalEdits")
+                .DataTextField("VV_CD")
+                .DataValueField("VV_CD").HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                .Value(@Model.PAYC_ADDITIONAL_EDITS != null ? @Model.PAYC_ADDITIONAL_EDITS.Split(","): null)
+                .Enable(@Model.IS_EDITABLE)
+                .Placeholder("------")
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("PayCodeSummaryController.multiSelect.param.AdditionalEdits");
+                    })
+                    .ServerFiltering(false);
+                })
+            )
+        </div>
+        <div class="form-group col-sm-2 col-md-2 col-lg-2">
+            <label for="msddAdvancedNotificationRequired" class="required msddAdvancedNotificationRequired_label">Advanced Notification Required?</label>
+            @(
+                Html.Kendo().DropDownList()
+                .Name("ddAdvancedNotificationRequired")
+                .DataTextField("VV_CD")
+                .DataValueField("VV_CD").HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })                
+                .Value(@Model.PAGE_TYPE == PayCodePageView.AddDetail.ToString() ? "No" : @Model.PAYC_ADVN_NOTIF)
+                .Enable(@Model.IS_EDITABLE)
+                //.OptionLabel("------")
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("PayCodeSummaryController.multiSelect.param.AdvancedNotificationRequired");
+                    })
+                    .ServerFiltering(false);
+                })
+                )
+        </div>        
+    </div>
+   
+    <div class="form-row PayCodeSummaryRow">
+
+        <div class="form-group col-lg-3">
+            <label for="msRoutedMCR">Routed to MCR:</label>
+            @if (ViewBag.MCR_Routed == null) {
+            @(Html.Kendo().ListBox()
+                .Name("optional")
+                .ConnectWith("selected")
+                .HtmlAttributes(new { style = "width: 100%; height: 80px; disabled:true;" })
+                .BindTo("")
+                )
+            }
+            else if (ViewBag.MCR_Routed != null) 
+            {
+                @(Html.Kendo().ListBox()
+                .Name("optional")
+                .ConnectWith("selected")
+                    .HtmlAttributes(new { style = "width: 100%; height: 80px; disabled:true;" })
+                .BindTo(ViewBag.MCR_Routed)
+                )
+            }
+        </div>
+
+        <div class="form-group col-sm-2 col-md-2 col-lg-2">
+            <label for="txtComments">Comments:</label>
+            @if (@Model.IS_EDITABLE == true)
+            {
+                <input type="text" class="form-control" id="txtComments" name="txtComments" value="@Model.PAYC_COMMENTS">
+            }
+            else
+            {
+                <input type="text" class="form-control" id="txtComments" name="txtComments" value="@Model.PAYC_COMMENTS" readonly>
+            }
+        </div>
+     </div>
+    
+
+</div>
+
+

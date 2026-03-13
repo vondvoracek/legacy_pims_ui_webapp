@@ -1,0 +1,76 @@
+﻿@using Kendo.Mvc.UI;
+@using MI.PIMS.BO.Dtos;
+
+@Html.Hidden("txtGDLN_DTQ_SYS_SEQ")
+@Html.Hidden("txtGDLN_ATS_RowNumber")
+<div class="container">
+    @(
+        Html.Kendo().Grid<DPOC_INV_DTQS_V_Dto>()
+                .Name("grid_config")
+                .Columns(columns =>
+                {
+
+                    columns.Bound(p => p.RowNumber).Hidden(true);
+                    columns.Bound(p => p.GDLN_DTQ_SYS_SEQ).Hidden(true);
+                    columns.Bound(p => p.DTQ_IQ_GDLN_ID).Hidden(true);
+                    columns.Bound(p => p.POS_APPL).Title("POS Codes").Sortable(false).EditorTemplateName("POS_APPL").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(100);
+                    columns.Bound(p => p.POS_INCL_EXCL_CD).Hidden(true);
+                    columns.Bound(p => p.POS_INCL_EXCL_DESC).Title("POS<br/>Include/Exclude").Sortable(false).EditorTemplateName("POS_INCL_EXCL_CD").ClientTemplate("#: POS_INCL_EXCL_DESC != null ? POS_INCL_EXCL_DESC : '' #").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(130);
+                    columns.Bound(p => p.STATES_APPL).Title("States").Sortable(false).EditorTemplateName("StatesAppl").ClientTemplate("#:STATES_APPL#").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(100);
+                    @* columns.Bound(p => p.STATES_APPL).Title("States").Sortable(false).Editable("nonEditablePreventDetault")
+                    .ClientTemplate(
+                        "# if(STATES_APPL.length > 0){#" +
+                        "<a href='javascript:void(0);' style='text-overflow:ellipsis;width:90px;color:blue;' onclick=\"StateInfoController.openStatePopup(this);\" title='Click to view details!' \\data-target='tooltip'\\>#=STATES_APPL.replace(/\\|/g, ',')#</a>" +
+                        "# } else { #" +
+                        "<a href='javascript:void(0);' style='color:blue;' onclick=\"StateInfoController.openStatePopup(this);\" title='Click to view details!' \\data-target='tooltip'\\>Add States</a>" +
+                    "# } #"
+                    )
+                    .HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(100); *@
+                    columns.Bound(p => p.STATES_INCL_EXCL_CD).Hidden(true);
+                    columns.Bound(p => p.STATES_INCL_EXCL_DESC).Title("State<br/>Include/Exclude").EditorTemplateName("STATES_INCL_EXCL_CD").ClientTemplate("#:STATES_INCL_EXCL_DESC#").Sortable(false).HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;max-length:50;" }).Width(130);
+                    columns.Bound(d => d.DTQ_NM).Title("DTQ Name").Sortable(false).HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;max-length:50;" }).Width(130); 
+                    columns.Bound(d => d.TGT_DTQ).Title("Target DTQ").Sortable(false).HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(130); 
+                    columns.Bound(d => d.TGT_DTQ_VERSION).Title("Target DTQ<br/>Version").Sortable(false).HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(130); 
+                    columns.Bound(d => d.HOLDING_DTQ).Title("Holding DTQ").Sortable(false).HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(130); 
+                    columns.Bound(d => d.HOLDING_DTQ_VERSION).Title("Holding DTQ<br/>Version").Sortable(false).HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(130);
+                    //columns.Bound(d => d.RULE_COMMENTS).Title("Rule Comments").Sortable(false).HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(150);
+                    columns.Bound(d => d.DPOC_SOS_PROVIDER_TIN_EXCL).Title("SOS Provider <br/>TIN Exclusion").Sortable(false).EditorTemplateName("DPOC_SOS_PROVIDER_TIN_EXCL").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(150);
+                    columns.Bound(d => d.DPOC_ADDTNL_RQRMNTS).Title("Additional Requirements<br/> (Limit 500 Character Max)").Sortable(false).HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;max-length:500;" }).Width(180); 
+                    columns.Bound(d => d.PKG_CONFIG_COMMENTS).Title("Comments").Sortable(false).HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;max-length:50;" }).Width(180); 
+                    columns.Command(command => command.Custom(" ").Template("<a class='btn btn-default btn-outline-primary noSubmit grid-column-button config-delete'  href='javascript:void(0);' title='Click to delete this row!' \\data-target='tooltip'\\><i  class=\"k-icon k-i-delete\"></i></a>")).Width(50);
+                })
+                .ToolBar(toolbar => { toolbar.Create(); })
+                .Editable(editable => editable.Mode(GridEditMode.InCell).DisplayDeleteConfirmation(false))
+                .Resizable(resize => resize.Columns(true))
+                .HtmlAttributes(new { style = "height: 400px;" })
+                .Scrollable()
+                .Sortable()
+                .Resizable(resize => resize.Columns(true))
+                .Pageable(pageable => pageable.Refresh(false))
+                .Events(events => events.DataBound("DPOC_ConfigController.grid.onDataBound"))
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .PageSize(100)
+                    .Read(read => read.Action("GetConfigurations", "GuidelineSummary", new { Area = "DPOC" }).Data("DPOC_ConfigController.grid.params"))
+                    .Model(model => {
+                        model.Id(c => c.RowNumber);
+                        model.Field(c => c.GDLN_DTQ_SYS_SEQ);
+                        model.Field(c => c.DTQ_IQ_GDLN_ID);
+                        model.Field(c => c.POS_APPL);
+                        model.Field(c => c.STATES_APPL).Editable(true);
+                        model.Field(c => c.POS_INCL_EXCL_CD);
+                        model.Field(c => c.POS_INCL_EXCL_DESC);
+                        model.Field(c => c.STATES_INCL_EXCL_CD);
+                        model.Field(c => c.STATES_INCL_EXCL_DESC).Editable(true);
+                        model.Field(c => c.DTQ_NM);
+                        model.Field(c => c.TGT_DTQ);
+                        model.Field(c => c.TGT_DTQ_VERSION);
+                        model.Field(c => c.HOLDING_DTQ);
+                        model.Field(c => c.HOLDING_DTQ_VERSION);
+                        model.Field(c => c.COMMENTS);
+                        model.Field(c => c.DPOC_SOS_PROVIDER_TIN_EXCL);
+            })
+        )
+        .AutoBind(false)
+    )
+</div>

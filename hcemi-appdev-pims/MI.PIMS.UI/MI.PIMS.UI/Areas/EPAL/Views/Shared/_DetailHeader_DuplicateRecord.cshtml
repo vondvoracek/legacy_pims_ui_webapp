@@ -1,0 +1,204 @@
+﻿@model MI.PIMS.BO.Dtos.EPAL_Procedures_V_Dto
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+
+@Html.Hidden("RequestVerificationToken", @Xsrf.GetAndStoreTokens(Context).RequestToken) <!--USER STORY 129227 MFQ-->
+
+<style>
+    .k-animation-container .k-list-container {
+        border-width:thin;
+        border-color:black;
+    }
+</style>
+
+<div class="container  search-section" style="padding-left:30px; padding-right:30px;">
+    <div class="section-heading">
+        <div class="row">
+            <div class="col-md-7 col-sm-7 col-lg-7">
+                <div style="font-size: 14px; margin-top:4px; ">
+                    PIMS Detail &nbsp; <span style="font-size: 11px; font-style: italic;">(Copied from PIMS ID:</span>
+                        <a id="btnGotoDetail" style="font-size: 11px; font-style: italic;" title="Click to edit details" href="javascript:void(0)">@Model.EPAL_HIERARCHY_KEY </a> ) 
+                        <input id="hidden-EPAL_HIERARCHY_KEY" type="hidden" readonly value="@(ViewBag.orig_EPAL_HIERARCHY_KEY)"/>
+                    </div>
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 text-lg-right text-md-right text-sm-right">
+                @if((string)ViewData["PageType"] != @Roles.EPALReadOnly.ToString()){
+                    <div>
+                        <button id="btnSave" data-toggle="tooltip" class="btn btn-primary noSubmit" title="Click to save record!"><i class="fas fa-save"></i> Save </button>
+                        <button id="btnReset" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click reset to revert changes!"><i class="fas fa-times-circle"></i> Reset </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (Model != null)
+    {
+    <div class="section-border">
+        <div style="margin-top:-15px;">
+             <span style="font-size:11px; font-weight:bold; color: red;">* Required Fields</span>
+            <div class="form-row">
+                <label for="txtPIMSID" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">PIMS ID:</label>
+                <div class="col-lg-2 cell-padding">
+                    <input type="hidden" class="form-control" data-toggle="tooltip" readonly id="txtPIMSID" name="txtPIMSID" value="">
+                    <input type="text" class="form-control" disabled id="txtPIMSID_Display" value="">
+                </div>
+                <label for="txtBusinessSegment" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight required">Business Segment:</label>
+                <div class="col-lg-2 cell-padding">
+                           @(Html.Kendo().DropDownList()
+                                .Name("ddlLOB")
+                                .DataTextField("VV_CD")
+                                .DataValueField("VV_CD")
+                                .OptionLabel("------")
+                                .Filter(FilterType.Contains)
+                                .HtmlAttributes(new { style = "width: 100%" })
+                                .Events(e =>
+                                {
+                                    e.Change("_DetailHeaderDuplicateRecordController.dropdown.onChange_LOB").Open("_DetailHeaderDuplicateRecordController.dropdown.onOpen_One");
+                                })
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                       read.Action("GetAllPIMSHierarchyCodesXwalk", "Home", new { Area = "EPAL" }).Data("_DetailHeaderDuplicateRecordController.dropdown.param.All_APP_LOB");
+                                    });
+                                })
+                            )
+                </div>
+                <label for="ddlEntity_AddNew" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight required">Entity:</label>
+                <div class="col-lg-2 cell-padding">
+                        @(Html.Kendo().DropDownList()
+                            .Name("ddlEntity")
+                            .DataTextField("COLUMN_NAME")
+                            .DataValueField("COLUMN_NAME")
+                            .OptionLabel("------")
+                            .AutoBind(false)
+                            .Events(e =>
+                            {
+                                e.Change("_DetailHeaderDuplicateRecordController.dropdown.onChange_Entity").Open("_DetailHeaderDuplicateRecordController.dropdown.onOpen_One");
+                            })
+                            .Filter(FilterType.Contains)
+                            .HtmlAttributes(new { style = "width: 100%" })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                     read.Action("GetAllPIMSHierarchyCodesXwalk", "Home", new { Area = "EPAL" }).Data("_DetailHeaderDuplicateRecordController.dropdown.param.All_APP_ENTITY");
+                                })                
+                                .ServerFiltering(true);
+                            })
+                        )
+                </div>
+
+                <label for="txtProcedureCode" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Procedure Code:</label>
+                <div class="col-lg-2 cell-padding">
+                    <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtProcedureCode" name="txtProcedureCode" value="@Model.PROC_CD">
+                </div>
+            </div>
+            <div class="form-row">
+                <label for="txtPlan" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight required">Plan:</label>
+                <div class="col-lg-2 cell-padding">
+                    @(Html.Kendo().DropDownList()
+                        .Name("ddlPlan")
+                        .DataTextField("COLUMN_NAME")
+                        .DataValueField("COLUMN_NAME")
+                        .OptionLabel("------")
+                        .AutoBind(false)
+                        .Events(e =>
+                        {
+                            e.Change("_DetailHeaderDuplicateRecordController.dropdown.onChange_Plan").Open("_DetailHeaderDuplicateRecordController.dropdown.onOpen_One");
+                        })
+                        .Filter(FilterType.Contains)
+                        .HtmlAttributes(new { style = "width: 100%" })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetAllPIMSHierarchyCodesXwalk", "Home", new { Area = "EPAL" }).Data("_DetailHeaderDuplicateRecordController.dropdown.param.All_APP_PLAN");
+                            })                
+                            .ServerFiltering(true);
+                        })
+                    )
+                </div>
+                <label for="txtProduct" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight required">Product:</label>
+                <div class="col-lg-2 cell-padding">
+                    @(Html.Kendo().DropDownList()
+                        .Name("ddlProduct")
+                        .DataTextField("COLUMN_NAME")
+                        .DataValueField("COLUMN_NAME")
+                        .OptionLabel("------")
+                        .Filter(FilterType.Contains)
+                        .AutoBind(false)
+                        .Events(e =>
+                        {
+                            e.Change("_DetailHeaderDuplicateRecordController.dropdown.onChange_Product").Open("_DetailHeaderDuplicateRecordController.dropdown.onOpen_One");
+                        })
+                        .HtmlAttributes(new { style = "width: 100%" })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                               read.Action("GetAllPIMSHierarchyCodesXwalk", "Home", new { Area = "EPAL" }).Data("_DetailHeaderDuplicateRecordController.dropdown.param.All_APP_PRODUCT");
+                            })                
+                            .ServerFiltering(true);
+                        })
+                    )
+                </div>
+
+                <label for="txtFunding" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight required">Funding:</label>
+                <div class="col-lg-2 cell-padding">
+                    @(Html.Kendo().DropDownList()
+                        .Name("ddlFundingArrangement")
+                        .DataTextField("COLUMN_NAME")
+                        .DataValueField("COLUMN_NAME")
+                        .OptionLabel("------")
+                        .Filter(FilterType.Contains)
+                        .HtmlAttributes(new { style = "width: 100%" })
+                        .AutoBind(false)
+                        .Events(e =>
+                        {
+                            e.Change("_DetailHeaderDuplicateRecordController.dropdown.onChange_FundingArrangement").Open("_DetailHeaderDuplicateRecordController.dropdown.onOpen_One");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetAllPIMSHierarchyCodesXwalk", "Home", new { Area = "EPAL" }).Data("_DetailHeaderDuplicateRecordController.dropdown.param.All_APP_FUNDING_ARRANGEMENT");
+                            })                
+                            .ServerFiltering(true);
+                        })
+                    )
+                </div>
+
+                <label for="txtDrugName" class="col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight required">Drug Name:</label>
+                 <div class="col-lg-2 cell-padding">
+                     <table style="width:100%">
+                         <tr>
+                             <td>
+                                   <input type="text" class="form-control" data-toggle="tooltip" readonly id="txtDrugName" name="txtDrugName" value="@Model.DRUG_NM">
+                             </td>
+                                <td style="padding-left:5px">
+                                     <label class="text-sm-left col-form-label form-check"><input type="checkbox" checked class="form-check-input" id="chkDefault"> Default</label>  
+                             </td>
+                         </tr>
+                     </table>
+                </div>
+            </div>
+@*            <div class="form-row">
+                <label for="txtEPALVersionDt" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">EPAL Version Eff Date:</label>
+                <div class="col-lg-2 cell-padding">
+                    <!--<input type="text" data-toggle="tooltip" class="form-control" readonly id="txtEPALVersionDt" name="txtEPALVersionDt" value="@Model.EPAL_VER_EFF_DT?.ToString("MM/dd/yyyy hh:mm:ss tt")">-->
+                    <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtEPALVersionDt" name="txtEPALVersionDt" value="">
+                </div>
+            </div>*@
+            <div >
+                <input type="hidden" readonly id="txtOrigEPALVersionDt" name="txtOrigEPALVersionDt" value="@(ViewBag.orig_EPAL_VER_EFF_DT)">
+                <input type="hidden" readonly id="txtOrigEPALBusSegCD" name="txtOrigEPALBusSegCD" value="@(ViewBag.orig_EPAL_BUS_SEG_CD)">
+                <input type="hidden" readonly id="txtOrigEPALEntityCD" name="txtOrigEPALEntityCD" value="@(ViewBag.orig_EPAL_ENTITY_CD)">
+            </div>
+        </div>
+    </div>
+
+}
+
+   </div>
+

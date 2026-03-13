@@ -1,0 +1,379 @@
+﻿@using Kendo.Mvc.UI
+@using MI.PIMS.UI.Common
+
+<script src="~/js/DPOC/_DPOC_GuidelineSummary.js" asp-append-version="true"></script>
+<script src="~/js/DPOC/_DPOC_Configuration.js" asp-append-version="true"></script>
+<script src="~/js/DPOC/_DPOC_GuidelineDiagnosis.js" asp-append-version="true"></script>
+<script src="~/js/DPOC/_DPOC_GuidelineState.js" asp-append-version="true"></script>
+
+@Html.Hidden("GuidelineSummaryDetailUrl", Url.Action("GuidelineSummaryDetailComponent", "Home", new
+    {
+        Area = "DPOC",
+        DPOC_HIERARCHY_KEY = "__DPOC_HIERARCHY_KEY__",
+        DPOC_VER_EFF_DT = "__DPOC_VER_EFF_DT__",
+        DPOC_PACKAGE = "__DPOC_PACKAGE__",
+        DPOC_RELEASE = "__DPOC_RELEASE__",
+        IQ_GDLN_ID = "__IQ_GDLN_ID__",
+        RULE_OUTCOME_OUTPAT = "__RULE_OUTCOME_OUTPAT__",
+        RULE_OUTCOME_OUTPAT_FCLTY = "__RULE_OUTCOME_OUTPAT_FCLTY__",
+        RULE_OUTCOME_INPAT = "__RULE_OUTCOME_INPAT__",
+        PageType = "__PageType__"
+    }))
+
+<style type="text/css">
+    tr.highlight {
+        background-color: lavender;
+    }
+
+    .k-window {
+        border: 1px solid rgb(0, 128, 255);
+    }
+
+
+    #grid_guideline_summary .k-pager-info {
+        display: inline-block !important;
+    }
+
+    #grid_guideline_summary_active .k-pager-info {
+        display: inline-block !important;
+    }
+
+    #grid_guideline_summary .k-grid-content.k-auto-scrollable {
+        height: 314px !important;
+    }
+
+    #grid_guideline_summary_active .k-grid-content.k-auto-scrollable {
+        height: 314px !important;
+    }
+</style>
+
+<input type="hidden" id="txtGDLNPopupType" class="gs-fields" />
+<input type="hidden" id="txtDataRowId_GS" class="gs-fields" />
+@Html.Hidden("txtDPOCRelease_GS_hdn")
+@Html.Hidden("txtDPOC_VER_NUM_hdn")
+@Html.Hidden("txtIQ_GDLN_ID_GS_hdn")
+<div class="container">
+    <div class="form-row gdln-header-row" style="padding-top:10px;">
+        <div class="col-6">
+            
+        </div>
+        <div class="col-6 text-right">
+            <a id="btnAvailableGuidelines" class="btn btn-md" href="javascript:void(0)"><i id="icon-up" class="fas fa-chevron-down color-dark-green" style="font-size:16px;"></i> <i id="icon-down" class="fas fa-chevron-up color-red" style="font-size:16px;"></i> Available Guidelines</a>
+        </div>
+        <hr />
+    </div>
+    <div class="row">
+        <div class="form-group col-md-12">
+            <div class="row" style="font-size:11px !important;">
+                <div class="col-12">
+                    <div id="divAvailableGuidelines" class="divAvailableGuidelines" style="margin-bottom:20px;padding: 15px 10px 10px 10px;border:1px groove #E6E6E6; border-radius: 6px;">
+                        <div class="row">
+                            <div class="col-12 text-left">
+                                <h6 style="border-bottom: 1px solid sandybrown;padding-bottom: 5px;">
+                                    <span style="border: 1px solid sandybrown;padding: 3px 5px 5px 5px;border-radius: 3px 3px 0px 0px;color: white;background: sandybrown;">
+                                        Available Guidelines
+                                    </span>
+                                </h6>
+                            </div>
+                        </div>
+                        @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.DPOC_Inv_Gdln_Rules_V_Dto>()
+                            .Name("grid_guideline_summary")
+                            .Columns(c =>
+                            {
+                                c.Bound(p => p.IQ_GDLN_STATUS).Title("Current<br/>Status").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold;" }).HtmlAttributes(new { style = "text-align: center" }).Width(100);
+                                c.Bound(p => p.IQ_GDLN_PRODUCT_DESC).Title("IQ Product<br/>Description").HeaderHtmlAttributes(new { title = "IQ Product Description" }).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(155);
+                                c.Bound(p => p.IQ_GDLN_DESC).Title("IQ Guideline<br/>Description").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+                                c.Bound(p => p.IQ_GDLN_ID).Title("IQ Guideline ID").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+                                c.Bound(p => p.IQ_REFERENCE).Title("IQ Reference").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+                                c.Bound(p => p.IQ_GDLN_REL_DT).Title("IQ Release Date").ClientTemplate("#= ( kendo.toString(kendo.parseDate(IQ_GDLN_REL_DT), 'MM/dd/yyyy') == '12/31/2999' || (data.IQ_GDLN_REL_DT == null)) ? ' ' : kendo.toString(kendo.parseDate(IQ_GDLN_REL_DT), 'MM/dd/yyyy') #").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+                                c.Bound(p => p.IQ_GDLN_EXP_DT).Title("IQ Expiration Date").ClientTemplate("#= ( kendo.toString(kendo.parseDate(IQ_GDLN_EXP_DT), 'MM/dd/yyyy') == '12/31/2999' || (data.IQ_GDLN_EXP_DT == null)) ? ' ' : kendo.toString(kendo.parseDate(IQ_GDLN_EXP_DT), 'MM/dd/yyyy') #").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);                                
+                                c.Bound(p => p.IQ_GDLN_VERSION).Title("IQ Version").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);                                
+                            })
+                            .Scrollable(scroll => scroll.Height(30))
+                            .Resizable(resize => resize.Columns(true))
+                            //.Pageable(pageable => pageable.Refresh(false).PreviousNext(true).Numeric(true))
+                            .Events(events => events.DataBound("DPOC_GuidelineSummaryController.grid.onDataBound"))
+                            .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .ServerOperation(false)
+                            //.PageSize(6)
+                            .Read(read => read.Action("GetPendingByPIMSID", "GuidelineSummary", new { Area = "DPOC" }).Data("DPOC_GuidelineSummaryController.grid.paramsPending"))
+                            )
+                            )
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div style="margin-bottom:20px;padding: 15px 10px 10px 10px;border:1px groove #E6E6E6; border-radius: 6px;">
+                        <div class="row">
+                            <div class="col-12 text-left">
+                                <h6 style="border-bottom: 1px solid lightseagreen;padding-bottom: 5px;">
+                                    <span style="border: 1px solid lightseagreen;padding: 3px 5px 5px 5px;border-radius: 3px 3px 0px 0px;background: lightseagreen;color: white;">
+                                        Active/Retired Guidelines
+                                    </span>
+                                </h6>
+                            </div>
+                        </div>
+                        @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.DPOC_Inv_Gdln_Rules_V_Dto>()
+                            .Name("grid_guideline_summary_active")
+                            .Columns(c =>
+                            {
+                                c.Bound(p => p.IQ_GDLN_STATUS).Title("Current<br/>Status").ClientTemplate(
+                                "<a href='javascript:void(0);' style='color:blue;' onclick=\"DPOC_GuidelineSummaryController.grid.edit_redirect(this, 'Active');\" title='Click to view details!' \\data-target='tooltip'\\>#= IQ_GDLN_STATUS # </a>")
+                                .Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold;" }).HtmlAttributes(new { style = "text-align: center" }).Width(180);
+
+                                c.Bound(p => p.DPOC_RELEASE).Title("DPOC<br/>Release").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(110);
+                                c.Bound(p => p.DPOC_VER_NUM).Title("DPOC Release<br/>Version").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(130);
+
+                                c.Bound(p => p.KL_PLCY_NAME).Title("Medical<br/>Policy Name").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(100);
+
+                                c.Bound(p => p.IQ_GDLN_PRODUCT_DESC).Title("IQ Product<br/>Description").HeaderHtmlAttributes(new { title = "IQ Product Description" }).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(155);
+                                c.Bound(p => p.IQ_GDLN_DESC).Title("IQ Guideline<br/>Description").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+
+                                c.Bound(p => p.IQ_GDLN_ID).Title("IQ Guideline ID").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+                                c.Bound(p => p.IQ_GDLN_VERSION).Title("IQ<br/>Version").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(100);
+                                c.Bound(p => p.IQ_CRITERIA).Title("IQ Criteria").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+
+                                c.Bound(p => p.GDLN_ASSOC_EFF_DT).Title("Guideline Start<br/>Date").ClientTemplate("#= ( kendo.toString(kendo.parseDate(GDLN_ASSOC_EFF_DT), 'MM/dd/yyyy') == '12/31/2999' || (data.GDLN_ASSOC_EFF_DT == null)) ? ' ' : kendo.toString(kendo.parseDate(GDLN_ASSOC_EFF_DT), 'MM/dd/yyyy') #").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+                                c.Bound(p => p.GDLN_ASSOC_EXP_DT).Title("Guideline End<br/>Date").ClientTemplate("#= ( kendo.toString(kendo.parseDate(GDLN_ASSOC_EXP_DT), 'MM/dd/yyyy') == '12/31/2999' || (data.GDLN_ASSOC_EXP_DT == null)) ? ' ' : kendo.toString(kendo.parseDate(GDLN_ASSOC_EXP_DT), 'MM/dd/yyyy') #").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+
+                                c.Bound(p => p.JRSDCTN_NM).Title("Jurisdictions").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+
+                                c.Bound(p => p.STATES_APPLY)
+                                .Title("State")
+                                .Filterable(false)
+                                .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                                .HtmlAttributes(new { style = "text-align: center" }).Width(160)
+                                .ClientTemplate(
+                                "# if(STATES_APPLY > 0){#" +
+                                "<a href='javascript:void(0);' class='hv-state' id='hv-state' style='color:blue;' onclick=\"DPOC_GuidelineSummaryController.grid.show_stateTab(this, 'Active');\" title='Click to view details!' \\data-target='tooltip'\\>State Applies <span class='spinner-border spinner-border-sm text-primary ms-2 spinner-hv-state' role='status' style='display:none;'><span class='visually-hidden'></span></span></a>" +
+                                "# } else { #" +
+                                "<a href='javascript:void(0);' style='color:blue;' onclick=\"DPOC_GuidelineSummaryController.grid.show_stateTab(this, 'Active');\" title='Click to view details!' \\data-target='tooltip'\\>Add State </a>" +
+                                "# } #"
+                                );
+
+                                c.Bound(p => p.POS_APPLY)
+                                .Title("POS")
+                                .Filterable(false)
+                                .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                                .HtmlAttributes(new { style = "text-align: center" }).Width(160)
+                                .ClientTemplate(
+                                "# if(POS_APPLY > 0){#" +
+                                "<a href='javascript:void(0);' class='pos' style='color:blue;' onclick=\"DPOC_GuidelineSummaryController.grid.show_dtqTab(this, 'Active');\" title='Click to view details!' \\data-target='tooltip'\\>POS Applies <span class='spinner-border spinner-border-sm text-primary ms-2 spinner-pos' role='status' style='display:none;'><span class='visually-hidden'></span></span></a>" +
+                                "# } else { #" +
+                                "<a href='javascript:void(0);' style='color:blue;' onclick=\"DPOC_GuidelineSummaryController.grid.show_posTab(this, 'Active');\" title='Click to view details!' \\data-target='tooltip'\\>Add POS </a>" +
+                                "# } #"
+                                );
+
+                                c.Bound(p => p.DTQ_APPLY)
+                                .Title("DTQ")
+                                .Filterable(false)
+                                .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                                .HtmlAttributes(new { style = "text-align: center" }).Width(160)
+                                .ClientTemplate(
+                                "# if(DTQ_APPLY > 0){#" +
+                                "<a href='javascript:void(0);' class='dtq' style='color:blue;' onclick=\"DPOC_GuidelineSummaryController.grid.show_dtqTab(this, 'Active');\" title='Click to view details!' \\data-target='tooltip'\\>DTQ Applies <span class='spinner-border spinner-border-sm text-primary ms-2 spinner-dtq' role='status' style='display:none;'><span class='visually-hidden'></span></span></a>" +
+                                "# } else { #" +
+                                "<a href='javascript:void(0);' style='color:blue;' onclick=\"DPOC_GuidelineSummaryController.grid.show_dtqTab(this, 'Active');\" title='Click to view details!' \\data-target='tooltip'\\>Add DTQ </a>" +
+                                "# } #"
+                                );
+
+
+                                c.Bound(p => p.DX_APPLY)
+                                .Title("Diagnosis")
+                                .Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160)
+                                .ClientTemplate(
+                                "# if(DX_APPLY > 0){#" +
+                                "<a href='javascript:void(0);' class='diag' style='color:blue;' onclick=\"DPOC_GuidelineSummaryController.grid.show_diagTab(this, 'Active');\" title='Click to view details!' \\data-target='tooltip'\\>DX Applies <span class='spinner-border spinner-border-sm text-primary ms-2 spinner-diag' role='status' style='display:none;'><span class='visually-hidden'></span></span></a>" +
+                                "# } else { #" +
+                                "<a href='javascript:void(0);' style='color:blue;' onclick=\"DPOC_GuidelineSummaryController.grid.show_diagTab(this, 'Active');\" title='Click to view details!' \\data-target='tooltip'\\>Add DX </a>" +
+                                "# } #"
+                                );
+
+                                c.Bound(p => p.GDLN_AGE_MIN).Title("Guideline<br/>Age Min").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+                                c.Bound(p => p.GDLN_AGE_MAX).Title("Guideline<br/>Age Max").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+
+                                c.Bound(p => p.RULE_TYPE_OUTPAT).Title("Outpatient Rule<br/>Type").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(130);
+                                //c.Bound(p => p.RULE_TYPE_OUTCOME_OUTPAT).Title("Outpatient Rule<br/>Type Outcome").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(130);
+                                c.Bound(p => p.RULE_TYPE_RSN_OUTPAT).Title("Outpatient Rule<br/>Type Reason").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(130);
+
+                                c.Bound(p => p.RULE_TYPE_OUTPAT_FCLTY).Title("Outpatient Facility<br/>Rule Type").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(180);
+                                //c.Bound(p => p.RULE_TYPE_OUTCOME_OUTPAT_FCLTY).Title("Outpatient Facility<br/>Rule Type Outcome").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(180);
+                                c.Bound(p => p.RULE_TYPE_RSN_OUTPAT_FCLTY).Title("Outpatient Facility Rule<br/>Type Reason").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(180);
+
+                                c.Bound(p => p.RULE_TYPE_INPAT).Title("Inpatient Rule<br/>Type").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(130);
+                                //c.Bound(p => p.RULE_TYPE_OUTCOME_INPAT).Title("Inpatient Rule<br/>Type Outcome").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(130);
+                                c.Bound(p => p.RULE_TYPE_RSN_INPAT).Title("Inpatient Rule<br/>Type Reason").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(180);
+
+                                c.Bound(p => p.MDCR_COVG_SUM_TITLE).Title("Medicare<br/>Summary Title").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(130);
+                                c.Bound(p => p.MDCR_COVG_SUM_ID).Title("Medicare<br/>Summary ID").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(130);
+
+                                //c.Bound(p => p.KL_PLCY_ID).Title("Medical<br/>Policy ID").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(100);
+
+                                //c.Bound(p => p.DPOC_SOS_PROVIDER_TIN_EXCL).Title("SOS Provider TIN<br/>Exclusions").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+
+                                /*Bug 121680 Field re-allocation*/
+                                @* c.Bound(p => p.IQ_GDLN_PRODUCT_NM).Title("IQ Guideline<br/>Product").HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(140);
+                                c.Bound(p => p.IQ_GDLN_RECOMMENDATION_DESC).Title("IQ Recommendation<br/>Description").HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+                                c.Bound(p => p.IQ_REFERENCE).Title("IQ Reference").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160); *@
+
+                                //c.Bound(p => p.RULE_EXCLUSIONS).Title("Exclusions").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+                                //c.Bound(p => p.PKG_CONFIG_COMMENTS).Title("Package Config<br/>Comments").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+                                //c.Bound(p => p.DPOC_ADDTNL_RQRMNTS).Title("Additional<br/>Comments").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+                                c.Bound(p => p.IQ_GDLN_REL_DT).Title("IQ Release Date").ClientTemplate("#= (kendo.toString(kendo.parseDate(IQ_GDLN_REL_DT), 'MM/dd/yyyy') == '01/01/1900' || kendo.toString(kendo.parseDate(IQ_GDLN_REL_DT), 'MM/dd/yyyy') == '12/31/2999' || (data.IQ_GDLN_REL_DT == null)) ? ' ' : kendo.toString(kendo.parseDate(IQ_GDLN_REL_DT), 'MM/dd/yyyy') #").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+
+                                c.Bound(p => p.DPOC_SOS_PROVIDER_TIN_EXCL).Hidden(true);
+                                c.Bound(p => p.IQ_GDLN_NM).Hidden(true);                                
+
+                            })
+                            .Scrollable(scroll => scroll.Height(30))
+                            .Resizable(resize => resize.Columns(true))
+                            //.Pageable(pageable => pageable.Refresh(false))
+                            .Events(events => events.DataBound("DPOC_GuidelineSummaryController.grid.onDataBound").DataBinding("DPOC_GuidelineSummaryController.grid.onDataBinding"))
+                            .DataSource(dataSource => dataSource
+                                .Ajax()
+                                //.PageSize(5)
+                                .Read(read => read.Action("GetActiveRetiredByPIMSIDSummary", "GuidelineSummary", new { Area = "DPOC" }).Data("DPOC_GuidelineSummaryController.grid.paramsActive"))
+                                .ServerOperation(false)
+                            )
+                        )
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Guideline Modal-->
+<div class="bs-dpoc-guideline-summary-widget-modal" id="bs-dpoc-guideline-summary-widget-modal" style="padding:5px;">
+    <div class="window-body guideline-modal-body">
+        @(
+            Html.Kendo().TabStrip()
+            .Name("gsTabstrip")
+            .TabPosition(TabStripTabPosition.Left)
+            .Items(tabstrip =>
+            {
+                tabstrip.Add().HtmlAttributes(new { id = "tab-gl-summary" }).Selected(true).Text("Guideline Detail")
+                .LoadContentFrom("Load_Guideline_Summary_Detail", "Home", new { Areas = "DPOC" });
+
+                tabstrip.Add().Text("Guideline Configuration")
+                .LoadContentFrom("Load_Guideline_Configuration", "Home", new { Areas = "DPOC" });
+
+                tabstrip.Add().HtmlAttributes(new { id = "tab-gl-diag" }).Text("Diagnosis Code")
+                .LoadContentFrom("Load_Guideline_DiagnosisCodes", "Home", new { Areas = "DPOC" });
+            })
+            .Events(events => events.ContentLoad("DPOC_GuidelineSummaryController.tab.loaded").Select("DPOC_GuidelineSummaryController.tab.select"))
+        )
+    </div>
+    <div class="window-footer bs-dpoc-guideline-summary-widget-modal-footer">
+        <button type="button" class="btn btn-primary btn-sm bs-dpoc-guideline-summary-widget-modal-save d-none"><i class="fas fa-save"></i> Activate</button>
+        <button type="button" class="btn btn-default btn-sm bs-dpoc-guideline-summary-widget-modal-close" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+    </div>
+</div>
+
+<div class="dpoc-guideline-summary-hover-window" id="dpoc-guideline-summary-hover-window" style="padding:5px;">
+    <div class="window-body guideline-summary-hover-window-body">
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    diagViewLoadInHoverWindowUrl = '@Url.Action("GuidelineDiagnosisHover", "GuidelineSummary", new { Areas = "DPOC" })';
+    statesViewLoadInHoverWindowUrl = '@Url.Action("GuidelineStatesHover", "GuidelineSummary", new { Areas = "DPOC" })';
+    guidelineConfigurationHoverUrl = '@Url.Action("GuidelineConfigurationHover", "GuidelineSummary", new { Areas = "DPOC" })';
+
+    statesViewLoadWindowUrl = '@Url.Action("Load_Guideline_States", "Home", new { Areas = "DPOC" })';
+
+</script>
+
+<!--Guideline Configuration State Modal-->
+<div class="dpoc-guideline-config-state-widget-window" id="dpoc-guideline-config-state-widget-window">
+</div>
+
+<div id="guidelines-modal-tab-data" style="display:none;">
+    <div class="gs-pos-hidden hide">
+        @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.DPOC_INV_DTQS_V_Dto>()
+            .Name("grid_configHidden")
+            .Columns(columns =>
+            {
+                columns.Bound(p => p.DTQ_IQ_GDLN_ID);
+                columns.Bound(d => d.POS_APPL);
+                columns.Bound(d => d.POS_INCL_EXCL_CD);
+                columns.Bound(d => d.STATES_APPL);
+                columns.Bound(d => d.STATES_INCL_EXCL_CD);
+                columns.Bound(d => d.DTQ_NM);
+                columns.Bound(d => d.TGT_DTQ);
+                columns.Bound(d => d.TGT_DTQ_VERSION);
+                columns.Bound(d => d.HOLDING_DTQ);
+                columns.Bound(d => d.HOLDING_DTQ_VERSION);
+                columns.Bound(d => d.COMMENTS);
+                columns.Bound(d => d.DPOC_SOS_PROVIDER_TIN_EXCL);
+                columns.Bound(d => d.DPOC_ADDTNL_RQRMNTS);
+                columns.Bound(d => d.PKG_CONFIG_COMMENTS);
+            })
+            .Events(events => events.DataBound("DetailController.grid.config.onDataBound"))
+            .DataSource(dataSource => dataSource
+                .Ajax()                
+                .ServerOperation(false)
+                .Read(read => read.Action("GetConfigurations", "GuidelineSummary", new { Area = "DPOC" }).Data("DetailController.grid.param"))
+            )
+        )
+    </div>
+    <div class="gs-diag-codes-hidden hide">
+        @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.DPOC_Inv_Gdln_Diagnoses_Dto>()
+            .Name("grid_GSDiagListHidden")
+            .Columns(c =>
+            {
+                c.Bound(p => p.DIAG_IQ_GDLN_ID);
+                c.Bound(p => p.LIST_NAME);
+                c.Bound(p => p.DIAG_CD);
+                c.Bound(p => p.DIAG_CD_DESC);
+                c.Bound(p => p.DIAG_INCL_EXCL_CD);
+                c.Bound(p => p.DIAG_INCL_EXCL_CD_DESC);
+            })
+            .Events(events => events.DataBound("DetailController.grid.diags.onDataBound"))
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            
+            .ServerOperation(false)
+            .Read(read => read.Action("GetList", "GuidelineDiagnosis").Data("DetailController.grid.param"))
+            )
+            )
+    </div>
+    <div class="gs-states-hidden hide">
+        @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.DPOC_Inv_Gdln_Appl_To_States_T_Dto>()
+            .Name("grid_GSStateInfoHidden")
+            .Columns(c =>
+            {
+                c.Bound(p => p.ATS_IQ_GDLN_ID);
+                c.Bound(p => p.STATE_NAME);
+                c.Bound(p => p.ATS_INCL_EXCL_CD);
+                c.Bound(p => p.ATS_INCL_EXCL_CD_DESC);
+                c.Bound(p => p.STATE_CD);
+            })
+            .Events(events => events.DataBound("DetailController.grid.states.onDataBound"))
+            .DataSource(dataSource => dataSource
+                .Ajax()                
+                .ServerOperation(false)
+                .Read(read => read.Action("GetGSStatesByDPOC", "GuidelineSummary").Data("DetailController.grid.param"))
+            )
+        )
+    </div>
+</div>
+
+<div id="windowLoader" style="
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 12000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+">
+    <span class="k-icon k-i-loading" style="font-size: 48px;"></span>
+</div>

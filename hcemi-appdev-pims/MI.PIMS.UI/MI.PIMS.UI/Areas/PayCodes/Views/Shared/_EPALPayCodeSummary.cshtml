@@ -1,0 +1,84 @@
+﻿@inject MI.PIMS.UI.Services.MIAuthenticate.IMIAuthenticateService _miAuthenticateService
+@inject MI.PIMS.UI.Common.Helper _helper
+@using Kendo.Mvc.UI
+
+<div class="container tab-section">
+    <h5>
+        EPAL Pay Code  Summary
+    </h5>
+    <hr />
+    <form id="frmEPALPayCodeSummary">
+
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <div style="font-size:11px !important;">
+                    @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.PayCode_EPAL_Summary_Dto>()
+                        .Name("gridPayCodeEPALSummary")
+                        .Columns(c => {
+
+                            c.Bound(p => p.PAY_CODE).Title("Pay Code").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(100);
+                            c.Bound(p => p.PIMS_EPAL_ID)
+                                    .Title("PIMS EPAL ID")
+                                    .ClientTemplate(
+                            "<a href='javascript:void(0);' style='color:blue;' onclick=\"PayCodeSummaryController.methods.redirect('#= PIMS_EPAL_ID#');\" title='Click to view details!' \\data-target='tooltip'\\>#= PIMS_EPAL_ID # </a>"
+                            )
+                                    .Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                                    .HtmlAttributes(new { style = "text-align: center" }).Width(200);
+
+                            c.Bound(p => p.PRIOR_AUTH_STATUS).Title("Prior Auth<br/>Status").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(100);
+                            c.Bound(p => p.PRIOR_AUTH_EFF_DT).Filterable(false)
+                            .Title("Prior Auth<br/>Eff Date")
+                            .ClientTemplate("#= (data.PRIOR_AUTH_EFF_DT == null) ? ' ' : kendo.toString(kendo.parseDate(PRIOR_AUTH_EFF_DT), 'MM/dd/yyyy') #")
+                            .HtmlAttributes(new { style = "text-align: center" })
+                            .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                            .Width(100);
+                            c.Bound(p => p.PRIOR_AUTH_EXP_DT).Filterable(false)
+                            .Title("Prior Auth<br/>Exp Date")
+                            .ClientTemplate("#= (data.PRIOR_AUTH_EXP_DT == null) ? ' ' : kendo.toString(kendo.parseDate(PRIOR_AUTH_EXP_DT), 'MM/dd/yyyy') #")
+                            .HtmlAttributes(new { style = "text-align: center" })
+                            .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                            .Width(100);
+                            c.Bound(p => p.SOS_APPLIES).Title("SOS Applies").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(100);
+                            c.Bound(p => p.SOS_EFF_DT).Filterable(false)
+                            .Title("SOS Eff Date")
+                            .ClientTemplate("#= (data.SOS_EFF_DT == null) ? ' ' : kendo.toString(kendo.parseDate(SOS_EFF_DT), 'MM/dd/yyyy') #")
+                            .HtmlAttributes(new { style = "text-align: center" })
+                            .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                            .Width(100);
+                            c.Bound(p => p.SOS_EXP_DT).Filterable(false)
+                            .Title("SOS Exp Date")
+                            .ClientTemplate("#= (data.SOS_EXP_DT == null) ? ' ' : kendo.toString(kendo.parseDate(SOS_EXP_DT), 'MM/dd/yyyy') #")
+                            .HtmlAttributes(new { style = "text-align: center" })
+                            .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                            .Width(100);
+                            c.Bound(p => p.ALTRNT_SVC_CAT).Title("Category").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                            c.Bound(p => p.ALTRNT_SVC_SUBCAT).Title("Sub Category").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                            c.Bound(p => p.DX_INDICATOR).Title("DX Indicator").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(100);
+
+
+
+                        })
+                        .Resizable(resize => resize.Columns(true))
+                        .HtmlAttributes(new { style = "height: 100%" })
+                        .Sortable()
+                        .NoRecords()
+                        .Navigatable()
+                        .Pageable(pageable => pageable
+                            .Refresh(true)
+                            .PreviousNext(true)
+                            .Numeric(true)
+                        )
+                        .AutoBind(true)
+                        .Scrollable()
+                        .Selectable()
+                        .Filterable()                        
+                        .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(100)
+                        .Read(read => read.Action("GetPayCodeEPALSummary", "Home", new { Area = "PayCodes" }).Data("PayCodeSummaryController.grid.param")))
+                    )
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

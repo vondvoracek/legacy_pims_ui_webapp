@@ -1,0 +1,177 @@
+﻿<div>
+    <button id="saveChanges">Save Changes</button>
+    @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.EPAL_Procedures_AssoCodes_T_DiagCodes_Dto>
+    ()
+    .Name("grid_DiagCodes1")
+    .Editable(editable => editable.Mode(GridEditMode.InCell))
+    .Events(e => e.Save("onSave"))
+    .Columns(columns =>
+    {
+    columns.Bound(c => c.DIAG_CD).Title("Diagnosis Codes").Filterable(false).HeaderHtmlAttributes(new {title = "Diagnosis Codes."}).HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" }).Width(100);
+
+    columns.Bound(c => c.DIAG_CD_TYPE).Title("ICD Version").Filterable(false).HeaderHtmlAttributes(new {title = "ICD_Version."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" }).Width(100);
+
+    })
+    .HtmlAttributes(new { style = "height: 400px;width:800px" })
+    .Scrollable()
+    .Sortable()
+    .DataSource(dataSource => dataSource
+    .Ajax()
+    .Model(model =>
+    {
+    model.Id(c => c.DIAG_CD);
+    })
+    .Read(read => read.Action("GetDiagCodes", "Home").Data("DiagCodesController.grid.param")))
+    )
+    <script type="text/javascript">
+        //$("#saveChanges").button().click(function(){
+        //       alert("button");
+        //   });
+        //$("#saveChanges").click
+
+
+        $("#saveChanges").kendoButton({
+            click: function(e) {
+                alert("this");
+                //var grid = $("#grid").data("kendoGrid");
+                //grid.saveChanges();
+            }
+        })
+
+
+        var element = CKEDITOR.document.getById('CKEditor1');
+        element.on('click', function(ev) {
+            //ev.removeListener();
+            alert('hello');
+            return false;
+        });
+        function onSave(e)
+        alert("hai");
+            }
+    </script>
+
+    <script type="text/javascript">
+
+        var DiagCodesController = {
+            init: function() {
+                DiagCodesController.bind();
+            },
+            bind: function() {
+                $(function() {
+                    $('[data-toggle="tooltip"]').tooltip()
+                })
+            },
+            grid: {
+                refreshGrid: function() {
+                    $("#grid_DiagCodes1").data("kendoGrid").dataSource.read();
+                    $("#grid_DiagCodes1").data("kendoGrid").refresh();
+                },
+                param: function() {
+                    var paramObj = {
+                        p_EPAL_HIERARCHY_KEY: $('#txtPIMSID').val()
+                    }
+                    return paramObj
+                },
+                gridError: function(e) {
+                    if (e.errors) {
+                        var message = "Errors:\n";
+                        $.each(e.errors, function(key, value) {
+                            if ('errors' in value) {
+                                $.each(value.errors, function() {
+                                    message += this + "\n";
+                                });
+                            }
+                        });
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: message,
+                            customClass: 'swal-size-sm'
+                        });
+                    }
+                }
+            },
+            validation: {
+                controlValidator: function(controlName) {
+                    var validator = MICore.Validation(controlName);
+                    return validator.validate();
+                },
+            },
+            methods: {
+                redirect: function(CaseId) {
+                    Swal.fire({
+                        title: 'Redirecting..',
+                        text: 'Redirecting to case, please wait..',
+                        timerProgressBar: true,
+                        allowOutsideClick: false,
+                        willOpen: () => {
+                            Swal.showLoading();
+                            window.location.href = VIRTUAL_DIRECTORY + "";
+                        }
+                    })
+                }
+
+            },
+            message: {
+                showSuccess: function() {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Something Success!',
+                        customClass: 'swal-size-sm'
+                    })
+                },
+                showWarning: function(message) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Invalid Date',
+                        text: message,
+                        customClass: 'swal-size-sm'
+                    })
+                },
+                showError: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Opps, an error occurred! Please contact the system administrators.',
+                        customClass: 'swal-size-sm'
+                    })
+                }
+            }
+        };
+
+
+
+
+        var eventobject;
+        function AdditionalData(e) {
+            alert("this is an alert");
+            console.log(eventobject.model.BranchID);
+            return {
+                branch: eventobject.model.BranchID,
+                OpCo: eventobject.model.OpCo
+            }
+        }
+        function onSave(e) {
+
+        }
+
+        $(document).ready(function() {
+            DiagCodesController.init();
+            $("#saveChanges").button().click(function() {
+                 var DidagCodes = getColumnValues('grid_DiagCodes1', 0);
+                 var ICDVersion =getColumnValues('grid_DiagCodes1', 1);
+                alert("Diagnosis Codes:'" + DidagCodes+"'"+"\n" + "ICDVersion:'" + ICDVersion+"'");
+                function getColumnValues(gridID, columnNo)
+                {
+                    ctrl = "#" + gridID + " table > tbody > tr";
+                    var comaSeparatedValues = '';
+                    $(ctrl).each(function() {
+                        comaSeparatedValues = comaSeparatedValues + $(this).find('td').eq(columnNo).text() + ","; //eq(0) stands for first column of grid
+                    });
+                    return comaSeparatedValues;
+                }
+            });
+        });
+    </script>
+</div>

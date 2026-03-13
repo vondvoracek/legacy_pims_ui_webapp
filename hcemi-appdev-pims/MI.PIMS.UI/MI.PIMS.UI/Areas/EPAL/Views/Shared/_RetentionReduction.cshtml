@@ -1,0 +1,63 @@
+﻿@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "Reduction/Retention";
+}
+
+<script src="~/js/EPAL/_RetRedFactor.js" asp-append-version="true"></script>
+
+<div class="container tab-section">
+    <div class="row">
+        <div class="col-6">
+            <h5>
+                Retention Factor
+            </h5>
+            <hr />
+            @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.Ret_Factors_Dto>()
+                .Name("grid_Retention")                        
+                .Columns(c => {
+                    c.Bound(p => p.FACTOR_NM_RET).Title("Retention Factor").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold; title:'asdf'" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                    c.Bound(p => p.FACTOR_EFF_DT_RET).Title("Eff Date").Format("{0:MM/dd/yyyy}")
+                    .ClientTemplate("#= (FACTOR_EFF_DT_RET == null || kendo.toString(kendo.parseDate(FACTOR_EFF_DT_RET), 'MM/dd/yyyy') == '12/31/2999') ? ' ' : kendo.toString(kendo.parseDate(FACTOR_EFF_DT_RET), 'MM/dd/yyyy') #").Filterable(false).HeaderHtmlAttributes(new { title = "The effective date of the Retention factor." }).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+                    c.Bound(p => p.FACTOR_EXP_DT_RET).Title("Exp Date").Format("{0:MM/dd/yyyy}")
+                    .ClientTemplate("#= (FACTOR_EXP_DT_RET == null || kendo.toString(kendo.parseDate(FACTOR_EXP_DT_RET), 'MM/dd/yyyy') == '12/31/2999') ? ' ' : kendo.toString(kendo.parseDate(FACTOR_EXP_DT_RET), 'MM/dd/yyyy') #").Filterable(false).HeaderHtmlAttributes(new { title = "The expiration date of the Retention factor." }).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+                    c.Bound(p => p.FACTOR_DESC_RET).Title("Description").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold; " }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                    @*c.Bound(p => p.FACTOR_NOTES).Title("Comments").Filterable(false).HeaderHtmlAttributes(new {title = "Comments"}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" });*@
+                })                        
+                .Resizable(resize => resize.Columns(true))
+                .HtmlAttributes(new { style = "height: 400px;width:100%;" })
+                .Scrollable()
+                .Sortable()                    
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .PageSize(1000)
+                    .Read(read => read.Action("GetRetFactorsByPIMSID", "Home").Data("_RetRedFactorController.gridRetention.param")))
+            )
+        </div>
+        <div class="col-6">
+            <h5>
+                Reduction Factor
+            </h5>
+            <hr />
+            @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.Red_Factors_Dto>()
+                .Name("grid_Reduction")                        
+                .Columns(c => {
+                    c.Bound(p => p.FACTOR_NM_RED).Title("Reduction Factor").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold; title:'asdf'" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                    c.Bound(p => p.FACTOR_EFF_DT_RED).Title("Eff Date")
+                    .ClientTemplate("#= (FACTOR_EFF_DT_RED == null || kendo.toString(kendo.parseDate(FACTOR_EFF_DT_RED), 'MM/dd/yyyy') == '12/31/2999') ? ' ' : kendo.toString(kendo.parseDate(FACTOR_EFF_DT_RED), 'MM/dd/yyyy') #").Filterable(false).HeaderHtmlAttributes(new { title = "The effective date of the Reduction factor." }).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+                    c.Bound(p => p.FACTOR_EXP_DT_RED).Title("Exp Date")
+                    .ClientTemplate("#= (FACTOR_EXP_DT_RED == null || kendo.toString(kendo.parseDate(FACTOR_EXP_DT_RED), 'MM/dd/yyyy') == '12/31/2999') ? ' ' : kendo.toString(kendo.parseDate(FACTOR_EXP_DT_RED), 'MM/dd/yyyy') #").Filterable(false).HeaderHtmlAttributes(new { title = "The expiration date of the Reduction factor." }).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+                    c.Bound(p => p.FACTOR_DESC_RED).Title("Description").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold; " }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                    @*c.Bound(p => p.FACTOR_NOTES).Title("Comments").Filterable(false).HeaderHtmlAttributes(new {title = "Comments"}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" });*@
+                })                        
+                .Resizable(resize => resize.Columns(true))
+                .HtmlAttributes(new { style = "height: 400px;width:100%;" })
+                .Scrollable()
+                .Sortable()                    
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .PageSize(1000)
+                    .Read(read => read.Action("GetRedFactorsByPIMSID", "Home").Data("_RetRedFactorController.gridReduction.param")))
+            )
+        </div>
+    </div>
+</div>

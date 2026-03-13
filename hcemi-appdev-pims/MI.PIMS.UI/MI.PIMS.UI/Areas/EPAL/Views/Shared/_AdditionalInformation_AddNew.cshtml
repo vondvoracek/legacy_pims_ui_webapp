@@ -1,0 +1,54 @@
+﻿@inject MI.PIMS.UI.Services.MIAuthenticate.IMIAuthenticateService _miAuthenticateService
+@inject MI.PIMS.UI.Common.Helper _helper
+@model MI.PIMS.BO.Dtos.EPAL_Procedures_V_Dto
+@using Kendo.Mvc.UI
+
+@{
+    var _UserInfo_T_Dto = (MI.PIMS.BO.Dtos.UserInfo_T_Dto)_miAuthenticateService.UserInfo_T_Dto(_helper.MS_ID);
+    var s = _UserInfo_T_Dto.APP_ROLEIDS;
+    string[] appRoles = s.Split(',');
+
+}
+
+<div class="container tab-section">
+    <h5>
+        Additional Information
+    </h5>
+    <hr />    
+    <div class="form-row my-row-padding">
+        <div class="col-lg-5">
+            <div>
+                <label for="txtFurtherConsideration" class="text-lg-right text-sm-left col-form-label font-modal-weight">Further considerations (Limit 500 Character Max):</label>
+            </div>
+            <textarea class="form-control" data-toggle="tooltip" id="txtFurtherConsideration" maxlength="500" name="txtFurtherConsideration" rows="5" @(appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALReadWrite))
+                                                                                                                                                      || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALAdmin))
+                                                                                                                                                      || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPAdmin))
+                                                                                                                                                      || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPReadWrite))
+                                                                                                                                                      || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin)) ? "" : "readonly='readonly'")></textarea>
+            <br />
+            <div>
+                <label for="txtFurtherConsiderationHistory" class="text-lg-right text-sm-left col-form-label font-modal-weight">Further considerations History:</label>
+            </div>
+            <textarea class="form-control" rows="10" id="txtFurtherConsiderationHistory" name="txtFurtherConsiderationHistory" style="resize: none; " readonly>@ViewBag.Future</textarea>
+        </div>
+        <div class="col-lg-1">
+        </div>
+        <div class="col-lg-5">
+            <div>
+                <label for="txtNote" class="text-lg-right text-sm-left col-form-label font-modal-weight">Note (Limit 500 Character Max):</label>
+            </div>
+            <textarea class="form-control" data-toggle="tooltip" id="txtNote" maxlength="500" name="txtNote" rows="5" @(appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALReadWrite))
+                                                                                                                      || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALAdmin))
+                                                                                                                      || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPAdmin))
+                                                                                                                      || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPReadWrite))
+                                                                                                                      || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin)) ? "" : "readonly='readonly'")></textarea>
+            <br />
+            <div>
+                <label for="txtNoteHistory" class="text-lg-right text-sm-left col-form-label font-modal-weight">Note History:</label>
+            </div>
+            <textarea class="form-control" rows="10" id="txtNoteHistory" name="txtNoteHistory" style="resize: none; " readonly>@ViewBag.Note</textarea>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/EPAL/ChangeHistory.js" asp-append-version="true"></script>

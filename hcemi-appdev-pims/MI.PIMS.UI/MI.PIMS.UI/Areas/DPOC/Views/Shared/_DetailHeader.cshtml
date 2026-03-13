@@ -1,0 +1,289 @@
+﻿@using MI.PIMS.UI.Common
+
+@model MI.PIMS.BO.Dtos.DPOC_Inventories_V_Dto
+@inject MI.PIMS.UI.Services.MIAuthenticate.IMIAuthenticateService _miAuthenticateService
+@inject MI.PIMS.UI.Common.Helper _helper
+@{
+    var _UserInfo_T_Dto = (MI.PIMS.BO.Dtos.UserInfo_T_Dto)_miAuthenticateService.UserInfo_T_Dto(_helper.MS_ID);
+    var s = _UserInfo_T_Dto.APP_ROLEIDS;
+    string[] appRoles = s.Split(',');
+}
+@{
+    /*
+✅ Summary of Logic
+Mode	Record Type	    Buttons Shown
+Add	    N/A	            Save, Reset
+Edit	Current	        Save, Reset, Delete, View Only, Duplicate
+View	Current	        Edit, Duplicate
+Edit	Historic	    View Only, Duplicate
+View	Historic	    Edit, Duplicate    
+    */
+}
+<div class="container search-section" style="padding-left:30px; padding-right:30px;" data-searchurl="@Url.Action("Index", "Home", new {area = "DPOC"})">
+    <div class="section-heading">
+        <div class="row">
+            <div class="col-md-7 col-sm-7 col-lg-7">
+                <div style="font-size: 14px; margin-top:4px; ">
+                    PIMS Detail &nbsp;                    
+                    <label class="label-tag-@Model.DPOC_STATUS">@Model.DPOC_STATUS</label>
+
+                    @if (@Model.IS_CURRENT == "N")
+                    {
+                        <label class="label-tag-orange">HISTORICAL RECORD</label>
+                    }
+
+                </div>
+            </div>
+
+            @{
+                var title = ViewData["Title"]?.ToString();
+                var isCurrent = Model.IS_CURRENT == "Y";
+                var isHistoric = Model.IS_CURRENT == "N";
+
+                bool HasRole(params MI.PIMS.UI.Roles[] roles) =>
+                    roles.Any(role => appRoles.Contains(((int)role).ToString()));
+
+                bool canEdit = HasRole(MI.PIMS.UI.Roles.DPOCReadWrite, MI.PIMS.UI.Roles.DPOCAdmin, MI.PIMS.UI.Roles.SuperAdmin);
+                bool isAdd = title == "Add Detail";
+                bool isEdit = title == "Edit Detail";
+                bool isView = title == "View Detail";
+                bool isEditOrView = isEdit || isView;
+            }
+
+            <div class="col-md-5 col-sm-5 col-lg-5 text-lg-right text-md-right text-sm-right">
+                @if ((isCurrent || isAdd) && canEdit)
+                {
+                    <div>
+                        <span class="loading-header hidden">Loading other sections...</span>
+                        @* Show Save/Delete/Reset only if not in View mode *@
+                        @if (!isView)
+                        {
+                            if (HasRole(MI.PIMS.UI.Roles.DPOCAdmin, MI.PIMS.UI.Roles.SuperAdmin))
+                            {
+                                <button id="deleteVersion" class="btn btn-danger noSubmit" title="Click to delete record!">
+                                    <i class="fas fa-trash-alt"></i> Delete Version
+                                </button>
+                            }
+                            <button id="btnSave" class="btn btn-primary noSubmit btnSave" title="Click to save record!" data-toggle="tooltip">
+                                <i class="fas fa-save"></i> Save
+                            </button>
+                            <button id="btnReset" class="btn btn-outline-primary noSubmit" title="Click reset to revert changes!" data-toggle="tooltip">
+                                <i class="fas fa-times-circle"></i> Reset
+                            </button>
+                        }
+
+                        @if (isEdit)
+                        {
+                            <button id="btnViewOnly" class="btn btn-outline-primary noSubmit" title="Click to View Only!" data-toggle="tooltip">
+                                <i class="fas fa-book-open"></i> View Only
+                            </button>
+                            <button id="btnDuplicateCopy" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!" data-toggle="tooltip">
+                                <i class="fas fa-copy"></i> Duplicate / Copy
+                            </button>
+                        }
+
+                        @if (isView && !isHistoric)
+                        {
+                            
+                            <script>
+                                console.log("isView && !isHistoric");
+                            </script>
+                   
+                            <button id="btnGoToEdit" class="btn btn-outline-primary noSubmit" title="Click to edit this record!" data-toggle="tooltip">
+                                <i class="fas fa-pencil-alt"></i> Edit Record
+                            </button>
+                            <button id="btnDuplicateCopy" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!" data-toggle="tooltip">
+                                <i class="fas fa-copy"></i> Duplicate / Copy
+                            </button>
+                        }
+                    </div>
+                }
+                else if (isHistoric && isEdit && canEdit)
+                {
+
+                    <script>
+                        console.log("isHistoric && isEdit && canEdit");
+                    </script>
+                    <div>
+                        <span class="loading-header hidden">Loading other sections...</span>
+                        @* <button id="btnViewOnly" class="btn btn-outline-primary noSubmit" title="Click to View Only!" data-toggle="tooltip">
+                            <i class="fas fa-book-open"></i> View Only
+                        </button>
+                         *@
+                         <button id="btnDuplicateCopy" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!" data-toggle="tooltip">
+                            <i class="fas fa-copy"></i> Duplicate / Copy
+                        </button>
+                    </div>
+                }
+               
+                else if (isHistoric)
+                {
+
+                    <script>
+                        console.log("isHistoric");
+                    </script>
+                    <div>
+                        <span class="loading-header hidden">Loading other sections...</span>
+                        @* <button id="btnViewOnly" class="btn btn-outline-primary noSubmit" title="Click to View Only!" data-toggle="tooltip">
+                            <i class="fas fa-book-open"></i> View Only
+                        </button>
+                         *@
+                         <button id="btnDuplicateCopy" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!" data-toggle="tooltip">
+                            <i class="fas fa-copy"></i> Duplicate / Copy
+                        </button>
+                    </div>
+                }
+                else if (!isHistoric && isView && canEdit)
+                {
+                    
+                    <script>
+                        console.log("!isHistoric && isView && canEdit");
+                    </script>
+                   
+                    <div>
+                        <span class="loading-header hidden">Loading other sections...</span>
+                        <button id="btnGoToEdit" class="btn btn-outline-primary noSubmit" title="Click to edit this record!" data-toggle="tooltip">
+                            <i class="fas fa-pencil-alt"></i> Edit Record
+                        </button>
+                        <button id="btnDuplicateCopy" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!" data-toggle="tooltip">
+                            <i class="fas fa-copy"></i> Duplicate / Copy
+                        </button>
+                    </div>
+                }
+
+                <input type="hidden" id="isCurrentRecord" readonly value="@Model.IS_CURRENT" />
+            </div>
+        </div>
+    </div>
+
+    @if (Model != null)
+    {
+        <input type="hidden" id="txtPIMSID" name="txtPIMSID" value="@Model.DPOC_HIERARCHY_KEY">
+        @*<input type="hidden" id="txtPIMSID" name="txtPIMSID" value="@Model.DPOC_HIERARCHY_KEY">
+        <input type="hidden" id="txtDPOCVersionDt" name="txtDPOCVersionDt" value="@Model.DPOC_VER_EFF_DT">*@
+        <div class="section-border">
+            <div style="margin-top:-15px;">
+                <span style="font-size:11px; font-weight:bold; color: red;">* Required Fields</span>
+                <div class="form-row">
+                    <label for="txtDPOCID" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">DPOC ID:</label>
+                    <div class="col-lg-2 cell-padding">
+                        <input type="text" data-toggle="tooltip" class="form-control" disabled="disabled" id="txtDPOCID" name="txtDPOCID" value="@Model.DPOC_HIERARCHY_KEY">
+                    </div>
+                    <label for="txtBusinessSegment" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Business Segment:</label>
+                    <div class="col-lg-2 cell-padding">
+                        <input type="text" data-toggle="tooltip" class="form-control" disabled="disabled" id="txtBusinessSegment" name="txtBusinessSegment" value="@Model.DPOC_BUS_SEG_CD">
+                    </div>
+                    <label for="txtEntity" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Entity:</label>
+                    <div class="col-lg-2 cell-padding">
+                        <input type="text" data-toggle="tooltip" class="form-control" disabled="disabled" id="txtEntity" name="txtEntity" value="@Model.DPOC_ENTITY_CD">
+                    </div>
+                    <label for="txtPlan" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Plan:</label>
+                    <div class="col-lg-2 cell-padding">
+                        <input type="text" data-toggle="tooltip" class="form-control" disabled="disabled" id="txtPlan" name="txtPlan" value="@Model.DPOC_PLAN_CD">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label for="txtProduct" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Product:</label>
+                    <div class="col-lg-2 cell-padding">
+                        <input type="text" data-toggle="tooltip" class="form-control" disabled="disabled" id="txtProduct" name="txtProduct" value="@Model.DPOC_PRODUCT_CD">
+                    </div>
+                    <label for="txtFunding" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Funding:</label>
+                    <div class="col-lg-2 cell-padding">
+                        <input type="text" data-toggle="tooltip" class="form-control" disabled="disabled" id="txtFunding" name="txtFunding" value="@Model.DPOC_FUND_ARNGMNT_CD">
+                    </div>
+                    <label for="txtProcedureCode" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Procedure Code:</label>
+                    <div class="col-lg-2 cell-padding">
+                        <input type="text" data-toggle="tooltip" class="form-control" disabled="disabled" id="txtProcedureCode" name="txtProcedureCode" value="@Model.PROC_CD">
+                    </div>
+                    <label for="txtDrugName" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Drug Name:</label>
+                    <div class="col-lg-2 cell-padding">
+                        <input type="text" data-toggle="tooltip" class="form-control" disabled="disabled" id="txtDrugName" name="txtDrugName" value="@Model.DRUG_NM">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <label for="ddlDPOCPackage" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight required">DPOC Package:</label>
+                    <div class="col-lg-2 cell-padding">
+                   @*      <input type="text" data-toggle="tooltip" class="form-control" id="txtDPOCPackage" name="txtDPOCPackage" value="@Model.DPOC_PACKAGE"> *@
+@*                         @(Html.Kendo().DropDownList() //User Story 128868 MFQ 3/3/2025
+                            .Name("ddlDPOCPackage")
+                            .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                            .OptionLabel("Type or Click for Dropdown")
+                            .Value(@Model.DPOC_PACKAGE)
+                            .Enable(ViewData["Title"].ToString() == "View Detail" ? false: true)
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetDPOCPackage", "DPOCInventories", new { Area = "DPOC" });
+                                })
+                                .ServerFiltering(false);
+                            })
+                        ) *@
+
+                        @(Html.Kendo().DropDownList() //User Story 128868 MFQ 3/3/2025
+                            .Name("ddlDPOCPackage")
+                            .DataTextField("VV_CD_DESC")
+                            .DataValueField("VV_CD_DESC")
+                            .Value(@Model.DPOC_PACKAGE)
+                            .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                            .OptionLabel("Type or Click for Dropdown")
+                            //.Enable(ViewData["Title"].ToString() == "View Detail" ? false : true)
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                            {
+                                                read.Action("GetPIMSValidValues", "Home", new { Area = "DPOC" }).Data("DetailController.dropdown.param.DPOC_PACKAGE_2");
+                            })
+                            .ServerFiltering(false);
+                            })
+                            )
+                    </div>
+                    <label for="txtDPOCVersionDt" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">DPOC Version Eff Date:</label>
+                    <div class="col-lg-2 cell-padding">
+                        <input type="text" data-toggle="tooltip" class="form-control" disabled="disabled" id="txtDPOCVersionDt" name="txtDPOCVersionDt" value="@Model.DPOC_VER_EFF_DT">
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<script>
+    $(document).ready(function () {
+        const headerContainer = document.getElementsByClassName("container search-section")[0];
+        const buttons = headerContainer.querySelectorAll("button")
+        buttons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const appInsightsClient = new TelemetryLogger();
+                var pageView = $(document).find('#dpoc-page-view').first().get(0).value.toLowerCase();
+                var pageType;
+                switch(pageView){
+                    case "adddetail":
+                        pageType = "DPOCAdd";
+                        break;
+                    case "editdetail":
+                        pageType = "DPOCEdit";
+                        break;
+                    case "addnew":
+                        pageType = "DPOCNew";
+                        break;
+                    case "duplicaterecorddetail":
+                        pageType = "DPOCDuplicate";
+                        break;
+                    case "viewdetail":
+                    default:
+                        pageType = "DPOCView";
+                }
+                if(appInsightsClient.isAppInsightsEnabled("Client." + pageView)) {
+                    var buttonStr = event.target.innerText;
+                    const logProperties = new LogInfo(event.target.id, MS_ID, pageType + " " + buttonStr + " Tab click");
+                    appInsightsClient.trackEvent('Client.' + pageType + '.' + buttonStr.replaceAll(' ', ''), logProperties);
+                }
+            });
+        });
+    });
+</script>
+
+@if (ViewBag.ShowDeleteButton != false)
+{
+    @await Html.PartialAsync("_DeleteModal")
+}

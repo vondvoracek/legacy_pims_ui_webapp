@@ -1,0 +1,87 @@
+﻿@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "Reduction/Retention";
+}
+
+<script src="~/js/EPAL/_RetRedFactor.js" asp-append-version="true"></script>
+
+<div class="container tab-section">
+    <div class="row">
+        <div class="col-6">
+            <h5>
+                Retention Factor
+            </h5>
+            <hr />
+            @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.Ret_Factors_Dto>()
+                .Name("grid_Retention")                        
+                .Columns(c => {
+                    c.Bound(p => p.FACTOR_NM_RET).Title("Retention Factor").EditorTemplateName("RetentionFactor").ClientTemplate("#:FACTOR_NM_RET#").Filterable(false).HeaderHtmlAttributes(new { title = "The state that the prior auth applies to." }).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold; title:'asdf'" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                    c.Bound(p => p.FACTOR_EFF_DT_RET).Title("Eff Date").EditorTemplateName("Date").Format("{0: MM/dd/yyyy}")
+                        .ClientTemplate("#= (FACTOR_EFF_DT_RET == null || kendo.toString(kendo.parseDate(FACTOR_EFF_DT_RET), 'MM/dd/yyyy') == '12/31/2999') ? ' ' : kendo.toString(kendo.parseDate(FACTOR_EFF_DT_RET), 'MM/dd/yyyy') #").Filterable(false).HeaderHtmlAttributes(new {title = "The effective date of the Retention factor."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+                    c.Bound(p => p.FACTOR_EXP_DT_RET).Title("Exp Date").EditorTemplateName("Date").Format("{0: MM/dd/yyyy}")
+                    .ClientTemplate("#= (FACTOR_EXP_DT_RET == null || kendo.toString(kendo.parseDate(FACTOR_EXP_DT_RET), 'MM/dd/yyyy') == '12/31/2999') ? ' ' : kendo.toString(kendo.parseDate(FACTOR_EXP_DT_RET), 'MM/dd/yyyy') #").Filterable(false).HeaderHtmlAttributes(new { title = "The effective date of the Reduction factor." }).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+                    c.Bound(p => p.FACTOR_DESC_RET).Title("Description").ClientTemplate("#:FACTOR_DESC_RET#").Editable("_RetRedFactorController.gridRetention.FACTOR_DESCEditable").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold; " }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                    c.Command(command => command.Custom(" ").Template("<a class='btn btn-default btn-outline-primary noSubmit grid-column-button retention-factor-delete' href='javascript:void(0);' title='Click to delete this row!' \\data-target='tooltip'\\><i  class=\"k-icon k-i-delete\"></i></a>")).Width(55);
+                })                    
+                .ToolBar(toolbar => {toolbar.Create();})
+                .Editable(editable => editable.Mode(GridEditMode.InCell).DisplayDeleteConfirmation(false))
+                .Resizable(resize => resize.Columns(true))
+                .HtmlAttributes(new { style = "height: 400px;width:100%;" })
+                .Scrollable()
+                .Sortable()                
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .PageSize(1000)
+                    .Batch(true)
+                    .ServerOperation(false)
+                    .Events(events => events.Change("_RetRedFactorController.gridRetention.dataSource.onChange"))
+                    .Read(read => read.Action("GetRetFactorsByPIMSID", "Home").Data("_RetRedFactorController.gridRetention.param"))
+                    .Model(model =>
+                    {
+                        model.Id(p => p.FACTOR_NM_RET);
+                        model.Field(p => p.FACTOR_EFF_DT_RET);
+                        model.Field(p => p.FACTOR_EXP_DT_RET);
+                        model.Field(p => p.FACTOR_NOTES_RET);
+                    })
+                )
+            )
+        </div>
+        <div class="col-6">
+            <h5>
+                Reduction Factor
+            </h5>
+            <hr />
+            @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.Red_Factors_Dto>()
+                .Name("grid_Reduction")                        
+                .Columns(c => {
+                    c.Bound(p => p.FACTOR_NM_RED).Title("Reduction Factor").EditorTemplateName("ReductionFactor").ClientTemplate("#:FACTOR_NM_RED#").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold; title:'asdf'" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                    c.Bound(p => p.FACTOR_EFF_DT_RED).Title("Eff Date").EditorTemplateName("Date").Format("{0: MM/dd/yyyy}")
+                    .ClientTemplate("#= (FACTOR_EFF_DT_RED == null || kendo.toString(kendo.parseDate(FACTOR_EFF_DT_RED), 'MM/dd/yyyy') == '12/31/2999') ? ' ' : kendo.toString(kendo.parseDate(FACTOR_EFF_DT_RED), 'MM/dd/yyyy') #").Filterable(false).HeaderHtmlAttributes(new { title = "The effective date of the Retention factor." }).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+                    c.Bound(p => p.FACTOR_EXP_DT_RED).Title("Exp Date").EditorTemplateName("Date").Format("{0: MM/dd/yyyy}")
+                    .ClientTemplate("#= (FACTOR_EXP_DT_RED == null || kendo.toString(kendo.parseDate(FACTOR_EXP_DT_RED), 'MM/dd/yyyy') == '12/31/2999') ? ' ' : kendo.toString(kendo.parseDate(FACTOR_EXP_DT_RED), 'MM/dd/yyyy') #").Filterable(false).HeaderHtmlAttributes(new { title = "The effective date of the Reduction factor." }).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(160);
+                    c.Bound(p => p.FACTOR_DESC_RED).Title("Description").ClientTemplate("#:FACTOR_DESC_RED#").Editable("_RetRedFactorController.gridReduction.FACTOR_DESCEditable").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold; " }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                    c.Command(command => command.Custom(" ").Template("<a class='btn btn-default btn-outline-primary noSubmit grid-column-button reduction-factor-delete'  href='javascript:void(0);' title='Click to delete this row!' \\data-target='tooltip'\\><i  class=\"k-icon k-i-delete\"></i></a>")).Width(55);
+                })
+                .ToolBar(toolbar => {toolbar.Create();})
+                .Editable(editable => editable.Mode(GridEditMode.InCell).DisplayDeleteConfirmation(false))
+                .Resizable(resize => resize.Columns(true))
+                .HtmlAttributes(new { style = "height: 400px;width:100%;" })
+                .Scrollable()
+                .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .PageSize(1000)
+                    .ServerOperation(false)
+                    .Events(events => events.Change("_RetRedFactorController.gridReduction.dataSource.onChange"))
+                    .Read(read => read.Action("GetRedFactorsByPIMSID", "Home").Data("_RetRedFactorController.gridReduction.param"))
+                    .Model(model =>
+                    {
+                        model.Id(p => p.FACTOR_NM_RED);
+                        model.Field(p => p.FACTOR_EFF_DT_RED);
+                        model.Field(p => p.FACTOR_EXP_DT_RED);
+                        model.Field(p => p.FACTOR_NOTES_RED);
+                    })
+                )
+            )
+        </div>
+    </div>
+</div>

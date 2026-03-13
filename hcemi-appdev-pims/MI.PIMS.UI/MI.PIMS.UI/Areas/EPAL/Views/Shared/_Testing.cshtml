@@ -1,0 +1,108 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Kendo UI Grid - MoreTechTips.net</title>
+@*    <link rel="stylesheet" href="//kendo.cdn.telerik.com/2017.3.1026/styles/kendo.common.min.css" />
+    <link rel="stylesheet" href="//kendo.cdn.telerik.com/2017.3.1026/styles/kendo.material.min.css" />
+    <link rel="stylesheet" href="//kendo.cdn.telerik.com/2017.3.1026/styles/kendo.material.mobile.min.css" />
+
+*@    <script src="//kendo.cdn.telerik.com/2017.3.1026/js/jquery.min.js"></script>
+    <script src="//kendo.cdn.telerik.com/2017.3.1026/js/kendo.all.min.js"></script>
+</head>
+<body>
+    <div id="grid"></div>
+
+    <script>
+        $(document).ready(function () {
+
+            // setup datasource options
+            //var crudOp = {
+            //    url: "http://localhost:54257/pims-api/api/EPALProcedures",
+            //    type: "POST",
+            //    contentType: "application/json; charset=utf-8", // send paramters as json
+            //    dataType: "json",
+                //param: function () {
+                //    var paramObj = {
+                //        p_EPAL_HIERARCHY_KEY: $('#txtPIMSID').val()
+                //    }
+                //    return paramObj
+                //},
+            //};
+
+            //var dataSource = new kendo.data.DataSource({
+            //    transport: {
+            //        read: crudOp,
+            //        create: crudOp,
+            //        update: crudOp,
+            //        destroy: crudOp,
+            //        parameterMap: function (data, type) {
+            //            // send operation type
+            //            data.type = type;
+            //            // convert data to json string
+            //            return kendo.stringify({ param: data });
+            //        }
+            //    },
+            //    // initial sorting
+            //    sort: {
+            //        field: 'DIAG_CD',
+            //        dir: 'DIAG_CD'
+            //    },
+            //    requestEnd: function (e) {
+            //        if (e.type != "read" && e.response && !e.response.d.errors) {
+            //            // reload grid on create/update/delete and no errors
+            //            this.read();
+            //        }
+            //    },
+            //    error: function (e) {
+            //        if (!e.errors || !e.errors.length) return;
+
+            //        // prevent data-binding for one time and keep form opened
+            //        // cancel changes on the grid
+            //        var grid = $("#grid").data('kendoGrid');
+            //        grid.one("dataBinding", function (args) {
+            //            args.preventDefault();
+            //        });
+
+            //        alert(e.errors.join('\n'));
+            //    },
+            //    batch:true,
+            //    pageSize: 10,
+            //    serverPaging: true,
+            //    serverSorting: true,
+            //    schema: {
+            //        parse: function (response) {
+            //            // get rid of .d wrapper (from WebMethod response)
+            //            return response.d;
+            //        },
+            //        data: "models",
+            //        total: "total",
+            //        model: {
+            //            id: "DIAG_CD",
+            //            fields: {
+            //                DIAG_CD: { editable: false, nullable: true },
+            //                DIAG_CD_TYPE: { validation: { required: true } },
+            //            }
+            //        }
+            //    }
+            //});
+
+            // Initialize grid
+            $("#grid").kendoGrid({
+                dataSource: dataSource,
+                pageable: true,
+                sortable: {
+                    allowUnsort: false
+                },
+c
+                columns: [
+                    "DIAG_CD",
+                    "DIAG_CD_TYPE",
+                    { field: "active", sortable: false },
+                    { DIAG_CD_TYPE: ["edit", "destroy"], title: "" } ],
+                editable: true;
+            });
+        });
+    </script>
+
+</body>
+</html>

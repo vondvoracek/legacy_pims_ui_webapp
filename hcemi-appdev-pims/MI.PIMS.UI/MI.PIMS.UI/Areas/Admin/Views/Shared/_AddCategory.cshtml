@@ -1,0 +1,133 @@
+﻿@using Kendo.Mvc.UI
+
+<script src="~/js/Admin/_CategoryUpdate.js" asp-append-version="true"></script>
+
+<div class="modal fade addCategoryModal" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form id="formAddCategory" onsubmit="return false;">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCategoryModalLabel">Add Category</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="width: 50px;margin-left: 0px;">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Row 1 -->
+                    <div class="form-row my-row-padding">
+                        <label for="NewProcedureCode:" class="col-lg-5 text-lg-right text-sm-left col-form-label font-modal-weight required">Procedure Code:</label>
+                        <div class="col-lg-7">
+                            @(Html.Kendo().DropDownList()
+                                .Name("NewProcedureCode")
+                                .DataTextField("PROC_CD")
+                                .DataValueField("PROC_CD")
+                                .OptionLabel("---Type at least 2 characters to search Procedure Code---")
+                                .AutoBind(false)
+                                .MinLength(2)
+                                .Filter(FilterType.Contains)
+                                .HtmlAttributes(new { style = "width: 100%" })
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetRefProceduresByFilter", "Home", new { Area = "EPAL" });
+                                    })
+                                    .ServerFiltering(true);
+                                })
+                                )
+                        </div>
+                    </div>
+                    <!-- Row 2 -->
+                    <div class="form-row my-row-padding">
+                        <label for="NewSpecialty:" class="col-lg-5 text-lg-right text-sm-left col-form-label font-modal-weight">New Specialty:</label>
+                        <div class="col-lg-7">
+                            @(Html.Kendo().DropDownList()
+                                .Name("NewSpecialty")
+                                .DataTextField("RET_VAL")
+                                .DataValueField("RET_VAL")
+                                .OptionLabel("---Select Specialty---")
+                                .HtmlAttributes(new { style = "width: 100%" })
+                                .Events(e =>
+                                {
+                                    e.Change("_categoryUpdateController.multiSelect.onChange_NewSpecialty");
+                                })
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetSpecialtyCombination", "Home", new { Area = "Admin" }).Data("_categoryUpdateController.multiSelect.param.SPECIALTY");
+                                    });
+                                })
+                                )
+                        </div>
+                    </div>
+                    <!-- Row 3 -->
+                    <div class="form-row my-row-padding">
+                        <label for="NewAlternateCategory:" class="col-lg-5 text-lg-right text-sm-left col-form-label font-modal-weight required">New Alternate Category:</label>
+                        <div class="col-lg-7">
+                            <input type="hidden" readonly id="txtNewAlternateCategory" />
+                            <input type="hidden" readonly id="txtNewAlternateCategoryFilterText" />
+                            @(Html.Kendo().DropDownList()
+                                .Name("NewAlternateCategory")
+                                .DataTextField("CATEGORY")
+                                .DataValueField("CATEGORY")
+                                .OptionLabel("---Select Alternate Category---")
+                                .HtmlAttributes(new { style = "width: 100%" })
+                                //.AutoBind(false)
+                                //.MinLength(3)
+                                .Filter(FilterType.Contains)
+                                .Events(e =>
+                                {
+                                    e.Change("_categoryUpdateController.multiSelect.onChange_NewAlternateCategory").Filtering("_categoryUpdateController.multiSelect.onFiltering_NewAlternateCategory");
+                                })
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetAdminCategoriesByType", "Home", new { Area = "Admin" }).Data("_categoryUpdateController.multiSelect.param.NEWALTERNATE_CATEGORY");
+                                    })
+                                    .ServerFiltering(true);
+                                })
+                                )
+                        </div>
+                    </div>
+                    <!-- Row 4 -->
+                    <div class="form-row my-row-padding">
+                        <label for="NewAlternateSubCategory:" class="col-lg-5 text-lg-right text-sm-left col-form-label font-modal-weight">New Alternate Sub Category:</label>
+                        <div class="col-lg-7">
+                            <input type="hidden" readonly id="txtNewAlternateSubcategory" />
+                            <input type="hidden" readonly id="txtNewAlternateSubCategoryFilterText" />
+                            @(Html.Kendo().DropDownList()
+                                .Name("NewAlternateSubCategory")
+                                .DataTextField("CATEGORY")
+                                .DataValueField("CATEGORY")
+                                .OptionLabel("---Select Alternate Sub Category---")
+                                .HtmlAttributes(new { style = "width: 100%" })
+                                //.AutoBind(false)
+                                //.MinLength(3)
+                                .Filter(FilterType.Contains)
+                                .Events(e =>
+                                {
+                                    e.Change("_categoryUpdateController.multiSelect.onChange_NewAlternateSubCategory").Filtering("_categoryUpdateController.multiSelect.onFiltering_NewAlternateSubCategory");
+                                })
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetAdminCategoriesByType", "Home", new { Area = "Admin" }).Data("_categoryUpdateController.multiSelect.param.NEWALTERNATE_SUB_CATEGORY");
+                                    })
+                                    .ServerFiltering(true);
+                                })
+                                )
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnValidateAdd" class="btn btn-primary noSubmit btnValidateAdd" title="Click to validate record!"><i class="fas fa-save"></i> Validate </button>
+                    <button type="reset" id="btnResetAdd" class="btn btn-secondary ">Reset</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

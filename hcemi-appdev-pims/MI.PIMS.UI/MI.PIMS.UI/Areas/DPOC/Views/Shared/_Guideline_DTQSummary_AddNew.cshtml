@@ -1,0 +1,39 @@
+﻿@using Kendo.Mvc.UI;
+@using MI.PIMS.BO.Dtos;
+
+<div class="container tab-section">
+
+    @(Html.Kendo().Grid<DPOC_INV_DTQS_V_Dto>()
+        .Name("grid_dtq")
+        .Columns(columns =>
+        {
+            columns.Bound(d => d.DTQ_IQ_GDLN_ID).Hidden(true);
+            columns.Bound(d => d.DTQ_POS_APPL).Title("POS").EditorTemplateName("DTQ_POS_APPL").ClientTemplate("#:DTQ_POS_APPL#").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(80);
+            columns.Bound(d => d.DTQ_INCL_EXCL_CD).Title("Incl/<br/>Excl").EditorTemplateName("DTQ_INCL_EXCL_CD").ClientTemplate("#:DTQ_INCL_EXCL_CD#").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(100);
+            columns.Bound(d => d.DTQ_NM).Title("DTQ<br/>Name").HeaderHtmlAttributes(new { @title = "Maximum length 100 characters", style = "vertical-align:text-top;background:white;font-weight:bold;", @maxlength = "100" }).Width(100);
+            //columns.Bound(d => d.DTQ_TYPE).Hidden(true);
+            //columns.Bound(d => d.DTQ_TYPE_DESC).Title("DTQ Type").EditorTemplateName("DTQ_TYPE").ClientTemplate("#:DTQ_TYPE_DESC#").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(200);
+            //columns.Bound(d => d.DTQ_RSN).Title("DTQ<br/>Reason").EditorTemplateName("DTQ_RSN").ClientTemplate("#:DTQ_RSN#").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(200);
+            //columns.Bound(d => d.DTQ_RSN).Hidden(true);
+            columns.Bound(d => d.TGT_DTQ).Title("Target<br/>DTQ").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;", @maxlength = "100" }).Width(200);
+            columns.Bound(d => d.TGT_DTQ_VERSION).Title("Target DTQ<br/>Version").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(200);
+            columns.Bound(d => d.HOLDING_DTQ).Title("Holding DTQ").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;", @maxlength = 100 }).Width(200);
+            columns.Bound(d => d.HOLDING_DTQ_VERSION).Title("Holding DTQ<br/>Version").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(200);
+            columns.Command(command => command.Custom(" ").Template("<a class='btn btn-default btn-outline-primary noSubmit grid-column-button dtq-delete'  href='javascript:void(0);' title='Click to delete this row!' \\data-target='tooltip'\\><i  class=\"k-icon k-i-delete\"></i></a>")).Width(50);
+        })
+        .ToolBar(toolbar => { toolbar.Create(); })
+        .Editable(editable => editable.Mode(GridEditMode.InCell).DisplayDeleteConfirmation(false))
+        .Resizable(resize => resize.Columns(true))
+        .HtmlAttributes(new { style = "height: 400px;" })
+        .Scrollable()
+        .Sortable()
+        .Pageable(pageable => pageable.Refresh(false))
+        .Events(events => events.Edit("GSSDTQController.grid.dtq.onEdit").DataBound("GSSDTQController.grid.onDataBound"))
+        @* .DataSource(dataSource => dataSource
+            .Ajax()
+            .PageSize(100)
+            .Read(read => read.Action("GetDPOCInvDTQsByPIMSID", "Home", new { Area = "DPOC" }).Data("GSSDTQController.grid.params"))
+        ) *@
+        //.AutoBind(false)
+    )
+</div>

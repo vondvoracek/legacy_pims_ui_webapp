@@ -1,0 +1,71 @@
+﻿@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "StateInfo";
+}
+
+<div class="container tab-section">    
+    <style>
+        div.k-grid tbody tr {
+            height: 40px;
+        }
+    </style>
+    <form id="frmStateInfo">
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <h5>
+                    State Information
+                </h5>              
+                <hr />
+                <div style="font-size:11px !important;">
+                    @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.EPAL_Procedures_AssoCodes_V_APPL_TO_STATES_Dto>()
+                        .Name("grid_StateInfo")                    
+                        .Columns(c => {
+                            c.Bound(p => p.STATE_NAME).Title("State").EditorTemplateName("State_CD").ClientTemplate("#:STATE_NAME#").Filterable(false).HeaderHtmlAttributes(new { title = "The state that the prior auth applies to.", style = "text-align: center; font-weight:bold;" }).HtmlAttributes(new { style = "text-align: center" }).Width(250);
+                            c.Bound(p => p.STATE_MANDATED_IND).Title("State Mandated").EditorTemplateName("State_Mandated_Ind").ClientTemplate("#:STATE_MANDATED_IND#").Filterable(false).HeaderHtmlAttributes(new {title = "Denotes if the prior auth is mandated by the state."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" });
+                            c.Bound(p => p.INCL_EXCL_CD).Hidden(true);
+                            c.Bound(p => p.INCL_EXCL_CD_DESC).Title("Include/Exclude").EditorTemplateName("Incl_Excl_CD").ClientTemplate("#:INCL_EXCL_CD_DESC#").Filterable(false).HeaderHtmlAttributes(new {title = "Denotes if the status of state is either included or excluded."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);                            
+                            c.Bound(p => p.ATS_EFF_DT).Title("State Effective<br/>Date").EditorTemplateName("Date").Format("{0: MM/dd/yyyy}")
+                                .ClientTemplate("#= (ATS_EFF_DT == null || kendo.toString(kendo.parseDate(ATS_EFF_DT), 'MM/dd/yyyy') == '12/31/2999') ? ' ' : kendo.toString(kendo.parseDate(ATS_EFF_DT), 'MM/dd/yyyy') #").Filterable(false).HeaderHtmlAttributes(new {title = "The effective date of the Program Managed By vendor if there is one on the record."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                            c.Bound(p => p.ATS_EXP_DT).Title("State Expiration<br/>Date").EditorTemplateName("Date").Format("{0: MM/dd/yyyy}")
+                                .ClientTemplate("#= (ATS_EXP_DT == null || kendo.toString(kendo.parseDate(ATS_EXP_DT), 'MM/dd/yyyy') == '12/31/2999') ? ' ' : kendo.toString(kendo.parseDate(ATS_EXP_DT), 'MM/dd/yyyy') #")
+                                    .Filterable(false).HeaderHtmlAttributes(new {title = "The expiration date of the Program Managed By vendor if there is one on the record."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                            c.Bound(p => p.ATS_ISSUE_GOV_DESC).Title("State Issue<br/>Governance").EditorTemplateName("Ats_Issue_Gov").ClientTemplate("#:ATS_ISSUE_GOV_DESC#").Filterable(false).HeaderHtmlAttributes(new {title = "The issue status of the record."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                            c.Bound(p => p.ATS_PROG_MGD_BY).Title("Program Managed By").EditorTemplateName("ATS_PROG_MGD_BY").ClientTemplate("#:ATS_PROG_MGD_BY#").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" });
+                            c.Command(command => command.Custom(" ").Template("<a class='btn btn-default btn-outline-primary noSubmit grid-column-button state-info-delete'  href='javascript:void(0);' title='Click to delete this row!' \\data-target='tooltip'\\><i  class=\"k-icon k-i-delete\"></i></a>")).Width(50);
+                            c.Bound(p => p.STATE_CD).Hidden(true);
+                            c.Bound(p => p.ATS_ISSUE_GOV).Hidden(true);
+                        })            
+                        .ToolBar(toolbar => {
+                            toolbar.Create();
+                        })
+                        .Editable(editable => editable.Mode(GridEditMode.InCell).DisplayDeleteConfirmation(false))
+                        .Resizable(resize => resize.Columns(true))
+                        .HtmlAttributes(new { style = "min-height: 400px;" })
+                        .Scrollable()
+                        .Pageable(pageable => pageable.Refresh(false))  
+                        .Events(events => events.DataBound("StateInfoController.grid.onDataBound").Edit("StateInfoController.grid.onEdit"))
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .Batch(true)
+                            .ServerOperation(false)
+                            .PageSize(1000)
+                            .Events(events => events.Change("StateInfoController.grid.dataSource.onChange"))
+                            .Read(read => read.Action("StateInfo", "Home").Data("StateInfoController.grid.param"))                            
+                        )
+                    )                                        
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                var gridElement = $("#grid_StateInfo");
+                var dataArea = gridElement.find(".k-grid-content");
+                gridElement.height("400px");
+                dataArea.height("305px");
+            });
+        </script>
+      </form>
+
+</div>
+
+<script src="~/js/EPAL/StateInfo.js" asp-append-version="true"></script>

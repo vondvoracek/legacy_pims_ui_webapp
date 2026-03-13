@@ -1,0 +1,34 @@
+﻿@using Kendo.Mvc.UI;
+@using MI.PIMS.BO.Dtos;
+
+<script src="~/js/DPOC/_DPOC_POS.js" asp-append-version="true"></script>
+
+<div class="container tab-section">
+
+    @(Html.Kendo().Grid<DPOC_POS_Dto>()
+        .Name("grid_pos")
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.POS_IQ_GDLN_ID).Hidden(true);
+            columns.Bound(d => d.PLC_OF_SVC_CD).Title("POS Codes").EditorTemplateName("PLC_OF_SVC_CD").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" });
+            columns.Bound(d => d.PLC_OF_SVC_DESC).Title("POS Description").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" });
+            columns.Bound(p => p.INCL_EXCL_CD).Hidden(true);
+            columns.Bound(d => d.INCL_EXCL_CD_DESC).Title("Include/Exclude").EditorTemplateName("INCL_EXCL_CD").ClientTemplate("#:INCL_EXCL_CD_DESC#").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" });
+            columns.Command(command => command.Custom(" ").Template("<a class='btn btn-default btn-outline-primary noSubmit grid-column-button pos-delete'  href='javascript:void(0);' title='Click to delete this row!' \\data-target='tooltip'\\><i  class=\"k-icon k-i-delete\"></i></a>")).Width(50);
+        })
+        .ToolBar(toolbar => { toolbar.Create(); })
+        .Editable(editable => editable.Mode(GridEditMode.InCell).DisplayDeleteConfirmation(false))
+        .Resizable(resize => resize.Columns(true))
+        .HtmlAttributes(new { style = "height: 400px;" })
+        .Scrollable()
+        .Sortable()
+        .Pageable(pageable => pageable.Refresh(true))
+        //.Events(events => events.Edit("GSSDTQController.grid.dtq.onEdit").DataBound("GSSDTQController.grid.onDataBound"))
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .PageSize(100)
+            .Read(read => read.Action("GetPOSByGuideline", "Home", new { Area = "DPOC" }).Data("DPOC_POSController.grid.params"))
+        )
+        .AutoBind(false)
+    )
+</div>

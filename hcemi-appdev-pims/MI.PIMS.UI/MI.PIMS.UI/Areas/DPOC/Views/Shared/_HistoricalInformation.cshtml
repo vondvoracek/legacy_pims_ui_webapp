@@ -1,0 +1,100 @@
+﻿@inject MI.PIMS.UI.Services.MIAuthenticate.IMIAuthenticateService _miAuthenticateService
+@inject MI.PIMS.UI.Common.Helper _helper
+@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "DPOC - Historical Information";
+}
+
+@{
+    var _UserInfo_T_Dto = (MI.PIMS.BO.Dtos.UserInfo_T_Dto)_miAuthenticateService.UserInfo_T_Dto(_helper.MS_ID);
+    var s = _UserInfo_T_Dto.APP_ROLEIDS;
+    string[] appRoles = s.Split(',');
+    <input type="hidden" readonly id="txtAppRoleIds" value="@_UserInfo_T_Dto.APP_ROLEIDS" />
+}
+
+<style>
+.edit-epal-icon{
+    cursor:pointer;font-size: 15px;margin-top: 4px;
+}
+
+.edit-epal-icon:hover {
+    transform: scale(1.3);
+}
+</style>
+
+<script src="~/js/DPOC/_DPOC_HistoricalInformation.js" asp-append-version="true"></script>
+
+<div class="container tab-section">
+    <h5>
+        Historical Information
+    </h5>
+    <hr />
+    <form id="frmHistoricalInformation">
+
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <div style="font-size:11px !important;">
+                    @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.DPOC_Inventories_V_Hist_Dto>()
+                        .Name("grid_HistoricalInformation")
+                        .Columns(c => {
+                        c.Bound(p => p.EPAL_HIERARCHY_KEY)
+                                .Title("PIMS ID")
+                                .ClientTemplate(
+                                    "<a href='javascript:void(0);' style='color:blue;' onclick=\"_HistoricalInformationController.methods.redirect('#= DPOC_HIERARCHY_KEY#,#= kendo.toString(kendo.parseDate(DPOC_VER_EFF_DT),'MM-dd-yyyy hh:mm:ss tt') #,#= DPOC_PACKAGE #');\" title='Click to view details!' \\data-target='tooltip'\\>#= DPOC_HIERARCHY_KEY # </a>"
+                                @* ((appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.DPOCReadWrite))
+                                || (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.DPOCAdmin))
+                                || (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRAdmin))
+                                || (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRReadWrite))
+                                || (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin))))))
+                                    ) ? "<i class=\"edit-epal-icon k-icon k-i-pencil text-primary showPencil float-right\" onclick=\"_HistoricalInformationController.methods.redirect_edit('#= DPOC_HIERARCHY_KEY #, #= kendo.toString(kendo.parseDate(DPOC_VER_EFF_DT),'MM-dd-yyyy hh:mm:ss tt') #,#= DPOC_PACKAGE #');\" title='Click to edit details!' \\data-target='tooltip'\\></i> " : "") *@
+                                )
+                            .Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                            .HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                        c.Bound(p => p.PROC_CD).Title("Proc<br />Code").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(85);
+                        c.Bound(p => p.DPOC_EFF_DT).Filterable(false)
+                        .Title("DPOC<br/>Start Date")
+                        .ClientTemplate("#= ( kendo.toString(kendo.parseDate(DPOC_EFF_DT), 'MM/dd/yyyy') == '12/31/2999' || (data.DPOC_EFF_DT == null)) ? ' ' : kendo.toString(kendo.parseDate(DPOC_EFF_DT), 'MM/dd/yyyy') #")
+                        .HtmlAttributes(new { style = "text-align: center" })
+                        .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                        .Width(100);
+                        c.Bound(p => p.DPOC_PACKAGE).Title("DPOC Package").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                        @* c.Bound(p => p.DPOC_RELEASE).Title("DPOC Release").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(100); *@
+                        c.Bound(p => p.DPOC_ELIGIBLE_IND).Title("DPOC Eligible").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(80);
+                        c.Bound(p => p.DPOC_IMPLEMENTED_IND).Title("DPOC Implemented").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                        c.Bound(p => p.DPOC_VER_EFF_DT).Filterable(false)
+                            .Title("DPOC Ver <br />Eff Date")
+                            .ClientTemplate("#= (data.DPOC_VER_EFF_DT == null) ? ' ' : kendo.toString(kendo.parseDate(DPOC_VER_EFF_DT), 'MM/dd/yyyy hh:mm:ss tt') #")
+                            .HtmlAttributes(new { style = "text-align: center" }).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).Width(150);
+                        c.Bound(p => p.IS_CURRENT)
+                                .ClientTemplate("#if(IS_CURRENT=='Y') {#<i style='color:teal;' class='fas fa-check-circle 3x'></i> #} else {# <i style='color:red;' class='fas fa-times 3x'></i> #} #")
+                                .Title("<b>Current <br/>Record</b>")
+                                .Width(80)
+                                .HtmlAttributes(new { style = "text-align:center" })
+                                .HeaderHtmlAttributes(new { style = "text-align:center" })
+                                .Filterable(false);
+                        })
+                        .Resizable(resize => resize.Columns(true))
+                        .HtmlAttributes(new { style = "height: 400px;" })
+                        .Events(events => events.DataBound("_HistoricalInformationController.grid.onDataBound"))
+                        .Sortable()
+                        .NoRecords()
+                        .Navigatable()
+                        .Pageable(pageable => pageable
+                            .Refresh(true)
+                            .PreviousNext(true)
+                            .Numeric(true)
+                        )                        
+                        .Scrollable()
+                        .Selectable()
+                        .Filterable()                     
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .PageSize(100)
+                            .Read(read => read.Action("GetDPOCInventoriesHistByPIMS_ID", "Home", new { Area = "DPOC"}).Data("_HistoricalInformationController.grid.param"))
+                        )
+                    )
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

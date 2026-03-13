@@ -1,0 +1,36 @@
+﻿@model MI.PIMS.BO.Dtos.EPAL_Procedures_V_Dto
+@using Kendo.Mvc.UI
+@using MI.PIMS.UI.Common
+
+<div class="container tab-section">
+    <h5>
+        Additional Information
+    </h5>
+    <hr />    
+    <div class="form-row my-row-padding">
+        <div class="col-lg-5">
+            <div>
+                <label for="txtFurtherConsideration" class="text-lg-right text-sm-left col-form-label font-modal-weight">Further considerations (Limit 500 Character Max):</label>
+            </div>
+            <textarea class="form-control" disabled="disabled" data-toggle="tooltip" id="txtFurtherConsideration" rows="5" @((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? "readonly='readonly'" : "")>@Model.FURTHER_INST</textarea>
+            <br />
+            <div>
+                <label for="txtFurtherConsiderationHistory" class="text-lg-right text-sm-left col-form-label font-modal-weight">Further considerations History:</label>
+            </div>
+            <textarea class="form-control" rows="10" id="txtFurtherConsiderationHistory" style="resize: none;" readonly>@ViewBag.Future</textarea>
+        </div>
+        <div class="col-lg-1">
+        </div>
+        <div class="col-lg-5">
+            <div>
+                <label for="txtNote" class="text-lg-right text-sm-left col-form-label font-modal-weight">Note (Limit 500 Character Max):</label>
+            </div>
+            <textarea class="form-control" disabled="disabled" data-toggle="tooltip" id="txtNote" rows="5" @((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? "readonly='readonly'" : "")>@Model.NOTES</textarea>
+            <br />
+            <div>
+                <label for="txtNoteHistory" class="text-lg-right text-sm-left col-form-label font-modal-weight">Note History:</label>
+            </div>
+            <textarea class="form-control" rows="10" id="txtNoteHistory" style="resize: none;" readonly>@ViewBag.Note</textarea>
+        </div>
+    </div>
+</div>

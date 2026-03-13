@@ -1,0 +1,314 @@
+﻿@model MI.PIMS.BO.Dtos.DPOC_Inventories_V_Dto
+@using Kendo.Mvc.UI
+@using MI.PIMS.UI.Common
+
+<style>
+    .k-datepicker .k-picker-wrap.k-invalid, .k-timepicker .k-picker-wrap.k-invalid {
+        color: inherit;
+        border-color: rgba(0, 0, 0, 0.08) !important;
+    }
+</style>
+
+<div class="container tab-section">
+    <div class="row">
+        <div class="col-6">
+            <h5>
+                EPAL Information
+            </h5>
+            <hr />
+            <input type="hidden" id="EPAL_HIERARCHY_KEY" value="@Model.EPAL_HIERARCHY_KEY" />
+            <input type="hidden" id="EPAL_VER_EFF_DT" value="@Model.EPAL_VER_EFF_DT" />
+            <div class="form-row my-row-padding">
+                <label class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">Category:</label>
+                <div class="col-lg-6">
+                    <input type="text" data-toggle="tooltip" class="form-control" id="txtStandardCategory" value="@(ViewBag.DuplicateRecord == "Y" ? string.Empty : Model.EPAL_SVC_CAT)" disabled>
+                </div>
+            </div>
+            <div class="form-row my-row-padding">
+                <label class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">Subcategory:</label>
+                <div class="col-lg-6">
+                    <input type="text" data-toggle="tooltip" class="form-control" id="txtStandardSubCategory" value="@(ViewBag.DuplicateRecord == "Y" ? string.Empty : Model.EPAL_SVC_SUBCAT)" disabled>
+                </div>
+            </div>
+            <div class="form-row my-row-padding">
+                <label for="txtProcedureCodeType" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">Procedure Code Type:</label>
+                <div id="divProcedureCodeType" class="col-lg-6" data-toggle="tooltip">
+                    <input type="text" data-toggle="tooltip" class="form-control" id="txtProcedureCodeType" value="@(ViewBag.DuplicateRecord == "Y" ? string.Empty : Model.EPAL_PROC_CD_TYPE)" disabled>
+                </div>
+            </div>
+            <div class="form-row my-row-padding">    
+                <label for="txtProcedureCodeDescription" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">Procedure Code Description:</label>
+                <div id="divProcedureCodeDescription" class="col-lg-6" data-toggle="tooltip">
+                    <textarea class="form-control" id="txtProcedureCodeDescription" rows="5" disabled>
+                        @(ViewBag.DuplicateRecord == "Y" ? string.Empty : Model.EPAL_PROC_CD_DESC)
+                    </textarea>
+                </div>
+            </div>
+            <div class="form-row my-row-padding">
+                <label for="txtProcedureCodeStatus" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">Procedure Code Status:</label>
+                <div id="divProcedureCodeStatus" class="col-lg-6" data-toggle="tooltip">
+                    <input type="text" class="form-control" id="txtProcedureCodeStatus" value="@(ViewBag.DuplicateRecord == "Y" ? string.Empty : Model.EPAL_PROC_CD_STATUS)" disabled />
+                </div>
+            </div>
+            <div class="form-row my-row-padding">
+                <label for="txtPriorAuthEffDate" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">Prior Auth Effective Date:</label>
+                <div id="divPriorAuthEffDate" class="col-lg-6" data-toggle="tooltip">
+                    <input type="text" class="form-control" id="txtPriorAuthEffDate" value="@(ViewBag.DuplicateRecord == "Y" ? string.Empty : Model.EPAL_PRIOR_AUTH_EFF_DT)" disabled />
+                </div>
+            </div>
+            <div class="form-row my-row-padding">
+                <label for="txtPriorAuthExpDate" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">Prior Auth Expiration Date:</label>
+                <div id="divPriorAuthExpDate" class="col-lg-6" data-toggle="tooltip">
+                    <input type="text" class="form-control" id="txtPriorAuthExpDate" value="@(ViewBag.DuplicateRecord == "Y" ? string.Empty : Model.EPAL_PRIOR_AUTH_EXP_DT)" disabled />
+
+                </div>
+            </div>
+            <div class="form-row my-row-padding">
+                <label for="txtSOSApplies" id="lblSOSApplies" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">SOS Applies:</label>
+                <div id="divSOSApplies" class="col-lg-6" data-toggle="tooltip">
+                    <input type="text" class="form-control" id="txtSOSApplies" value="@(ViewBag.DuplicateRecord == "Y" ? string.Empty : Model.EPAL_SOS_IND)" disabled />
+                </div>
+            </div>
+            <div class="form-row my-row-padding">
+                <label for="txtSOSEffectiveDate" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">SOS Effective Date:</label>
+                <div id="divSOSEffectiveDate" class="col-lg-6" data-toggle="tooltip">                    
+                    @(Html.Kendo().DatePicker()
+                        .Name("dpSOSEffectiveDate")
+                        .Value(@ViewBag.DuplicateRecord == "Y" ? null : @Model.EPAL_SOS_EFF_DT)
+                        .Format("MM/dd/yyyy")
+                        .ParseFormats(new string[] {"MMddyyyy",
+                        "MMddyy",
+                        "MM.dd.yyyy",
+                        "MM.dd.yy",
+                        "MM.d.yyyy",
+                        "M.d.yy",
+                        "M.d.yyyy",
+                        "MM/dd/yyyy",
+                        "MM/dd/yy",
+                        "MM/d/yyyy",
+                        "M/d/yy",
+                        "M/d/yyyy",
+                        "MM-dd-yyyy",
+                        "MM-dd-yy",
+                        "MM-d-yyyy",
+                        "M-d-yy",
+                        "M-d-yyyy"
+                        })
+                        .Enable(false)
+                        .HtmlAttributes(new { style = "width: 100%", title = "SOS Effective Date", @class = "form-to-update" })
+                    )
+                </div>
+            </div>
+            <div class="form-row my-row-padding">
+                <label for="dpSOSExpirationDate" id="lblSOSExpirationDate" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">SOS Expiration Date:</label>
+                <div id="divSOSExpirationDate" class="col-lg-6" data-toggle="tooltip">
+                    @(Html.Kendo().DatePicker()
+                        .Name("dpSOSExpirationDate")
+                        .Min(Convert.ToDateTime("01/01/1900"))
+                        .Value(@ViewBag.DuplicateRecord == "Y" ? null : @Model.EPAL_SOS_EXP_DT)
+                        .Format("MM/dd/yyyy")
+                        .ParseFormats(new string[] {"MMddyyyy",
+                            "MMddyy",
+                            "MM.dd.yyyy",
+                            "MM.dd.yy",
+                            "MM.d.yyyy",
+                            "M.d.yy",
+                            "M.d.yyyy",
+                            "MM/dd/yyyy",
+                            "MM/dd/yy",
+                            "MM/d/yyyy",
+                            "M/d/yy",
+                            "M/d/yyyy",
+                            "MM-dd-yyyy",
+                            "MM-dd-yy",
+                            "MM-d-yyyy",
+                            "M-d-yy",
+                            "M-d-yyyy"
+                        })
+                        .Enable(false)
+                        .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                        )
+                </div>
+            </div>
+            <div class="form-row my-row-padding">
+                <label for="lblProgram" id="lblProgram" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">Program:</label>
+                <div id="divProgram" class="col-lg-6" data-toggle="tooltip">
+                    <input type="text" data-toggle="tooltip" class="form-control" id="txtProgram" value="@(ViewBag.DuplicateRecord == "Y" ? string.Empty : Model.prog_mgd_by)" disabled>
+                </div>
+            </div>
+            <div class="form-row my-row-padding">
+                <label for="lblAssociatedEPALRecord" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">Associated EPAL Record:</label>
+                <div id="divAssociatedEPALRecord" class="col-lg-6" data-toggle="tooltip">
+                    <a href="javascript:void(0)" id="lblAssociatedEPALRecord"
+                       onclick="DetailController.methods.onAssociatedEPALRecord('@Model.EPAL_HIERARCHY_KEY','@Model.EPAL_VER_EFF_DT')" class="link-primary">@(ViewBag.DuplicateRecord == "Y" ? string.Empty : Model.EPAL_HIERARCHY_KEY)</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <h5>
+                DPOC Information
+            </h5>
+            <hr />
+            <!-- Row 1 -->
+            <div class="form-row my-row-padding">
+                <label class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight required">DPOC Eligible: </label>
+                <div class="col-lg-6">
+                    @(Html.Kendo().DropDownList()
+                        .Name("ddlDPOCEligible")
+                        .DataTextField("VV_CD_DESC")
+                        .DataValueField("VV_CD")
+                        .OptionLabel("Type or Click for Dropdown")
+                        .Filter(FilterType.Contains)
+                        .HtmlAttributes(new { style = "width: 100%" })
+                        .Value(Model.DPOC_ELIGIBLE_IND)
+                        .Events(events => events.Change("DetailController.dropdown.onChangeddlDPOCEligible"))
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetPIMSValidValues", "Home", new { Area = "DPOC" }).Data("DetailController.dropdown.param.DPOC_ELIGIBLE_IND");
+                            })
+                            .ServerFiltering(false);
+                        })
+                    )
+                </div>
+            </div>
+            <div class="form-row my-row-padding">
+                <label class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight lbl-ddlDpocIneligibleRsn @(Model.DPOC_ELIGIBLE_IND == "No" ? "required": "")">DPOC Not Eligible Reason:</label>
+                <div class="col-lg-6">
+                    @(Html.Kendo().DropDownList()
+                        .Name("ddlDpocIneligibleRsn")
+                        .DataTextField("VV_CD")
+                        .DataValueField("VV_CD")
+                        .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                        .Value(@Model.DPOC_INELIGIBLE_RSN != null ? (Model.DPOC_ELIGIBLE_IND == "Yes" ? "": @Model.DPOC_INELIGIBLE_RSN) : null)
+                        .Enable(Model.DPOC_ELIGIBLE_IND == "Yes" ? false: true)
+                        .OptionLabel("Type or Click for Dropdown")
+                        .Filter(FilterType.Contains)
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetPIMSValidValues", "Home", new { Area = "DPOC" }).Data("DetailController.dropdown.param.DPOC_INELIGIBLE_RSN");
+                            })
+                            .ServerFiltering(false);
+                        })
+                     )
+                </div>
+            </div>
+            <div class="form-row my-row-padding">
+                <label id="lblDPOCImplemented" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight @(Model.DPOC_ELIGIBLE_IND == "Yes" ? "required": "")">DPOC Implemented:</label>
+                <div id="divDPOCImplemented" class="col-lg-6" data-toggle="tooltip">
+                    @(Html.Kendo().DropDownList()
+                        .Name("ddlDPOCImplemented")
+                        .DataTextField("VV_CD_DESC")
+                        .DataValueField("VV_CD")
+                        .OptionLabel("Type or Click for Dropdown")
+                        .Filter(FilterType.Contains)
+                        .HtmlAttributes(new { style = "width: 100%" })
+                        .Value(Model.DPOC_IMPLEMENTED_IND)
+                        .Enable(Model.DPOC_ELIGIBLE_IND == "No" ? false: true) /*User Story 137438 MFQ 4/14/2025*/
+                        .Events(events => events.Change("DetailController.dropdown.onChangeddlDPOCImplemented"))
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetPIMSValidValues", "Home", new { Area = "DPOC" }).Data("DetailController.dropdown.param.DPOC_IMPLEMENTED_IND");
+                            })
+                            .ServerFiltering(false);
+                        })
+                    )
+                </div>
+            </div>
+            <div class="form-row my-row-padding">
+                <label id="lblDPOCNotImplementedReason" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">DPOC Not Implemented Reason:</label>
+                <div id="divDPOCNotImplementedReason" class="col-lg-6" data-toggle="tooltip">
+                    @(Html.Kendo().DropDownList()
+                        .Name("ddlDPOCNotImplementedReason")
+                        .DataTextField("VV_CD")
+                        .DataValueField("VV_CD")
+                        .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                        .Value(@Model.UIR_RSN != null ? @Model.UIR_RSN : null)
+                        .Enable(Model.DPOC_IMPLEMENTED_IND == "Yes" ? false: true)
+                        .OptionLabel("Type or Click for Dropdown")
+                        .Filter(FilterType.Contains)
+                        .Events(events => events.Change("DetailController.dropdown.onChangedddlDPOCNotImplementedReason"))
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetPIMSValidValues", "Home", new { Area = "DPOC" }).Data("DetailController.dropdown.param.DPOC_UNIMPLEMENTED_RSN");
+                            })
+                            .ServerFiltering(false);
+                        })
+                    )
+                </div>
+            </div>
+            <div class="form-row my-row-padding">
+                <label id="lblDPOCStartDate" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight @(Model.DPOC_IMPLEMENTED_IND == "Yes" ? "required": "")">DPOC Start Date:</label>
+                <div id="divDPOCStartDate" class="col-lg-6" data-toggle="tooltip">
+                    @(Html.Kendo().DatePicker()
+                        .Name("dpDPOCStartDate")
+                        .Min(Convert.ToDateTime("01/01/1900"))
+                        .Value(@Model.DPOC_EFF_DT)
+                        .Format("MM/dd/yyyy")
+                        .ParseFormats(new string[] {"MMddyyyy",
+                            "MMddyy",
+                            "MM.dd.yyyy",
+                            "MM.dd.yy",
+                            "MM.d.yyyy",
+                            "M.d.yy",
+                            "M.d.yyyy",
+                            "MM/dd/yyyy",
+                            "MM/dd/yy",
+                            "MM/d/yyyy",
+                            "M/d/yy",
+                            "M/d/yyyy",
+                            "MM-dd-yyyy",
+                            "MM-dd-yy",
+                            "MM-d-yyyy",
+                            "M-d-yy",
+                            "M-d-yyyy"
+                        })
+                        .Events(events => events.Change("DetailController.dropdown.onChangedpDPOCStartDate"))
+                        .Enable(((string)ViewData["PageType"] == @Roles.DPOCReadOnly.ToString() ? false : true))
+                        .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                    )
+                </div>
+            </div>
+            <div class="form-row my-row-padding">
+                <label for="dpDPOCTermDate" id="lblDPOCTermDate" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">DPOC Term Date:</label>
+                <div id="divDPOCTermDate" class="col-lg-6" data-toggle="tooltip">
+                    @(Html.Kendo().DatePicker()
+                        .Name("dpDPOCTermDate")
+                        .Min(Convert.ToDateTime("01/01/1900"))
+                        .Value(@Model.DPOC_EXP_DT)
+                        .Format("MM/dd/yyyy")
+                        .ParseFormats(new string[] {"MMddyyyy",
+                            "MMddyy",
+                            "MM.dd.yyyy",
+                            "MM.dd.yy",
+                            "MM.d.yyyy",
+                            "M.d.yy",
+                            "M.d.yyyy",
+                            "MM/dd/yyyy",
+                            "MM/dd/yy",
+                            "MM/d/yyyy",
+                            "M/d/yy",
+                            "M/d/yyyy",
+                            "MM-dd-yyyy",
+                            "MM-dd-yy",
+                            "MM-d-yyyy",
+                            "M-d-yy",
+                            "M-d-yyyy"
+                        })
+                        .Enable(((string)ViewData["PageType"] == @Roles.DPOCReadOnly.ToString() ? false : true))
+                        .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                    )
+                </div>
+            </div>            
+        </div>
+    </div>
+</div>
+
+

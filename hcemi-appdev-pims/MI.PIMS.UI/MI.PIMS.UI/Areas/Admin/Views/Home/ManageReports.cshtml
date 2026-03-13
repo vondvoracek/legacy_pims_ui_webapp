@@ -1,0 +1,112 @@
+﻿
+@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "Manage Reports";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Html.Hidden("UpdateReportsUrl", Url.Action("UpdateRptUrl", "Home", new { Area = "Admin" }))
+<script src="~/js/Admin/ManageReports.js"></script>
+<form id="searchForm">
+    <div class="breadcrumb-background">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-background">
+                    <li class="breadcrumb-item">@Html.ActionLink("Home", "index", "/", new { Area = "" }, new { @class = "breadcrumb-item-font" })</li>
+                    <li class="breadcrumb-item active" style="color: black !important" aria-current="page">Manage Reports</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+
+    <div class="container  search-section" style="padding-left:30px; padding-right:30px;">
+        <h4>Manage Report Links</h4>
+        <div style="font-size:11px !important;">
+            @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.ReportsDto>()
+                .Name("grid_ReportLinks")
+                .Columns(c =>
+                {
+                    c.Bound(p => p.MODULE_NAME).Title("Module Name").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" }).Width(70);
+                    c.Bound(p => p.URLPATH).Title("Report Link URL").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" }).Width(150);
+                    c.Command(command => command.Custom("View Access")
+                    .Template("<a class='btn btn-default btn-outline-primary noSubmit grid-column-button' href='javascript:void(0);' onclick=\'ManageReportsController.methods.edit(this)\' data-toggle='modal' data-target='.user-role-modal' title='Edit'><i class='k-icon k-i-pencil'></i></a>"))
+                    .Width(50).Title("Edit")
+                    .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                    .HtmlAttributes(new { style = "text-align: center" });
+                })
+                .Resizable(resize => resize.Columns(true))
+                .HtmlAttributes(new { style = "height: 50%" })
+                .Sortable()
+                .NoRecords()
+                .Navigatable()
+                .Pageable(pageable => pageable
+                .Refresh(true)
+                .PreviousNext(true)
+                .Numeric(true)
+                )
+                //.AutoBind(false)
+                .Scrollable()
+                .Selectable()
+                .Filterable()
+                .DataSource(dataSource => dataSource
+                .Ajax()
+                .PageSize(100)
+                .Read(read => read.Action("GetReportLinks", "Home")))
+                )
+        </div>
+    </div>
+
+
+    <div class="modal fade editModal" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editUserModalLabel">Edit Reports URL</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="width: 50px;margin-left: 0px;">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <span style="font-size:11px; font-weight:bold; color: red;">* Required Fields</span>
+                    <!-- Row 1 -->
+                    <input type="hidden" readonly id="txtID" />
+                    <div class="form-row my-row-padding">
+                        <label for="txtModuleName:" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">Module Name:</label>
+                        <div class="col-lg-8">
+                            <input type="text" readonly class="form-control" id="txtModuleName" value="">
+                        </div>
+                    </div>
+                    <!-- Row 2 -->
+                    <div class="form-row my-row-padding">
+                        <label for="txtReportURL:" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight required">Report URL:</label>
+                        <div class="col-lg-8">
+                            <textarea rows="3" class="form-control" id="txtReportURL" value=""></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnSaveEdit" class="btn btn-primary noSubmit" title="Click to save record!"><i class="fas fa-save"></i> Save </button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+        $(function () {
+            UserAccessHistController.add({
+                "MODULE_NAME": "Admin",
+                "USERACTION": "Admin/Home/ManageReports",
+                "USERSELECTION": "Admin/Home/ManageReport",
+                "LST_UPDT_DT": null,
+                "LST_UPDT_BY": MS_ID,
+                "PAGE_ID": "28",
+            "__RequestVerificationToken": $('meta[name="request-verification-token"]')[0].content
+
+            });
+        });
+    </script>
+</form>

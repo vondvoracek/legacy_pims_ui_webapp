@@ -1,0 +1,63 @@
+﻿<div class="modal fade validate-add-new-record-modal" id="validate-add-new-record-modal" tabindex="-1" role="dialog" aria-labelledby="validate-add-new-record-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 style="padding-left:10px;" class="modal-title" id="validate-add-new-record-modal-title">Validate record</h5>
+                <button type="button" class="close validate-add-new-record-modal-close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Row 1 -->
+                <div style="padding:10px;">
+                    <div class="form-row my-row-padding">
+                        <h5>A record already exists in PIMS for this Pay Code ID. Please select an option below to proceed.</h5>
+                    </div>
+                    <div class="form-row my-row-padding">
+                        <button type="button" class="btn btn-outline-primary w-100 update-existing">Update existing record</button>
+                    </div>
+                    <div class="form-row my-row-padding">
+                        <button type="button" class="btn btn-outline-primary w-100 duplicate">Duplicate / Copy existing record</button>
+                    </div>
+                    <div class="form-row my-row-padding">
+                        <button type="button" class="btn btn-outline-primary w-100 view-existing">View existing record</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary validate-add-new-record-modal-close">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        var observer = new MutationObserver(function(mutations) {
+            for(let mutation of mutations) {
+                if (mutation.type === 'attributes') {
+                    let id = mutation.target.id;
+                    if(document.getElementById(id).style.display === 'block') {
+                        const element = document.getElementById(id);
+                        const valBody = element.querySelector(".modal-body");
+                        const valButtons = valBody.querySelectorAll(".btn");
+                        valButtons.forEach(valButton => {
+                            valButton.addEventListener('click', (event) => {
+                                const appInsightsClient = new TelemetryLogger();
+                                if(appInsightsClient.isAppInsightsEnabled("Client.DPOCValidate")) {
+                                    var buttonStr = event.target.innerText;
+                                    const logProperties = new LogInfo(event.target.id, MS_ID, "DPOC Validate " + buttonStr + " button click");
+                                    appInsightsClient.trackEvent('Client.DPOCValidate.' + buttonStr.replaceAll(' ', ''), logProperties);
+                                }
+                            });
+                        });
+                        observer.disconnect();
+                    }
+                }
+            }
+        });
+        var target = document.querySelector('#validate-add-new-record-modal');
+        observer.observe(target, {
+          attributes: true, attributeFilter: ['style']
+        });
+    });
+</script>

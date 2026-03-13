@@ -1,0 +1,111 @@
+﻿@using Kendo.Mvc.UI
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+<script src="~/js/Admin/_EditUser.js" asp-append-version="true"></script>
+
+<div class="modal fade editUserModal" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="col-9">
+                <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+                    </div>
+                <div style="margin-bottom:-7px;">
+                    <label class="text-lg-right text-sm-left col-form-label font-modal-weight">PIMS User:</label>
+                    <div class="div-pims-user d-inline" title="Click to toggle PIMS user status" onclick="_editUserController.methods.toggleActiveStatus()">
+                    </div>
+                </div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="width: 50px;margin-left: 0px;">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Row 1 -->
+                <div class="form-row my-row-padding">
+                    <label for="txtMSID_Edit:" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">MS ID:</label>
+                    <div class="col-lg-8">
+                        <input type="text" readonly class="form-control" id="txtMSID_Edit" value="">
+                    </div>
+                </div>
+                <!-- Row 2 -->
+                <div class="form-row my-row-padding">
+                    <label for="txtFirstName_Edit:" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">First Name:</label>
+                    <div class="col-lg-8">
+                        <input type="text" readonly class="form-control" id="txtFirstName_Edit" value="">
+                    </div>
+                </div>
+                <!-- Row 3 -->
+                <div class="form-row my-row-padding">
+                    <label for="txtLastName_Edit" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">Last Name:</label>
+                    <div class="col-lg-8">
+                        <input type="text" readonly class="form-control" id="txtLastName_Edit" value="">
+                    </div>
+                </div>
+                <!-- Row 4 -->
+                <div class="form-row my-row-padding">
+                    <label for="txtDepartment_Edit" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">Department:</label>
+                    <div class="col-lg-8">
+                        <input type="text" readonly class="form-control" id="txtDepartment_Edit" value="">
+                    </div>
+                </div>
+                <!-- Row 5 -->
+                <div class="form-row my-row-padding">
+                    <label for="txtManager_Edit" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">Manager:</label>
+                    <div class="col-lg-8">
+                        <input type="text" readonly class="form-control" id="txtManager_Edit" value="">
+                    </div>
+                </div>
+                <!-- Row 6 -->
+                <div class="form-row my-row-padding">
+                    <label for="ddlAppRole_Edit" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">Select an App Role:</label>
+                    <div class="col-lg-8">
+                        <div style="font-size:11px !important;">
+                            @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.AppRole_T_Dto>()
+                                .Name("grid_RoleUserAssign")
+                                .Columns(c =>
+                                {
+                                    c.Bound(p => p.MS_ID).Title("MS ID").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" }).Width(100);
+                                    c.Bound(p => p.APP_ROLENAME).Title("App Role Name").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" }).Width(150);
+                                    c.Bound(p => p.HAS_ROLE)
+                                                    .Title("Has Access")
+                                                    .Filterable(false)
+                                                    .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                                                    .ClientTemplate("#if(HAS_ROLE>0) {# <input type='checkbox' name='chkEdit' value='#=ID#' class='chkEdit' checked> #} else {# <input type='checkbox' name='chkEdit' value='#=ID#' class='chkEdit'> #} # ")
+                                                    .HtmlAttributes(new { style = "text-align: center" })
+                                                    .Width(80);
+                                })
+                                .Resizable(resize => resize.Columns(true))
+                                .HtmlAttributes(new { style = "height: 100%" })
+                                .Sortable()
+                                .NoRecords()
+                                .Navigatable()
+                                .Pageable(pageable => pageable
+                                .Refresh(true)
+                                .PreviousNext(true)
+                                .Numeric(true)  
+                                )
+                                //.AutoBind(false)
+                                //.Scrollable()
+                                .Selectable()
+                                .Filterable()
+                                .DataSource(dataSource => dataSource
+                                .Ajax()
+                                .PageSize(100)
+                                .Read(read => read.Action("GetRoleUserAssign", "Home").Data("_editUserController.grid.param")))
+                                )
+                        </div>
+                    </div>
+                </div>                
+            </div>
+            <div class="modal-footer">
+                <button id="btnSaveEdit" class="btn btn-primary noSubmit" title="Click to save record!"><i class="fas fa-save"></i> Save </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

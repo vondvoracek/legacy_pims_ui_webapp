@@ -1,0 +1,44 @@
+﻿@model MI.PIMS.BO.Dtos.PayCode_Procedures_T_Dto
+@using Kendo.Mvc.UI
+
+
+<div class="container tab-section">
+    <h5>
+        Additional Information
+    </h5>
+    <hr />
+    <div class="form-row my-row-padding">
+        
+        <div class="col-lg-5">
+            
+            @if (@Model.IS_EDITABLE == true)
+            {
+                <div>
+                    <label for="txtFurtherConsideration" class="text-lg-right text-sm-left col-form-label font-modal-weight">Further considerations (Limit 500 Character Max):</label>
+                </div>
+                <textarea class="form-control" data-toggle="tooltip" id="txtFurtherConsideration" maxlength="500" name="txtFurtherConsideration" rows="5" @((string)ViewData["PageType"] == @Roles.PayCodeReadOnly.ToString() ? "readonly='readonly'" : "")></textarea>
+                <br />
+            }
+            <div>
+                <label for="txtFurtherConsiderationHistory" class="text-lg-right text-sm-left col-form-label font-modal-weight">Further considerations History:</label>
+            </div>
+            <textarea class="form-control" rows="10" id="txtFurtherConsiderationHistory" name="txtFurtherConsiderationHistory" style="resize: none; " readonly>@ViewBag.furtherConsideration</textarea>
+        </div>
+        <div class="col-lg-1"> 
+        </div>
+        <div class="col-lg-5">
+            @if (@Model.IS_EDITABLE == true)
+            {
+                <div>
+                    <label for="txtNote" class="text-lg-right text-sm-left col-form-label font-modal-weight">Note (Limit 500 Character Max):</label>
+                </div>
+                <textarea class="form-control" data-toggle="tooltip" id="txtNote" maxlength="500" name="txtNote" rows="5" @((string)ViewData["PageType"] == @Roles.PayCodeReadOnly.ToString() ? "readonly='readonly'" : "")></textarea>
+                <br />
+            }            
+            <div>
+                <label for="txtNoteHistory" class="text-lg-right text-sm-left col-form-label font-modal-weight">Note History:</label>
+            </div>
+            <textarea class="form-control" rows="10" id="txtNoteHistory" name="txtNoteHistory" style="resize: none; " readonly>@ViewBag.notes</textarea>
+        </div>
+    </div>
+</div>

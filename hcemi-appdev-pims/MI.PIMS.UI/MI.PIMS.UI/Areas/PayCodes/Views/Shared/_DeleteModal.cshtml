@@ -1,0 +1,37 @@
+﻿<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Delete Version</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="deleleForm">
+                    <span style="font-size:11px; font-weight:bold; color: red;">* Required Fields</span>
+                    <!-- Row 1 -->
+                    <div class="form-row my-row-padding">
+                        <label for="txtCRNumber" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight required">CR #:</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtCRNumber" name="txtCRNumber" />
+                        </div>
+                    </div>
+
+                    <!-- Row 2 -->                    
+                    <div class="form-row my-row-padding">
+                        <label for="txtDeleleReason" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight required">Delete Reason:</label> <!-- Bug 122115 MFQ 3-24-2025 -->
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control" id="txtDeleleReason" name="txtDeleleReason" />
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="btnDeleteRecord" class="btn btn-primary noSubmit" title="Click to delete record!"><i class="fas fa-save"></i> OK </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

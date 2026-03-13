@@ -1,0 +1,671 @@
+﻿@inject MI.PIMS.UI.Services.MIAuthenticate.IMIAuthenticateService _miAuthenticateService
+@inject MI.PIMS.UI.Common.Helper _helper
+@using MI.PIMS.UI.Common
+
+@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="~/js/PayCode/Search.js" asp-append-version="true"></script>
+
+
+<style type="text/css">
+    .search-section {
+        font-size: 12px;
+    }
+
+    .k-dropdown .k-dropdown-wrap {
+        border-color: #e4e7eb;
+        color: #212529;
+        background-color: white;
+        transition: color .2s ease,background-color .2s ease,border-color .2s ease,box-shadow .2s ease;
+    }
+
+    .date-border {
+        border: solid 1px #BDBDBD;
+        margin-left: 2px;
+        margin-right: 2px;
+        margin-top: -8px;
+        padding: 8px;
+    }
+
+    .edit-epal-icon {
+        cursor: pointer;
+        font-size: 15px;
+        margin-top: 4px;
+    }
+
+        .edit-epal-icon:hover {
+            transform: scale(1.3);
+        }
+</style>
+  
+@{
+    var _UserInfo_T_Dto = (MI.PIMS.BO.Dtos.UserInfo_T_Dto)_miAuthenticateService.UserInfo_T_Dto(_helper.MS_ID);
+    var s = _UserInfo_T_Dto.APP_ROLEIDS;
+    string[] appRoles = s.Split(',');
+    <input type="hidden" readonly id="txtAppRoleIds" value="@_UserInfo_T_Dto.APP_ROLEIDS" />
+}
+
+<div class="breadcrumb-background">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-background">
+                <li class="breadcrumb-item"><a>@Html.ActionLink("Home", "index", "/", new { Area = "" }, new { @class = "breadcrumb-item-font" })</a></li>
+                <li class="breadcrumb-item active" style="color: black !important; cursor: initial;" aria-current="page">Pay Codes Search</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+
+<div class="container  search-section" style="padding-left:30px; padding-right:30px;">
+    <form id="searchForm">
+        <div class="section-heading">
+            <div class="row">
+                <div class="col-10" style="font-size: 14px;">
+                    Pay Codes Search
+                </div>
+                <div class="col-2 text-right" style="font-size: 14px;">
+                    <div data-toggle="tooltip" title="Toggle the switch to Include Historical records in your search.">
+                        <span>Include Historical Records</span> &nbsp;
+                        @(Html.Kendo().Switch()
+                            .Name("switch")
+                            .Events(ev => ev.Change("SearchController.switch.onChange"))
+                            .HtmlAttributes(new { style = "width: 100%" })
+                            .Checked(true)
+                            .Messages(c => c.Checked("YES").Unchecked("NO"))
+                            )
+                        <input type="hidden" readonly id="txtIncludeHistorical" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="section-border">
+            <!-- Row 1 -->
+            <div class="form-row">
+                <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                    <b><label for="txtPayCodeID">Pay Code ID: </label> <label for="txtPayCodeID" style="color:red; font-style:italic;"> (Case Sensitive) </label>  </b>
+                    <input type="text" class="form-control" id="txtPayCodeID" value="">
+                </div>
+                <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                    <b><label for="ddlPayCodeStatus">Pay Code Status:</label></b><br />
+                    @(Html.Kendo().DropDownList()
+                        .Name("ddlPayCodeStatus")
+                        .DataTextField("VV_CD")
+                        .DataValueField("VV_CD")
+                        .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                        .OptionLabel("-- Select ---")
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("SearchController.multiSelect.param.PayCodeStatus");
+                            })
+                            .ServerFiltering(false);
+                        })
+                        .Value("")
+                        )
+                </div>
+                <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                    <b><label for="msPlan">KL PCS:</label></b>
+                    <input type="hidden" readonly id="txtKLPCS" />
+                    @(Html.Kendo().MultiSelect()
+                        .Name("msKLPCS")
+                        .DataTextField("VV_CD")
+                        .DataValueField("VV_CD")
+                        .Placeholder("-- Select One ---")
+                        //.AutoClose(false)
+                        .Filter(FilterType.Contains)
+                        //.TagMode(MultiSelectTagMode.Multiple)
+                        .Events(e =>
+                        {
+                            e.Change("SearchController.multiSelect.onChange_KLPCS");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("SearchController.multiSelect.param.KLPCS");
+                            })
+                            .ServerFiltering(false);
+                        })
+                        )
+
+                </div>
+                <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                    <b><label for="msProduct">NDB PCS:</label></b>
+                    <input type="hidden" readonly id="txtNDBPCS" />
+                    @(Html.Kendo().MultiSelect()
+                        .Name("msNDBPCS")
+                        .DataTextField("VV_CD")
+                        .DataValueField("VV_CD")
+                        .Placeholder("-- Select One ---")
+                        //.AutoClose(false)
+                        .Filter(FilterType.Contains)
+                        //.TagMode(MultiSelectTagMode.Multiple)
+                        .Events(e =>
+                        {
+                            e.Change("SearchController.multiSelect.onChange_NDBPCS");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("SearchController.multiSelect.param.NDBPCS");
+                            })
+                            .ServerFiltering(false);
+                        })
+                        )
+                </div>
+
+            </div>
+            <!-- Row 2 -->
+            <div class="form-row">
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="txtProcedureCode">Procedure Code:</label>  <label for="txtPayCodeID" style="color:red; font-style:italic;"> (Case Sensitive) </label> </b>
+                    <input type="text" class="form-control" id="txtProcedureCode" value="">
+                </div>
+@*                <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                    <b><label for="msAlternateCategory">Alternate Category:</label></b>
+                    <input type="hidden" readonly id="txtAlternateCategory" />
+                    <input type="hidden" readonly id="txtAlternateCategoryFilterText" />
+                    @(Html.Kendo().MultiSelect()
+                        .AutoBind(false)
+                        .Name("msAlternateCategory")
+                        .DataTextField("CATEGORY")
+                        .DataValueField("CATEGORY")
+                        .Placeholder("-- Type in to see list (at least type 3 characters) ---")
+                        .MinLength(3)
+                        .Filter(FilterType.Contains)
+                        .TagMode(MultiSelectTagMode.Multiple)
+                        .Events(e =>
+                        {
+                            e.Change("SearchController.multiSelect.onChange_AlternateCategory").Filtering("SearchController.multiSelect.onFiltering_AlternateCategory");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetPIMSEPALCategoriesByType", "Home", new { Area = "EPAL" }).Data("SearchController.multiSelect.param.AlternateCategory");
+                            })
+                            .ServerFiltering(true);
+                        })
+                        )
+                </div>*@
+@*                <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                    <b><label for="msAlternateSubCategory">Alternate SubCategory:</label></b>
+                    <input type="hidden" readonly id="txtAlternateSubCategory" />
+                    <input type="hidden" readonly id="txtAlternateSubCategoryFilterText" />
+                    @(Html.Kendo().MultiSelect()
+                        .AutoBind(false)
+                        .Name("msAlternateSubCategory")
+                        .DataTextField("CATEGORY")
+                        .DataValueField("CATEGORY")
+                        .Placeholder("-- Type in to see list (at least type 3 characters) ---")
+                        .MinLength(3)
+                        .Filter(FilterType.Contains)
+                        .TagMode(MultiSelectTagMode.Multiple)
+                        .Events(e =>
+                        {
+                            e.Change("SearchController.multiSelect.onChange_AlternateSubCategory").Filtering("SearchController.multiSelect.onFiltering_AlternateSubCategory");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetPIMSEPALCategoriesByType", "Home", new { Area = "EPAL" }).Data("SearchController.multiSelect.param.AlternateSubCategory");
+                            })
+                            .ServerFiltering(true);
+                        })
+                        )
+                </div>*@
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="msiCES">iCES/CES Edit:</label></b>
+                    <input type="hidden" readonly id="txtiCES" />
+
+                    @(Html.Kendo().MultiSelect()
+                        .Name("msiCES")
+                        .DataTextField("Text")
+                        .DataValueField("Value").HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                        .Events(e =>
+                        {
+                            e.Change("SearchController.multiSelect.onChange_iCES");
+                        })
+                        .BindTo(new List<SelectListItem>() {
+                            new SelectListItem() {
+                            Text = "Yes",
+                            Value = "Yes"
+                            },
+                            new SelectListItem() {
+                            Text = "No",
+                            Value = "No"
+                            }
+                            })
+                        .Value("")
+                        )
+                </div>
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="msLOB">Clinical iCES/CES Name:</label></b>
+                    <input type="hidden" readonly id="txtClinicaliCESName" />
+                    @(Html.Kendo().MultiSelect()
+                        .Name("msClinicaliCESName")
+                        .DataTextField("VV_CD")
+                        .DataValueField("VV_CD")
+                        .Placeholder("-- Select One ---")
+                        //.AutoClose(false)
+                        .Filter(FilterType.Contains)
+                        //.TagMode(MultiSelectTagMode.Multiple)
+                        .Events(e =>
+                        {
+                            e.Change("SearchController.multiSelect.onChange_ClinicaliCESName");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetPIMSValidValuesVVCdOnly", "Home", new { Area = "EPAL" }).Data("SearchController.multiSelect.param.ClinicaliCESName");
+                            })
+                            .ServerFiltering(false);
+                        })
+                        )
+                </div>
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="msLOB">Clinical iCES/CES Action:</label></b>
+                    <input type="hidden" readonly id="txtClinicaliCESAction" />
+                    @(Html.Kendo().MultiSelect()
+                        .Name("msClinicaliCESAction")
+                        .DataTextField("VV_CD")
+                        .DataValueField("VV_CD")
+                        .Placeholder("-- Select One ---")
+                        //.AutoClose(false)
+                        .Filter(FilterType.Contains)
+                        //.TagMode(MultiSelectTagMode.Multiple)
+                        .Events(e =>
+                        {
+                            e.Change("SearchController.multiSelect.onChange_ClinicaliCESAction");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("SearchController.multiSelect.param.ClinicaliCESAction");
+                            })
+                            .ServerFiltering(false);
+                        })
+                        )
+                </div>
+
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+
+                    <b><label for="txtDrugName_Search">Prior Auth Status:</label></b>
+                    @(Html.Kendo().DropDownList()
+                        .Name("ddlPriorAuthStatus")
+                        .DataTextField("Text")
+                        .DataValueField("Value").HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                        .BindTo(new List<SelectListItem>() {
+                            new SelectListItem() {
+                            Text = "",
+                            Value = ""
+                            },
+                            new SelectListItem() {
+                            Text = "Yes",
+                            Value = "Yes"
+                            },
+                            new SelectListItem() {
+                            Text = "No",
+                            Value = "No"
+                            }
+                            })
+                                .Value("")
+                    )
+
+                </div>
+
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label>Pay Code Version Effective Date:</label></b>
+                    <div class="form-row">
+                        @(Html.Kendo().DatePicker()
+                            .Name("dpPayCodeVerEffDate")
+                            .Value("")
+                            .Format("MM/dd/yyyy")
+                            .ParseFormats(new string[] {"MMddyyyy",
+                        "MMddyy",
+                        "MM.dd.yyyy",
+                        "MM.dd.yy",
+                        "MM.d.yyyy",
+                        "M.d.yy",
+                        "M.d.yyyy",
+                        "MM/dd/yyyy",
+                        "MM/dd/yy",
+                        "MM/d/yyyy",
+                        "M/d/yy",
+                        "M/d/yyyy",
+                        "MM-dd-yyyy",
+                        "MM-dd-yy",
+                        "MM-d-yyyy",
+                        "M-d-yy",
+                        "M-d-yyyy"
+                            })
+                            .HtmlAttributes(new { style = "width: 100%; padding-left: 5px;padding-right: 5px;", title = "datepicker", @class = "form-to-update" })
+                            )
+                    </div>
+
+
+                </div>
+
+            </div>            
+           
+            <!-- Row 3 -->
+            <div class="form-row">
+                <div class="form-group col-sm-4 col-md-4 col-lg-4">
+                   <div class="form-row">
+                    <div class="form-group col-sm-6 col-md-6 col-lg-6">
+                    <b><label>Pay Code Effective Date:</label></b>
+                    <div class="form-row">
+                        @(Html.Kendo().DatePicker()
+                                    .Name("dpCurrentEffectiveDate")
+                            .Value("")
+                            .Format("MM/dd/yyyy")
+                            .ParseFormats(new string[] {"MMddyyyy",
+                        "MMddyy",
+                        "MM.dd.yyyy",
+                        "MM.dd.yy",
+                        "MM.d.yyyy",
+                        "M.d.yy",
+                        "M.d.yyyy",
+                        "MM/dd/yyyy",
+                        "MM/dd/yy",
+                        "MM/d/yyyy",
+                        "M/d/yy",
+                        "M/d/yyyy",
+                        "MM-dd-yyyy",
+                        "MM-dd-yy",
+                        "MM-d-yyyy",
+                        "M-d-yy",
+                        "M-d-yyyy"
+                            })
+                            .HtmlAttributes(new { style = "width: 100%; padding-left: 5px;padding-right: 5px;", title = "datepicker", @class = "form-to-update" })
+                            )
+
+                    </div>
+                </div>
+                    <div class="form-group col-sm-6 col-md-6 col-lg-6">
+                    <b><label>Pay Code Expiration Date:</label></b>
+                    <div class="form-row">
+                        @(Html.Kendo().DatePicker()
+                                    .Name("dpCurrentExpirationDate")
+                            .Value("")
+                            .Format("MM/dd/yyyy")
+                            .ParseFormats(new string[] {"MMddyyyy",
+                        "MMddyy",
+                        "MM.dd.yyyy",
+                        "MM.dd.yy",
+                        "MM.d.yyyy",
+                        "M.d.yy",
+                        "M.d.yyyy",
+                        "MM/dd/yyyy",
+                        "MM/dd/yy",
+                        "MM/d/yyyy",
+                        "M/d/yy",
+                        "M/d/yyyy",
+                        "MM-dd-yyyy",
+                        "MM-dd-yy",
+                        "MM-d-yyyy",
+                        "M-d-yy",
+                        "M-d-yyyy"
+                            })
+                            .HtmlAttributes(new { style = "width: 100%; padding-left: 5px;padding-right: 5px;", title = "datepicker", @class = "form-to-update" })
+                            )
+                    </div>
+                </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-8 col-md-8 col-lg-8">
+                    <div class="form-row">
+                    <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                        <b><label for="msLOB">Business Segment:</label></b>
+                        <input type="hidden" readonly id="txtLOB" />
+                        @(Html.Kendo().MultiSelect()
+                            .Name("msLOB")
+                            .DataTextField("COLUMN_NAME")
+                            .DataValueField("COLUMN_NAME")
+                            .Placeholder("-- Select One ---")                            
+                            //.AutoClose(false)
+                            .Filter(FilterType.Contains)
+                            //.TagMode(MultiSelectTagMode.Multiple)
+                            .Events(e =>
+                            {
+                                    e.Change("SearchController.multiSelect.onChange_LOB");
+                            })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                        read.Action("GetPayCodeSearchFilters", "Home", new { Area = "PayCodes" }).Data("SearchController.multiSelect.param.APP_LOB");
+                                })
+                                .ServerFiltering(false);
+                            })
+                        )
+            </div>
+            <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                <b><label for="msEntity">Entity:</label></b>
+                            <input type="hidden" readonly id="txtEntity" />
+                        @(Html.Kendo().MultiSelect()
+                            .Name("msEntity")
+                            .DataTextField("COLUMN_NAME")
+                            .DataValueField("COLUMN_NAME")
+                            .Placeholder("-- Select One ---")
+                            //.AutoClose(false)
+                            .Filter(FilterType.Contains)
+                            //.TagMode(MultiSelectTagMode.Multiple)
+                            .Events(e =>
+                            {
+                                e.Change("SearchController.multiSelect.onChange_ENTITY");
+                            })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                        read.Action("GetPayCodeSearchFilters", "Home", new { Area = "PayCodes" }).Data("SearchController.multiSelect.param.APP_ENTITY");
+                                })
+                                .ServerFiltering(false);
+                            })
+                       )
+            </div>
+                <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                    <b><label for="msPlan">Plan:</label></b>
+                    <input type="hidden" readonly id="txtPlan" />
+                    @(Html.Kendo().MultiSelect()
+                        .Name("msPlan")
+                        .DataTextField("COLUMN_NAME")
+                        .DataValueField("COLUMN_NAME")
+                        .Placeholder("-- Select One ---")
+                        //.AutoClose(false)
+                        .Filter(FilterType.Contains)
+                        //.TagMode(MultiSelectTagMode.Multiple)
+                        .Events(e =>
+                        {
+                            e.Change("SearchController.multiSelect.onChange_PLAN");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                    read.Action("GetPayCodeSearchFilters", "Home", new { Area = "PayCodes" }).Data("SearchController.multiSelect.param.APP_PLAN");
+                            })
+                            .ServerFiltering(false);
+                        })
+                    )
+
+                </div>
+                <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                <b><label for="msProduct">Product:</label></b>
+                <input type="hidden" readonly id="txtProduct" />
+                @(Html.Kendo().MultiSelect()
+                        .Name("msProduct")
+                        .DataTextField("COLUMN_NAME")
+                        .DataValueField("COLUMN_NAME")
+                        .Placeholder("-- Select One ---")
+                        //.AutoClose(false)
+                        .Filter(FilterType.Contains)
+                        //.TagMode(MultiSelectTagMode.Multiple)
+                        .Events(e =>
+                        {
+                                e.Change("SearchController.multiSelect.onChange_PRODUCT");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                    read.Action("GetPayCodeSearchFilters", "Home", new { Area = "PayCodes" }).Data("SearchController.multiSelect.param.APP_PRODUCT");
+                            })
+                            .ServerFiltering(false);
+                        })
+                )
+            </div>
+
+        </div>
+                </div>
+            </div>
+            <!-- Row 4 -->
+        <div class="form-row">
+            <div class="form-group col-md-12 col-sm-12 col-lg-12 text-center">
+                <button id="btnSearch" class="btn btn-primary noSubmit" title="Click to search records!"><i class="fas fa-search"></i> Search </button>
+                <button id="btnReset" class="btn btn-outline-primary noSubmit" title="Click to reset filters!"><i class="fas fa-times"></i> Reset </button>
+                    @if(_UserInfo_T_Dto != null){
+                        if (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.PayCodeReadWrite))
+                        || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.PayCodeAdmin))
+                        || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin))
+                        )
+                        {
+                            <button id="btnAddNew" class="btn btn-primary noSubmit" data-toggle="modal" data-target="#addNewModal" data-backdrop="static" data-keyboard="false" title="Click to go Add New!"><i class="fas fa-plus-circle"></i> Add New </button>
+                        }
+                    }
+                     
+            </div>
+        </div>
+        </div>
+    </form>
+    <br />
+    <div style="font-size:11px !important;">
+        @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.PayCode_Procedures_V_Dto>()
+            .Name("grid_Search")
+            .Columns(c =>
+            {                
+                c.Bound(p => p.PAYC_HIERARCHY_KEY)
+                .Title("Pay Code ID")
+                    .ClientTemplate(
+                    "<a href='javascript:void(0);' style='color:blue;' onclick=\"SearchController.methods.redirect_Detail('View','#= PAYC_HIERARCHY_KEY#,#= kendo.toString(kendo.parseDate(PAYC_VER_EFF_DT),'MM-dd-yyyy hh:mm:ss tt') #');\" title='Click to view details!' \\data-target='tooltip'\\>#= PAYC_HIERARCHY_KEY # </a>" +
+                    ((appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.PayCodeReadWrite))
+                    || (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.PayCodeAdmin))
+                    || (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin))))
+                ) ? "<i class=\"edit-epal-icon k-icon k-i-pencil text-primary showPencil float-right\" onclick=\"SearchController.methods.redirect_Detail('Edit','#= PAYC_HIERARCHY_KEY #, #= kendo.toString(kendo.parseDate(PAYC_VER_EFF_DT),'MM-dd-yyyy hh:mm:ss tt') #');\" title='Click to edit details!' \\data-target='tooltip'\\></i> " : "")
+                    )
+                .Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                .HtmlAttributes(new { style = "text-align: center" }).Width(160);
+
+                c.Bound(p => p.PAYC_STATUS).Title("Pay Code<br/>Status").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(75);
+                c.Bound(p => p.PAYC_PROC_CD).Title("Procedure  <br/>Code").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(75);
+                c.Bound(p => p.PROC_CD_DESC).Title("Procedure Code <br/> Description").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                
+                
+                
+                
+                c.Bound(p => p.PAYC_KL_PCS).Title("KL PCS").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(75);
+                c.Bound(p => p.PAYC_NDB_PCS).Title("NDB PCS").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(75);
+              
+                //c.Bound(p => p.EPAL_ALT_SUB_CAT).Title("Alternate <br/>Subcategory").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                c.Bound(p => p.PAYC_ICES_IND).Title("iCES/CES").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(65);
+                c.Bound(p => p.PAYC_ICES_EDIT_NAME).Title("iCES Edit  <br/> Name").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(65);
+                c.Bound(p => p.PAYC_ICES_EDIT_ACTION).Title("iCES Edit  <br/> Action").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(65);
+                c.Bound(p => p.EPAL_STATUS).Title("Prior Auth <br/>Status").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(70);
+                c.Bound(p => p.PAYC_EFF_DT).Filterable(false)
+                .Title("Pay Code <br/>Effective Date")
+                    .ClientTemplate("#= ( kendo.toString(kendo.parseDate(PAYC_EFF_DT), 'MM/dd/yyyy') == '12/31/2999'  || (data.PAYC_EFF_DT == null)) ? ' ' : kendo.toString(kendo.parseDate(PAYC_EFF_DT), 'MM/dd/yyyy') #")
+                    .HtmlAttributes(new { style = "text-align: center" })
+                    .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                    .Width(100);
+                c.Bound(p => p.PAYC_EXP_DT).Filterable(false)
+                .Title("Pay Code <br/>Expiration Date")
+                    .ClientTemplate("#= ( kendo.toString(kendo.parseDate(PAYC_EXP_DT), 'MM/dd/yyyy') == '12/31/2999'  || (data.PAYC_EFF_DT == null)) ? ' ' : kendo.toString(kendo.parseDate(PAYC_EXP_DT), 'MM/dd/yyyy') #")
+                    .HtmlAttributes(new { style = "text-align: center" })
+                    .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                    .Width(100);
+                c.Bound(p => p.PAYC_VER_EFF_DT).Filterable(false)
+                    .Title("Pay Code Ver<br/>Eff Date")
+                    .ClientTemplate("#= ( kendo.toString(kendo.parseDate(PAYC_VER_EFF_DT), 'MM/dd/yyyy hh:mm:ss tt') == '12/31/2999' || (data.PAYC_VER_EFF_DT == null)) ? ' ' : kendo.toString(kendo.parseDate(PAYC_VER_EFF_DT), 'MM/dd/yyyy hh:mm:ss tt') #")
+                    .HtmlAttributes(new { style = "text-align: center" })
+                    .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                    .Width(100);
+                c.Bound(p => p.ROW_NUMBER).ClientTemplate("<span id='lblRowNum'>#= data.ROW_NUMBER#</span>").Title("Row Number").Hidden(true);
+                //c.Bound(p => p.PAYC_BUS_SEG_CD).Title("Bus Seg").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(65);
+                //c.Bound(p => p.PAYC_ENTITY_CD).Title("Entity").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(65);
+                //c.Bound(p => p.PAYC_PLAN_CD).Title("Plan").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(65);
+                //c.Bound(p => p.PAYC_PRODUCT_CD).Title("Product").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(65);
+            
+              
+
+
+           
+            })
+            .Resizable(resize => resize.Columns(true))
+            .HtmlAttributes(new { style = "height: 100%" })
+            .Sortable()
+            .Events(e => e.ExcelExport("SearchController.grid.excelExport")
+            .DataBound("SearchController.grid.onDataBound")
+            )
+            .Navigatable()
+            .ToolBar(tools => tools.Excel())
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .PreviousNext(true)
+            .Numeric(true)
+            )
+            .AutoBind(false)
+            .Scrollable()
+            .Selectable()
+            .Filterable()
+            .Excel(excel => excel
+            .AllPages(true)
+            .FileName("ExportExcel.xlsx")
+            .Filterable(true)
+            .ProxyURL(Url.Action("Excel_Export_Save", "Grid"))
+            )
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .PageSize(100)
+            .Read(read => read.Action("GetPayCodeProceduresSearch", "Home").Data("SearchController.grid.param"))
+            .Events(ev => ev.RequestEnd("SearchController.grid.onGridRequestEnd"))
+            .ServerOperation(false)
+            )
+            )
+    </div>
+
+
+</div>
+
+@await Html.PartialAsync("_AddNewModal")
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        MIApp.Common.Enum.screenType = MIApp.Common.Enum.screenTypeValues.search;
+
+        UserAccessHistController.add({
+            "MODULE_NAME": "PayCodes ",
+            "USERACTION": "PayCodes/Home/Index",
+            "USERSELECTION": "PayCodes/Home/Index",
+            "LST_UPDT_DT": null,
+            "LST_UPDT_BY": MS_ID,
+            "PAGE_ID": "18",
+            "__RequestVerificationToken": $('meta[name="request-verification-token"]')[0].content
+
+        });
+    });
+</script>
+
+
+
+

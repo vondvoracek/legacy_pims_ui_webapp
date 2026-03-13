@@ -1,0 +1,87 @@
+﻿@model MI.PIMS.BO.Dtos.EPAL_Procedures_V_Dto
+@using Kendo.Mvc.UI
+@using MI.PIMS.UI.Common
+@{
+    ViewData["Title"] = "Add Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="~/css/EPAL/Detail.css" asp-append-version="true"/>
+<script src="~/js/EPAL/Detail.js" asp-append-version="true"></script>
+<script src="~/js/EPAL/DetailToolTips.js" asp-append-version="true"></script>
+@{
+    ViewData["PageType"] = @Roles.EPALReadOnly.ToString();
+    ViewData["EPALPageView"] = @EPALPageView.AddDetail.ToString();
+}
+
+@if (Model != null)
+{
+    <input id="addnew-record" type="hidden" readonly value="@ViewBag.AddRecord" />
+    @Html.Hidden("epal-page-view", ViewData["EPALPageView"].ToString())
+    <form id="addForm">
+        <div id="myOverlay"></div>
+        <div style="height:100%" class="my-form-font">
+            <div class="breadcrumb-background">
+                <div class="container">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb breadcrumb-background">
+                            <li class="breadcrumb-item"><a>@Html.ActionLink("Home", "index", "/", new { Area = "" }, new { @class = "breadcrumb-item-font" })</a></li>
+                            <li class="breadcrumb-item"><a>@Html.ActionLink("EPAL Search", "Index", "Home", new { Area = "EPAL" }, new { @class = "breadcrumb-item-font" })</a></li>
+                            <li class="breadcrumb-item active" style="color: black !important; cursor: initial;" aria-current="page">Add Detail</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+            @*@await Html.PartialAsync("_DetailHeader", Model)*@
+            @*@await Html.PartialAsync("_DetailTabs", Model)*@
+
+            <partial name="_DetailHeader" model="Model" view-data="ViewData" />
+            <partial name="_DetailTabs_AddNew" model="Model" view-data="ViewData" />
+
+            <div style="padding:30px;">
+                @*        <span> The following fields are hidden:
+            <b>AHRQ,
+            Source,
+            Procedure Code Type,
+            Procedure Code Description,
+            Dx Code Requirements,
+            Internal/External</b>
+            </span>*@
+
+            </div>
+
+
+        </div>
+        <br />
+        <br />
+    </form>
+
+}
+
+else
+{
+    <div class="container">
+        <div style="height:100%" class="my-form-font">
+            @*@await Html.PartialAsync("_NoRecordsFound")*@
+            <partial name="_NoRecordsFound" />
+        </div>
+        <br />
+        <br />
+    </div>
+}
+
+<script>
+    $(function() {
+        // Log User Access Hist for the page and logged in user
+        var pims_id = "@Model" != null ? "@Model.EPAL_HIERARCHY_KEY.ToStringNullSafe()": "";
+
+        UserAccessHistController.add({
+            "MODULE_NAME": "EPAL Add Detail",
+            "USERACTION": "EPAL/Home/AddDetail?pims_id=" + pims_id,
+            "USERSELECTION": "EPAL/Home/AddDetail",
+            "LST_UPDT_DT": null,
+            "LST_UPDT_BY": MS_ID,
+            "PAGE_ID": "4",
+             "__RequestVerificationToken": $('meta[name="request-verification-token"]')[0].content
+        });
+    });
+</script>

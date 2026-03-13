@@ -1,0 +1,144 @@
+﻿@using Kendo.Mvc.UI
+@using MI.PIMS.UI.Common
+@{
+    ViewData["Title"] = "Manage Guidelines";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Html.Hidden("manage-guidelines-urls", ViewData["ManageGuidelinesUrls"].ToString())
+
+<script src="~/js/Admin/ManageGuidelines.js" asp-append-version="true"></script>
+
+<div class="breadcrumb-background">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-background">
+                <li class="breadcrumb-item"><a>@Html.ActionLink("Home", "index", "/", new { Area = "" }, new { @class = "breadcrumb-item-font" })</a></li>
+                <li class="breadcrumb-item active" style="color: black !important; cursor: initial;" aria-current="page">Manage Guidelines</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="container guidelines-search-section" style="padding-left:30px; padding-right:30px;">
+    <!-- Instruction Banner -->
+    <div id="searchAlertBanner" class="alert alert-warning d-none" role="alert" style="font-size:14px;">
+        <strong>Instruction:</strong> At least one field of search criteria must be populated.
+        <button type="button" class="close" aria-label="Close" onclick="$('#searchAlertBanner').addClass('d-none');">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+    <form id="guidelines-search-form">
+        <div class="section-heading">
+            <div class="row">
+                <div class="col-10" style="font-size: 14px;">
+                    Manage Guidelines
+                </div>
+            </div>
+        </div>
+        <div class="section-border">
+            <!-- Row 1 -->
+            <div class="form-row">
+                <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                    <b>
+                        <label for="txtProcedureCode" class="required">Procedure Code:</label>
+                        <label for="txtProcedureCode" style="color:red; font-style:italic;"> (Case Sensitive) </label>
+                    </b>
+                    @* <input type="text" class="form-control" id="txtProcedureCode" value=""> *@
+                    
+                    <div>
+                        @(
+                            Html.Kendo().MultiSelect()
+                                .Name("ddlProcedureCodes") // ID for the MultiSelect
+                                .Placeholder("Select Procedure Codes...")
+                                .DataTextField("proc_cd")   // Field to display
+                                .DataValueField("proc_cd")  // Field for value
+                                .Filter("contains")         // Enable filtering
+                                .MinLength(2)               // Minimum chars before search
+                                .AutoBind(false)            // Load only when user types
+                                .DataSource(source => {
+                                    source.Read(read => {
+                                        read.Action("GetProcedureCodes", "ManageGuidelines", new { area = "Admin" }).Data("ManageGuidelines.getProcCdParams"); // Controller Action
+                                    }).ServerFiltering(true);
+                            })
+                            .HtmlAttributes(new { style = "width:100%;" })
+                        )
+                    </div>
+                </div>
+                <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                    <b><label for="txtIQReference">IQ Reference:</label></b>
+                    <input type="text" class="form-control" id="txtIQReference" value="">
+                </div>
+                <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                    <b><label for="txtIQGuidelineID">IQ Guideline ID:</label></b>
+                    <input type="text" class="form-control" id="txtIQGuidelineID" value="">
+                </div>
+                <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                    <b><label for="txtIQVersion">IQ Version:</label></b>
+                    <input type="text" class="form-control" id="txtIQVersion" value="">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-4 col-sm-4 col-lg-4 text-left">
+                    <button id="btnAddNew" type="button" class="btn btn-success noSubmit" title="Click to go Add New!">
+                        <i class="fas fa-plus-circle"></i> Add New
+                    </button>
+                </div>
+                <div class="form-group col-md-8 col-sm-8 col-lg-8 text-right">
+                    <button id="btnSearch" class="btn btn-primary noSubmit" title="Click to search records!">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <button id="btnReset" type="reset" class="btn btn-outline-primary noSubmit" title="Click to reset filters!">
+                        <i class="fas fa-times"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    <br />
+    <div style="font-size:11px !important;">
+        @(
+            Html.Kendo().Grid<MI.PIMS.BO.Dtos.DPOC_Guidelines_Dto>()
+            .Name("grid_guidelines")
+            .AutoBind(false)
+            .Columns(c =>
+            {
+                @*c.Select().Width(20);*@
+                c.Bound(p => p.proc_cd).Title("Proc<br />Code").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(65);
+                c.Bound(p => p.iq_reference).Title("IQ<br />Reference").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                c.Bound(p => p.iq_gdln_id).Title("IQ<br />Guideline ID").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                c.Bound(p => p.iq_gdln_version).Title("IQ<br />Version").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+            })
+            .Resizable(resize => resize.Columns(true))
+            .HtmlAttributes(new { style = "height: 100%" })
+            .Sortable()            
+            .Pageable(pageable => pageable
+                .Refresh(true)
+                .PreviousNext(true)
+                .Numeric(true)
+            )            
+            .Scrollable()
+            .Selectable()
+            .Filterable()
+            //.Events(events => events.DataBound("_categoryUpdateController.grid.onDataBound"))
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .PageSize(100)
+                .Read(read => read.Action("GetGuidelinesByParams", "ManageGuidelines", new { Area = "Admin" }).Data("ManageGuidelines.getSearchParams"))
+                .ServerOperation(true)
+            )
+         )
+    </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("_AddGuideline")
+
+<script>
+    $(document).ajaxSend(function (event, xhr, settings) {
+       var token = $('meta[name="request-verification-token"]')[0].content;
+       if (token) {
+              xhr.setRequestHeader('RequestVerificationToken', token);
+         }
+     });
+</script>

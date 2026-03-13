@@ -1,0 +1,196 @@
+﻿@using Kendo.Mvc.UI
+@using MI.PIMS.UI.Common
+@{
+    ViewData["Title"] = "Category Update";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/js/admin/_categoryupdate.js" asp-append-version="true"></script>
+
+<style>
+    .edit-category-icon {
+        cursor: pointer;
+    }
+</style>
+
+@Html.Hidden("category-update-urls", ViewData["CategoryUpdateUrls"].ToString())
+
+<div class="breadcrumb-background">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-background">
+                <li class="breadcrumb-item"><a>@Html.ActionLink("Home", "index", "/", new { Area = "" }, new { @class = "breadcrumb-item-font" })</a></li>
+                <li class="breadcrumb-item active" style="color: black !important; cursor: initial;" aria-current="page">Category Update</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="container category-search-section" style="padding-left:30px; padding-right:30px;">
+    <form id="category-search-form">
+        <div class="section-heading">
+            <div class="row">
+                <div class="col-10" style="font-size: 14px;">
+                    Category Update
+                </div>                
+            </div>
+        </div>
+        <div class="section-border">
+            <!-- Row 1 -->
+            <div class="form-row">
+                <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                    <b><label for="txtProcedureCode">Procedure Code:</label> <label for="txtProcedureCode" style="color:red; font-style:italic;"> (Case Sensitive) </label> </b>
+                    <input type="text" class="form-control" id="txtProcedureCode" value="">
+                </div>
+                <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                    <b><label for="msSpecialty">Specialty:</label></b>
+                    @(Html.Kendo().MultiSelect()
+                        .Name("msSpecialty")
+                        .DataTextField("RET_VAL")
+                        .DataValueField("RET_VAL")
+                        @*.Placeholder("Type in at least 3 characters...")*@
+                        .Filter(FilterType.Contains)
+                        .TagMode(MultiSelectTagMode.Multiple)
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetSpecialtyCombination", "Home", new { Area = "Admin" }).Data("_categoryUpdateController.multiSelect.param.SPECIALTY");
+                            })
+                            .ServerFiltering(false);
+                        })
+                    )
+                </div>
+                <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                    <b><label for="msAlternateCategory">Alternate Category:</label></b>
+                    <input type="hidden" readonly id="txtAlternateCategory" />
+                    <input type="hidden" readonly id="txtAlternateCategoryFilterText" />
+                    @(Html.Kendo().MultiSelect()
+                        .AutoBind(false)
+                        .Name("msAlternateCategory")
+                        .DataTextField("CATEGORY")
+                        .DataValueField("CATEGORY")
+                        .Placeholder("Type in at least 3 characters...")
+                        .MinLength(3)
+                        .Filter(FilterType.Contains)
+                        .TagMode(MultiSelectTagMode.Multiple)
+                        .Events(e =>
+                        {
+                            e.Change("_categoryUpdateController.multiSelect.onChange_AlternateCategory").Filtering("_categoryUpdateController.multiSelect.onFiltering_AlternateCategory");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetAdminCategoriesByType", "Home", new { Area = "Admin" }).Data("_categoryUpdateController.multiSelect.param.ALTERNATE_CATEGORY");
+                            })
+                            .ServerFiltering(true);
+                        })
+                    )
+                </div>
+                <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                    <b><label for="txtAlternateSubcategory">Alternate Subcategory:</label></b>
+                    <input type="hidden" readonly id="txtAlternateSubcategory" />
+                    <input type="hidden" readonly id="txtAlternateSubCategoryFilterText" />
+                    @(Html.Kendo().MultiSelect()
+                        .AutoBind(false)
+                        .Name("msAlternateSubCategory")
+                        .DataTextField("CATEGORY")
+                        .DataValueField("CATEGORY")
+                        .Placeholder("Type in at least 3 characters...")
+                        .MinLength(3)
+                        .Filter(FilterType.Contains)
+                        .TagMode(MultiSelectTagMode.Multiple)
+                        .Events(e =>
+                        {
+                            e.Change("_categoryUpdateController.multiSelect.onChange_AlternateSubCategory").Filtering("_categoryUpdateController.multiSelect.onFiltering_AlternateSubCategory");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetAdminCategoriesByType", "Home", new { Area = "Admin" }).Data("_categoryUpdateController.multiSelect.param.ALTERNATE_SUB_CATEGORY");
+                            })
+                            .ServerFiltering(true);
+                        })
+                    )
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-4 col-sm-4 col-lg-4 text-left">
+                    <button id="btnAddNew" type="button" class="btn btn-success noSubmit" data-toggle="modal" data-target="#addCategoryModal" data-backdrop="static" data-keyboard="false" title="Click to go Add New!"><i class="fas fa-plus-circle"></i> Add New </button>
+                    <button id="btnUpdateByProcCode" type="button" class="btn btn-primary noSubmit" data-toggle="modal" data-target="#updateByProcCodeModal" data-backdrop="static" data-keyboard="false" title="Click to go update search results!"><i class="fas fa-save-circle"></i> Bulk Insert by Proc Code </button>
+                    <button id="btnUpdateByAltCat" type="button" class="btn btn-primary noSubmit" data-toggle="modal" data-target="#updateByAltCatModal" data-backdrop="static" data-keyboard="false" title="Click to go update search results!"><i class="fas fa-save-circle"></i> Update By Alternate Categories </button>
+                </div>
+                <div class="form-group col-md-8 col-sm-8 col-lg-8 text-right">
+                    <button id="btnSearch" class="btn btn-primary noSubmit" title="Click to search records!"><i class="fas fa-search"></i> Search </button>
+                    <button id="btnReset" type="reset" class="btn btn-outline-primary noSubmit" title="Click to reset filters!"><i class="fas fa-times"></i> Reset </button>                    
+                </div>
+            </div>
+        </div>
+    </form>
+    <br />
+    <div style="font-size:11px !important;">
+        @(
+            Html.Kendo().Grid<MI.PIMS.BO.Dtos.CategoryUpdate_Dto>()
+            .Name("grid_category_update")
+            .Columns(c =>
+            {
+                @*c.Select().Width(20);*@
+                c.Bound(p => p.PROC_CD).Title("Proc<br />Code")
+                .ClientTemplate(
+                    "#=PROC_CD# " +
+                    "#if(!isNullOrEmpty(DRUG_NM)) {#" +
+                        "#if(DRUG_NM.indexOf('~') < 0 && EDITABLE_IND == 'Y') {#" +
+                            "<i class=\"edit-category-icon k-icon k-i-pencil text-primary showPencil float-right\" onclick='_categoryUpdateController.edit.popup(\"#=PROC_CD#\",\"#=ALTERNATE_CATEGORY#\",\"#=ALTERNATE_SUB_CATEGORY#\")' title = 'Click to edit details!' data-target = 'tooltip'></ i > " +
+                        "#}#" +
+                    "#} else {#" +
+                        "#if(EDITABLE_IND == 'Y') {#" +
+                            "<i class=\"edit-category-icon k-icon k-i-pencil text-primary showPencil float-right\" onclick='_categoryUpdateController.edit.popup(\"#=PROC_CD#\",\"#=ALTERNATE_CATEGORY#\",\"#=ALTERNATE_SUB_CATEGORY#\")' title='Click to edit details!' data-target='tooltip'></i> " +
+                        "#}#" + 
+                    "#}#"
+                ).Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(65);
+                c.Bound(p => p.DRUG_NM).Title("Specialty").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                c.Bound(p => p.ALTERNATE_CATEGORY).Title("Alternate<br/>Category").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                c.Bound(p => p.ALTERNATE_SUB_CATEGORY).Title("Alternate Sub<br/>Category").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                c.Bound(p => p.STNDRD_SVC_CAT).Title("HCEMI Reporting<br/>Category").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                c.Bound(p => p.STNDRD_SVC_SUBCAT).Title("HCEMI Reporting<br/>Subcategory").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                c.Bound(p => p.PROC_CD).Title(" ").Filterable(false).ClientTemplate(
+                    "#if(!isNullOrEmpty(DRUG_NM)) {#" +
+                        "#if (DRUG_NM.indexOf('~') < 0 && EDITABLE_IND == 'Y') {#" +
+                            "<a class='btn btn-default btn-outline-primary noSubmit grid-column-button category-delete' href='javascript:void(0);' onclick='_categoryUpdateController.delete.validate(\"#=PROC_CD#\",\"#=ALTERNATE_CATEGORY#\",\"#=ALTERNATE_SUB_CATEGORY#\")' title='Click to delete this row!' \\data-target='tooltip'\\><i  class=\"k-icon k-i-delete\"></i></a>" +
+                        "#}#" +
+                    "#} else {#" +
+                        "#if(EDITABLE_IND == 'Y') {#" +
+                            "<a class='btn btn-default btn-outline-primary noSubmit grid-column-button category-delete' href='javascript:void(0);' onclick='_categoryUpdateController.delete.validate(\"#=PROC_CD#\",\"#=ALTERNATE_CATEGORY#\",\"#=ALTERNATE_SUB_CATEGORY#\")' title='Click to delete this row!' \\data-target='tooltip'\\><i  class=\"k-icon k-i-delete\"></i></a>" +
+                        "#}#" +
+                    "#}#"
+                ).Width(30);
+            })
+            .Resizable(resize => resize.Columns(true))
+            .HtmlAttributes(new { style = "height: 100%" })
+            .Sortable()            
+            .Pageable(pageable => pageable
+                .Refresh(true)
+                .PreviousNext(true)
+                .Numeric(true)
+            )
+            .AutoBind(false)
+            .Scrollable()
+            .Selectable()
+            .Filterable()
+            //.Events(events => events.DataBound("_categoryUpdateController.grid.onDataBound"))
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .PageSize(100)
+                .Read(read => read.Action("GetCategoryUpdates", "Home", new { Area = "Admin" }).Data("_categoryUpdateController.grid.param"))
+                .Events(ev => ev.RequestEnd("_categoryUpdateController.grid.onGridRequestEnd"))
+                .ServerOperation(false)
+            )
+         )
+    </div>
+</div>
+
+@await Html.PartialAsync("_AddCategory")
+@await Html.PartialAsync("_EditCategory")
+@await Html.PartialAsync("_UpdateByProcCodes")
+@await Html.PartialAsync("_UpdateByAltCat")

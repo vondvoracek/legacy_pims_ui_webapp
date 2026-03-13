@@ -1,0 +1,63 @@
+﻿@using Kendo.Mvc.UI;
+@using MI.PIMS.BO.Dtos;
+@model DPOC_Gdln_Param_Dto;
+
+<script src="~/js/dpoc/_DPOC_GuidelineDiagnosis.js" asp-append-version="true"></script>
+
+<input type="hidden" id="hv-iq-gdln-id" value="@Model.p_IQ_GDLN_ID" />
+
+@(Html.Kendo().Grid<DPOC_Inv_Gdln_Diagnoses_Dto>()
+    .Name("grid_GSDiagList_hover")
+    .Columns(c =>
+    {
+        c.Bound(p => p.LIST_NAME).Title("Diagnosis List")
+                                    .Width(250)
+                                    .Filterable(false)
+                                    .EditorTemplateName("Diag_List")
+                                    .Editable("DiagCodesController.grid.isDiagListNotEditable")
+                                    .HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold", title = "Diagnosis List." })
+                                    .HtmlAttributes(new { style = "text-align: left" });
+        c.Bound(p => p.DIAG_CD)
+                                    .Title("Diagnosis Code")
+                                    .EditorTemplateName("Diag_CD")
+                                    .Editable("DiagCodesController.grid.isDiagCDNotEditable")
+                                    .ClientTemplate("#:DIAG_CD#")
+                                    .Width(150)
+                                    .HeaderHtmlAttributes(new { title = "Diagnosis Codes.", style = "text-align: left; font-weight:bold" })
+                                    .HtmlAttributes(new { style = "text-align: left" });
+        c.Bound(p => p.DIAG_CD_DESC).Title("Diagnosis Description").HeaderHtmlAttributes(new { title = "Diagnosis Codes." }).HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+        c.Bound(p => p.DIAG_INCL_EXCL_CD).Hidden(true);
+        c.Bound(p => p.DIAG_INCL_EXCL_CD_DESC)
+                                    .Title("Include/Exclude")
+                                    .EditorTemplateName("DIAG_INCL_EXCL_CD")
+                                    .ClientTemplate("#:DIAG_INCL_EXCL_CD_DESC#")
+                                    .Width(200)
+                                    .Filterable(false)
+                                    .Editable("DiagCodesController.grid.isNotEditable")
+                                    .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold", title = "Denotes if the status of Diagnosis is either included or excluded" })
+                                    .HtmlAttributes(new { style = "text-align: left", required = "required" });
+    })
+    .Resizable(resize => resize.Columns(true))
+    .HtmlAttributes(new { style = "height: 400px;" })
+    .Scrollable()
+    .Sortable()
+    .Events(events => events.DataBound("gsDiagHoverController.onDataBound"))
+    .Pageable(pageable => pageable.Refresh(false))
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Batch(true)
+        .ServerOperation(false)
+        .PageSize(20)
+        .Model(model =>
+        {
+            model.Field(c => c.DIAG_CD);
+            model.Field(c => c.LIST_NAME).Editable(true);
+            model.Field(c => c.DIAG_CD_DESC).Editable(false);
+            model.Field(c => c.DIAG_CD_TYPE).Editable(false);
+            model.Field(c => c.DIAG_INCL_EXCL_CD).DefaultValue("INCL");
+            model.Field(c => c.DIAG_INCL_EXCL_CD_DESC).DefaultValue("Include");
+        })
+        .Read(read => read.Action("GetList", "GuidelineDiagnosis").Data("gsDiagHoverController.param"))
+    )    
+    .AutoBind(false)
+)

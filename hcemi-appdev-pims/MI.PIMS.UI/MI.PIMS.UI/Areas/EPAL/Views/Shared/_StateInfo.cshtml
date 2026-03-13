@@ -1,0 +1,55 @@
+﻿@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "StateInfo";
+}
+<script src="~/js/EPAL/StateInfo.js" asp-append-version="true"></script>
+
+<div class="container tab-section">
+    <h5>
+        State Information
+    </h5>
+    <hr />
+    <form id="frmStateInfo">
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <div style="font-size:11px !important;">
+                    @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.EPAL_Procedures_AssoCodes_V_APPL_TO_STATES_Dto>()
+                    .Name("grid_StateInfo")                        
+                    .Columns(c => {
+                        c.Bound(p => p.STATE_NAME).Title("State").Filterable(false).HeaderHtmlAttributes(new { title = "The state that the prior auth applies to." }).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold; title:'asdf'" }).HtmlAttributes(new { style = "text-align: center" }).Width(250);
+                        c.Bound(p => p.STATE_MANDATED_IND).Title("State Mandated").Filterable(false).HeaderHtmlAttributes(new { title = "Denotes if the prior auth is mandated by the state." }).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(250);
+                        c.Bound(p => p.INCL_EXCL_CD_DESC).Title("Include/Exclude").Filterable(false).HeaderHtmlAttributes(new {title = "Denotes if the status of state is either included or excluded."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                        c.Bound(p => p.ATS_EFF_DT).Title("State Effective<br/>Date")
+                            .ClientTemplate("#= (ATS_EFF_DT == null || kendo.toString(kendo.parseDate(ATS_EFF_DT), 'MM/dd/yyyy') == '12/31/2999') ? ' ' : kendo.toString(kendo.parseDate(ATS_EFF_DT), 'MM/dd/yyyy') #").Filterable(false).HeaderHtmlAttributes(new {title = "The effective date of the Program Managed By vendor if there is one on the record."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                        c.Bound(p => p.ATS_EXP_DT).Title("State Expiration<br/>Date")
+                            .ClientTemplate("#= (ATS_EXP_DT == null || kendo.toString(kendo.parseDate(ATS_EXP_DT), 'MM/dd/yyyy') == '12/31/2999') ? ' ' : kendo.toString(kendo.parseDate(ATS_EXP_DT), 'MM/dd/yyyy') #")
+                                .Filterable(false).HeaderHtmlAttributes(new {title = "The expiration date of the Program Managed By vendor if there is one on the record."})
+                                .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" })
+                                .Width(200);
+                        c.Bound(p => p.ATS_ISSUE_GOV_DESC).Title("State Issue<br/>Governance").Filterable(false).HeaderHtmlAttributes(new {title = "The issue status of the record."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                        c.Bound(p => p.ATS_PROG_MGD_BY).Title("Program Managed<br/>By").Filterable(false).HeaderHtmlAttributes(new {title = "Program managed by"}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" });
+                    })                        
+                    .Resizable(resize => resize.Columns(true))
+                    .HtmlAttributes(new { style = "height: 400px;" })
+                    .Scrollable()
+                    .Sortable()                    
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(1000)
+                        .Read(read => read.Action("StateInfo", "Home").Data("StateInfoController.grid.param")))
+                    )
+                </div>
+            </div>
+        </div>
+        
+        <script type="text/javascript">
+            $(document).ready(function() {
+                //var gridElement = $("#grid_StateInfo");
+                //var dataArea = gridElement.find(".k-grid-content");
+                //gridElement.height("375px");
+                //dataArea.height("380px");
+            });
+        </script>
+    </form>
+</div>
+

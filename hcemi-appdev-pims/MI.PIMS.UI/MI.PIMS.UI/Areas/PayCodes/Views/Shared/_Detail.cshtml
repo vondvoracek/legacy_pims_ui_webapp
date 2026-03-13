@@ -1,0 +1,42 @@
+﻿@model MI.PIMS.BO.Dtos.PayCode_Procedures_T_Dto
+@using Kendo.Mvc.UI
+@using MI.PIMS.UI.Common
+<link rel="stylesheet" href="~/css/PayCodes/Detail.css" />
+
+@if (Model != null)
+{
+    
+    <form id="editForm">
+        <div id="myOverlay"></div>
+        <div style="height:100%" class="my-form-font">
+            <div class="breadcrumb-background">
+                <div class="container">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb breadcrumb-background">
+                            <li class="breadcrumb-item"><a>@Html.ActionLink("Home", "index", "/", new { Area = "" }, new { @class = "breadcrumb-item-font" })</a></li>
+                            <li class="breadcrumb-item"><a>@Html.ActionLink("Pay Codes Search", "Index", "Home", new { Area = "PayCodes" }, new { @class = "breadcrumb-item-font" })</a></li>
+                            <li class="breadcrumb-item active" style="color: black !important; cursor: initial;" aria-current="page">@ViewData["Title"]</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>            
+            <partial name="_DetailHeader" model="Model" view-data="ViewData" />
+            <br />
+            <partial name="_DetailTabs" model="Model" view-data="ViewData" />
+        </div>
+        <br />
+        <br />
+    </form>
+}
+
+else
+{
+    <div class="container">
+        <div style="height:100%" class="my-form-font">
+            <partial name="_NoRecordsFound" />
+        </div>
+        <br />
+        <br />
+    </div>
+}
+

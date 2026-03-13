@@ -1,0 +1,79 @@
+﻿@using MI.PIMS.BO.Dtos
+
+@(
+Html.Kendo().Grid<DPOC_Inv_Gdln_Diagnoses_Dto>()
+    .Name("grid_GSDiagList")
+    .Columns(c =>
+    {
+        c.Bound(p => p.LIST_NAME_CODE).Hidden(true);
+        c.Bound(p => p.LIST_NAME).Title("Diagnosis List").Width(400).Filterable(false).HeaderHtmlAttributes(new { title = "Diagnosis List." }).HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+        c.Bound(p => p.DIAG_CD).Title("Diagnosis Code").Width(150).Filterable(false).HeaderHtmlAttributes(new { title = "Diagnosis Codes." }).HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+        c.Bound(p => p.DIAG_CD_DESC).Title("Diagnosis Description").HeaderHtmlAttributes(new { title = "Diagnosis Codes." }).HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+        c.Bound(p => p.DIAG_CD_TYPE).Title("ICD Version").Filterable(false).HeaderHtmlAttributes(new { title = "ICD_Version." }).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" }).Width(100);
+        c.Bound(p => p.DIAG_INCL_EXCL_CD_DESC).Title("Include/Exclude").Width(200).Filterable(false).HeaderHtmlAttributes(new { title = "Denotes if the status of Diagnosis is either included or excluded" }).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+        c.Bound(p => p.DIAG_IQ_GDLN_ID).Hidden(true);
+    })
+    .Resizable(resize => resize.Columns(true))
+    .HtmlAttributes(new { style = "height: 400px;" })
+    .Scrollable()
+    .Sortable()
+    .Events(events => events.DataBound("DiagCodesController.grid.onDataBound").DetailInit("DiagCodesController.grid.onDetailInit").Edit("DiagCodesController.grid.edit"))
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Model(model =>
+        {
+            model.Field(c => c.DIAG_CD);
+            model.Field(c => c.LIST_NAME).Editable(true);
+            model.Field(c => c.LIST_NAME_CODE);
+            model.Field(c => c.DIAG_CD_DESC).Editable(false);
+            model.Field(c => c.DIAG_CD_TYPE).Editable(false);
+            model.Field(c => c.DIAG_INCL_EXCL_CD).DefaultValue("INCL");
+            model.Field(c => c.DIAG_INCL_EXCL_CD_DESC).DefaultValue("Include");
+            model.Field(c => c.hasChildren).DefaultValue(true);
+        })
+        .PageSize(20)
+        .ServerOperation(false)
+        .Read(read => read.Action("GetList", "GuidelineDiagnosis").Data("DiagCodesController.grid.param"))
+    )
+    .ClientDetailTemplateId("templateDiagCodes")
+)
+
+<script id="templateDiagCodes" type="text/kendo-tmpl">
+    @(
+        Html.Kendo().Grid<DPOC_Inv_Gdln_Diagnoses_Dto>()
+            .Name("grid_GSDiagCodes_")
+            //.AutoBind(false)
+            .Columns(c =>
+            {            
+                c.Bound(p => p.DIAG_CD)
+                    .Title("Diagnosis Code")
+                    .Width(150)
+                    .HeaderHtmlAttributes(new { title = "Diagnosis Codes." })
+                    .HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" })
+                    .HtmlAttributes(new { style = "text-align: left" });
+                c.Bound(p => p.DIAG_CD_DESC).Title("Diagnosis Description").HeaderHtmlAttributes(new { title = "Diagnosis Codes." }).HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                c.Bound(p => p.DIAG_INCL_EXCL_CD).Hidden(true);
+                c.Bound(p => p.DIAG_INCL_EXCL_CD_DESC)
+                    .Title("Include/Exclude")
+                    .Width(200)
+                    .Filterable(false)
+                    .HeaderHtmlAttributes(new { title = "Denotes if the status of Diagnosis is either included or excluded" })                                        
+                    .HtmlAttributes(new { style = "text-align: left" });
+            })
+            .HtmlAttributes(new { style = "height: 300px;" })
+            .NoRecords(true)        
+            .Sortable()
+            .Scrollable()
+            .Resizable(resize => resize.Columns(true))
+            .Pageable(pageable => pageable.Refresh(true))  
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                //.Batch(true)
+                .ServerOperation(false)
+                //.AutoSync(true)
+                .PageSize(20)                          
+                .Read(read => read.Action("GetCodesByGuideline", "GuidelineDiagnosis").Data("DiagCodesController.grid.param"))
+            )      
+            .ToClientTemplate()
+        )
+</script>

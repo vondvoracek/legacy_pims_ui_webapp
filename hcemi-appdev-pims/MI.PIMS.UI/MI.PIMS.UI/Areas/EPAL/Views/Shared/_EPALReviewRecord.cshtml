@@ -1,0 +1,78 @@
+﻿@inject MI.PIMS.UI.Services.MIAuthenticate.IMIAuthenticateService _miAuthenticateService
+@inject MI.PIMS.UI.Common.Helper _helper
+
+@model MI.PIMS.BO.Dtos.EPAL_Procedures_V_Dto
+@using MI.PIMS.UI.Common
+@using Kendo.Mvc.UI
+@{
+    var _UserInfo_T_Dto = (MI.PIMS.BO.Dtos.UserInfo_T_Dto)_miAuthenticateService.UserInfo_T_Dto(_helper.MS_ID);
+    var s = _UserInfo_T_Dto.APP_ROLEIDS;
+    string[] appRoles = s.Split(',');
+}
+
+<div class="container tab-section">
+    <h5>
+        EPAL Record Review
+    </h5>
+    <hr />
+    <div class="row">
+        <div class="col-6">
+            <div class="section-border">
+                <span>
+                    <strong>EPAL Record Review</strong>
+                </span>
+                <hr style="margin-top:4px;" />
+                <div class="form-row my-row-padding">
+                    <label for="dpDateOfRecentReview" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Date of Most Recent Review</label>
+                    <input type="hidden" data-toggle="tooltip" class="form-control" id="txtDateOfRecentReview_Before" value="@Model.EPAL_CURR_REVIEW_DT?.ToString("MM/dd/yyyy")" readonly />
+                    <div id="divDateOfRecentReview" class="col-lg-3" data-toggle="tooltip">
+                        @(Html.Kendo().DatePicker()
+                            .Name("dpDateOfRecentReview")
+                            .Value(@ViewBag.DuplicateRecord == "Y" ? "" : @Model.EPAL_CURR_REVIEW_DT.ToString() == "12/31/2999 12:00:00 AM" ? null : @Model.EPAL_CURR_REVIEW_DT?.ToString("MM/dd/yyyy"))
+                            //.Min(DateTime.Today)
+                            .Format("MM/dd/yyyy")
+                            .ParseFormats(new string[] {"MMddyyyy",
+                        "MMddyy",
+                        "MM.dd.yyyy",
+                        "MM.dd.yy",
+                        "MM.d.yyyy",
+                        "M.d.yy",
+                        "M.d.yyyy",
+                        "MM/dd/yyyy",
+                        "MM/dd/yy",
+                        "MM/d/yyyy",
+                        "M/d/yy",
+                        "M/d/yyyy",
+                        "MM-dd-yyyy",
+                        "MM-dd-yy",
+                        "MM-d-yyyy",
+                        "M-d-yy",
+                        "M-d-yyyy"
+                            })
+                            @*.Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))*@
+                            .Enable((appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALReadWrite))
+                            || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALAdmin))
+                            || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRAdmin))
+                            || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRReadWrite))
+                            || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPAdmin))
+                            || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPReadWrite))
+                            || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin)) ? true : false))
+                            .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                            )
+                    </div>
+                    <label for="txtDateOfPreviousReview" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Date of Previous Review:</label>
+                    <div id="divDateOfPreviousReview" class="col-lg-3" data-toggle="tooltip">
+                        @if (@ViewBag.DuplicateRecord == "Y")
+                        {
+                            <input type="text" data-toggle="tooltip" class="form-control" id="txtDateOfPreviousReview" name="txtDateOfPreviousReview" value="" readonly />
+                        }
+                        else
+                        {
+                            <input type="text" data-toggle="tooltip" class="form-control" id="txtDateOfPreviousReview" name="txtDateOfPreviousReview" value="@Model.EPAL_PREV_REVIEW_DT?.ToString("MM/dd/yyyy")" readonly />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,239 @@
+﻿@inject MI.PIMS.UI.Services.MIAuthenticate.IMIAuthenticateService _miAuthenticateService
+@inject MI.PIMS.UI.Common.Helper _helper
+@using Kendo.Mvc.UI
+
+    <style>
+        .k-dropdown .k-dropdown-wrap {
+            border-color: #e4e7eb;
+            color: #212529;
+            background-color: white;
+            transition: color .2s ease,background-color .2s ease,border-color .2s ease,box-shadow .2s ease;            
+        }
+
+        /*.k-list-filter, .k-list-optionlabel, #ddlLOB_AddNew_listbox, #ddlEntity_AddNew_listbox, #ddlPlan_AddNew_listbox, #ddlProduct_AddNew_listbox, #ddlFundingArrangement_AddNew_listbox {
+            background-color: lightcyan !important;
+        }*/
+
+        .k-list-container {
+            border-width:thin;
+            border-color:black;
+        }
+    </style>
+
+@Html.Hidden("EPALProcedureByPIMS_IDUrl", Url.Action("GetEPALProcedureByPIMS_ID", "Home", new { Area = "EPAL", pims_id = "__pims_id__" }))
+@Html.Hidden("EPALAddDetailUrl", Url.Action("AddDetail", "Home", new { Area = "EPAL" , pims_id = "__pims_id__" }))
+@Html.Hidden("EPALEditDetailUrl", Url.Action("EditDetail", "Home", new { Area = "EPAL", pims_id = "__pims_id__" }))
+
+@{
+    var _UserInfo_T_Dto = (MI.PIMS.BO.Dtos.UserInfo_T_Dto)await _miAuthenticateService.UserInfo_T_Dto2(_helper.MS_ID);
+    <input id="txtRoleIds" type="hidden" readonly value="@_UserInfo_T_Dto.APP_ROLEIDS" />
+}
+
+
+<form id="addNewForm">     
+     <span style="font-size:11px; font-weight:bold; color: red;">* Required Fields</span>
+    <!-- Row 1 -->
+        <div class="form-row my-row-padding">
+        <label for="ddlLOB_AddNew" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight required">Business Segment:</label>
+        <div class="col-lg-8">
+                @(Html.Kendo().DropDownList()
+                    .Name("ddlLOB_AddNew")
+                    .DataTextField("VV_CD")
+                    .DataValueField("VV_CD")
+                    .OptionLabel("------")
+                    .Filter(FilterType.Contains)
+                    .HtmlAttributes(new { style = "width: 100%" })
+                    .Events(e =>
+                    {
+                        e.Change("_AddNewDetailController.dropdown.onChange_LOB").Open("_AddNewDetailController.dropdown.onOpen_One");
+                    })
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                           read.Action("GetAllPIMSHierarchyCodesXwalk", "Home", new { Area = "EPAL" }).Data("_AddNewDetailController.dropdown.param.All_APP_LOB");
+                        });
+                    })
+                )
+
+        </div>
+    </div>
+
+    <!-- Row 2 -->
+@*    <div class="form-row my-row-padding">
+        <label for="txtEditType" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">Add/Edit Type (Domain):</label>
+        <div class="col-lg-8">
+            <input type="text" class="form-control" id="txtEditType" value="">
+        </div>
+    </div>*@
+    <!-- Row 2 -->
+    <div class="form-row my-row-padding">
+        <label for="ddlEntity_AddNew" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight required">Entity:</label>
+        <div class="col-lg-8">
+                @(Html.Kendo().DropDownList()
+                    .Name("ddlEntity_AddNew")
+                    .DataTextField("COLUMN_NAME")
+                    .DataValueField("COLUMN_NAME")
+                    .OptionLabel("------")
+                    .AutoBind(false)
+                    .Events(e =>
+                    {
+                        e.Change("_AddNewDetailController.dropdown.onChange_Entity").Open("_AddNewDetailController.dropdown.onOpen_One");
+                    })
+                    .Filter(FilterType.Contains)
+                    .HtmlAttributes(new { style = "width: 100%" })
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                             read.Action("GetAllPIMSHierarchyCodesXwalk", "Home", new { Area = "EPAL" }).Data("_AddNewDetailController.dropdown.param.All_APP_ENTITY");
+                        })
+                        .ServerFiltering(true);
+                    })
+                )
+        </div>
+    </div>
+    <!-- Row 3 -->
+    <div class="form-row my-row-padding">
+        <label for="ddlPlan_AddNew" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight required">Plan:</label>
+        <div class="col-lg-8">
+                @(Html.Kendo().DropDownList()
+                    .Name("ddlPlan_AddNew")
+                    .DataTextField("COLUMN_NAME")
+                    .DataValueField("COLUMN_NAME")
+                    .OptionLabel("------")
+                    .AutoBind(false)
+                    .Events(e =>
+                    {
+                        e.Change("_AddNewDetailController.dropdown.onChange_Plan").Open("_AddNewDetailController.dropdown.onOpen_One");
+                    })
+                    .Filter(FilterType.Contains)
+                    .HtmlAttributes(new { style = "width: 100%" })
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetAllPIMSHierarchyCodesXwalk", "Home", new { Area = "EPAL" }).Data("_AddNewDetailController.dropdown.param.All_APP_PLAN");
+                        })
+                        .ServerFiltering(true);
+                    })
+                )
+        </div>
+    </div>  
+    <!-- Row 4 -->
+    <div class="form-row my-row-padding">
+        <label for="ddlProduct_AddNew" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight required">Product:</label>
+        <div class="col-lg-8">
+                @(Html.Kendo().DropDownList()
+                    .Name("ddlProduct_AddNew")
+                    .DataTextField("COLUMN_NAME")
+                    .DataValueField("COLUMN_NAME")
+                    .OptionLabel("------")
+                    .Filter(FilterType.Contains)
+                    .AutoBind(false)
+                    .Events(e =>
+                    {
+                        e.Change("_AddNewDetailController.dropdown.onChange_Product").Open("_AddNewDetailController.dropdown.onOpen_One");
+                    })
+                    .HtmlAttributes(new { style = "width: 100%" })
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                           read.Action("GetAllPIMSHierarchyCodesXwalk", "Home", new { Area = "EPAL" }).Data("_AddNewDetailController.dropdown.param.All_APP_PRODUCT");
+                        })
+                        .ServerFiltering(true);
+                    })
+                )
+        </div>
+    </div>
+    <!-- Row 5 -->
+    <div class="form-row my-row-padding">
+        <label for="ddlFundingArrangement_AddNew" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight required">Funding Arrangement:</label>
+        <div class="col-lg-8">
+                @(Html.Kendo().DropDownList()
+                    .Name("ddlFundingArrangement_AddNew")
+                    .DataTextField("COLUMN_NAME")
+                    .DataValueField("COLUMN_NAME")
+                    .OptionLabel("------")
+                    .Filter(FilterType.Contains)
+                    .HtmlAttributes(new { style = "width: 100%" })
+                    .AutoBind(false)
+                    .Events(e =>
+                    {
+                        e.Change("_AddNewDetailController.dropdown.onChange_FundingArrangement").Open("_AddNewDetailController.dropdown.onOpen_One");
+                    })
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetAllPIMSHierarchyCodesXwalk", "Home", new { Area = "EPAL" }).Data("_AddNewDetailController.dropdown.param.All_APP_FUNDING_ARRANGEMENT");
+                        })
+                        .ServerFiltering(true);
+                    })
+                )
+        </div>
+    </div>
+      <!-- Row 6 -->
+    <div class="form-row my-row-padding">
+        <label for="txtProcedureCode_AddNew" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight required">Procedure Code:</label>
+        <div class="col-lg-8">
+            @*<input type="text" class="form-control" id="txtProcedureCode_AddNew" value="">*@
+            @(
+                Html.Kendo().MultiColumnComboBox()
+                    .Name("txtProcedureCode_AddNew")
+                    .AutoBind(false)
+                    .MinLength(2)
+                    .DataTextField("PROC_CD")
+                    .DataValueField("PROC_CD")
+                    .Filter("contains")
+                    .FilterFields(new string[] { "PROC_CD, PROC_CD_DESC"})
+                    .Placeholder("Please type atleast 2 characters to search Procedure code(s)...")
+                    .Events(events => events.Change("_AddNewDetailController.dropdown.onChange_txtProcedureCode_AddNew"))
+                    .Columns(columns =>
+                    {
+                        columns.Add().Field("PROC_CD").Title("Name").Width("100px");
+                        columns.Add().Field("PROC_CD_DESC").Title("Description").Width("400px");
+                        //columns.Add().Field("PROC_CC_EFF_DT").Title("Effective Date").Width("150px");
+                    })                
+                    .HtmlAttributes(new { style = "width:100%;", data_value_primitive = "true", title = "Please type atleast 2 characters to search Procedure code(s)..." })
+                    .Height(400)    
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetRefProceduresByFilter", "Home", new { Area = "EPAL" });
+                        })               
+                    .ServerFiltering(true);
+                })
+            )
+        </div>
+    </div>
+    <!-- Row 7 -->
+    <div class="form-row my-row-padding">
+        <label for="txtDrugName_AddNew" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">Drug Name:</label>
+        <div class="col-lg-8">
+            <div class="row">
+                <div class="col-lg-9">
+                    <input type="text" class="form-control" id="txtDrugName_AddNew" value="" maxlength="100">
+                </div>
+                <div class="col-lg-3">
+               <div class="form-check">
+                   <label class="text-sm-left col-form-label"><input type="checkbox" checked class="form-check-input" id="chkDefault"> Default</label>       
+                  </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row 8 -->
+    <div class="form-row my-row-padding">
+        <label for="txtPIMSID" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight">PIMS ID:</label>
+        <div class="col-lg-8">
+            <input type="hidden" class="form-control" disabled id="txtPIMSID" value="">
+            <input type="text" class="form-control" disabled id="txtPIMSID_Display" value="">
+         
+        </div>
+    </div>
+  </form>
+
+<script src="~/js/EPAL/_AddNewDetail.js" asp-append-version="true"></script>

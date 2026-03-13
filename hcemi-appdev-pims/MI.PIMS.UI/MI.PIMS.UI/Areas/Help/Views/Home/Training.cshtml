@@ -1,0 +1,61 @@
+﻿
+@{
+    ViewData["Title"] = "Training";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="breadcrumb-background">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-background">
+                <li class="breadcrumb-item"><a>@Html.ActionLink("Home", "index", "/", new { Area = "" }, new { @class = "breadcrumb-item-font" })</a></li>
+                <li class="breadcrumb-item active" style="color: black !important; cursor: initial;" aria-current="page">Help</li>
+                <li class="breadcrumb-item active" style="color: black !important; cursor: initial;" aria-current="page">Training</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="container">
+    <div class="col-md-12 col-sm-12 col-lg-12">
+        <div class="bd-example bd-example-tabs">
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                     <a class="nav-item nav-link active" id="trainingTab-tab" data-toggle="tab" href="#trainingTab" role="tab" aria-controls="trainingTab" aria-selected="false">Training</a>
+                </div>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="supportTab" role="tabpanel" aria-labelledby="supportTab-tab">
+                    <div style="padding-top:50px; padding-left:15px;">
+                        <a target="_blank" href="/documents/PIMS_SECURE_Access.pdf">Request SECURE Access</a>
+                        <br />
+                        <br />
+                        <a target="_blank" href="/documents/EPAL_PIMS_Training_Guide.pdf">EPAL PIMS Training Guide</a>
+                        <br />
+                        <br />
+                        <a target="_blank" href="/documents/Drug_Name_Training_Guide.pdf">Drug Name Training Guide</a>
+                        <br />
+                        <br />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    $(function() {
+        UserAccessHistController.add({
+            "MODULE_NAME": "Help",
+            "USERACTION": "Help/Home/Training",
+            "USERSELECTION": "Help/Home/Training",
+            "LST_UPDT_DT": null,
+            "LST_UPDT_BY": MS_ID,
+            "PAGE_ID": "6",
+            "__RequestVerificationToken": $('meta[name="request-verification-token"]')[0].content
+
+        });
+    });
+</script>
