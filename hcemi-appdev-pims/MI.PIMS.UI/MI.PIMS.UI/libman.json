@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "font-awesome@5.15.1",
+      "destination": "wwwroot/lib/font-awesome/"
+    },
+    {
+      "library": "limonte-sweetalert2@10.7.0",
+      "destination": "wwwroot/lib/limonte-sweetalert2/"
+    }
+  ]
+}
