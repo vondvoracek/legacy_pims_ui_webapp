@@ -1,0 +1,300 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "AssocCodes";
+}
+<script src="~/js/EPAL/AssocCodes.js" asp-append-version="true"></script>
+<form id="frmAssocCodes">
+
+    <div class="container tab-section">
+        <h5>
+            Associated Codes Add New/Edit
+        </h5>
+        <hr />
+        <style>
+            .section-border-padding-bottom {
+                margin-bottom: 10px;
+            }
+
+
+
+            /*#grid_DiagCodes>table
+            {
+                table-layout: fixed;
+            }*/
+
+            #tabstrip-left > .k-content {
+                overflow: visible;
+            }
+
+        </style>
+
+          @*<button id="btnTest" class="btn btn-outline-primary noSubmit" title="Click to reset filters!"><i class="fas fa-times"></i> Test </button>*@
+
+        <input id="txtDiagListCount" type="hidden" readonly value="@ViewBag.DiagListCount" />
+        @(Html.AntiForgeryToken())
+        @(Html.Kendo().TabStrip()
+            .Name("associated-codes-tabStrip")
+            .TabPosition(TabStripTabPosition.Left)
+            .Animation(animation =>
+            {
+                animation.Open(config =>
+                {
+                    config.Fade(FadeDirection.In);
+                });
+            })
+            .HtmlAttributes(new { style = "height: 425px"  })
+            .Scrollable(false)
+            .SelectedIndex(0)
+            .Items(items =>
+            {
+                items.Add().Text("Diagnosis List")
+                    .Content(@<text>
+                                   @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.EPAL_Procs_Diagnoses_V_Dto>()
+                                .Name("grid_DiagList")                                    
+                                .Columns(c => {
+                                    c.Bound(p => p.LIST_NAME)
+                                        .Title("Diagnosis List")
+                                        .EditorTemplateName("Diag_List")
+                                        .ClientTemplate("#:LIST_NAME#")
+                                        //.ClientTemplate("<a href='javascript:void(0);' style='color:blue;' onclick=\"DiagCodesController.methods.redirect_diagcodes();\" title='Click to view diagnosis codes!' \\data-target='tooltip'\\>#= LIST_NAME # </a>")
+                                        .Width(150)
+                                        .HeaderHtmlAttributes(new {title = "Diagnosis List."})
+                                        .HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" })
+                                        .HtmlAttributes(new { style = "text-align: left" });                                    
+                                    c.Bound(p => p.INCL_EXCL_CD).Hidden(true);
+                                    c.Bound(p => p.INCL_EXCL_CD_DESC).Title("Include/Exclude").EditorTemplateName("Incl_Excl_CD").ClientTemplate("#:INCL_EXCL_CD_DESC#").Width(200).Filterable(false).HeaderHtmlAttributes(new {title = "Denotes if the status of Diagnosis is either included or excluded"}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left", required="required" }).Width(120);
+                                    c.Bound(p => p.PROG_MGD_BY).Title("Program Managed By").EditorTemplateName("Prog_Mgd_By").ClientTemplate("#:PROG_MGD_BY#").Width(200).Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left", required="required" });
+                                    c.Command(command => command.Custom(" ").Template("<a class='btn btn-default btn-outline-primary noSubmit grid-column-button diagnosis-list-delete'  href='javascript:void(0);' title='Click to delete this row!' \\data-target='tooltip'\\><i  class=\"k-icon k-i-delete\"></i></a>").Click("DiagListController.grid.deleteRow")).Width(30);
+                                })                                    
+                                .ToolBar(toolbar => {
+                                    toolbar.Create();                                        
+                                })
+                                .Editable(editable => editable.Mode(GridEditMode.InCell).DisplayDeleteConfirmation(false))
+                                .Resizable(resize => resize.Columns(true))
+                                .HtmlAttributes(new { style = "height: 400px;" })    
+                                .Scrollable()
+                                .Sortable()
+                                .Events(events => events.DataBound("DiagListController.grid.onDataBound"))                                    
+                                .Pageable(pageable => pageable.Refresh(false))
+                                .DataSource(dataSource => dataSource
+                                    .Ajax()
+                                    .Batch(true)
+                                    .ServerOperation(false)
+                                    .PageSize(20)
+                                    .Model(model =>
+                                    {
+                                        model.Id(c => c.LIST_NAME);
+                                        //model.Field(c => c.LIST_NAME).Editable(false);
+                                        model.Field(c => c.PROG_MGD_BY);
+                                        model.Field(c =>  c.INCL_EXCL_CD).DefaultValue("INCL");
+                                        model.Field(c =>  c.INCL_EXCL_CD_DESC).DefaultValue("Include");
+                                    })
+                                    .Read(read => read.Action("GetDiagnosisVList", "Home").Data("DiagListController.grid.param"))                                                                                
+                                )
+                                            )                            
+                                    </text>);
+                items.Add().Text("Diagnosis Codes")
+                    .Content(@<text>
+                                    @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.EPAL_Procedures_AssoCodes_V_DiagCodes_Dto>()
+                                .Name("grid_DiagCodes")    
+                                .Columns(c => {
+                                    c.Bound(p => p.LIST_NAME).Title("Diagnosis List")
+                                                                .Width(400)
+                                                                .Filterable(false)
+                                                                .HeaderHtmlAttributes(new {title = "Diagnosis List."})
+                                                                .HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" })
+                                                                .HtmlAttributes(new { style = "text-align: left" });
+                                    c.Bound(p => p.DIAG_CD)
+                                                                .Title("Diagnosis Code")
+                                                                .EditorTemplateName("Diag_CD")
+                                                                .Editable("DiagCodesController.grid.isNotEditable")
+                                                                .ClientTemplate("#:DIAG_CD#")
+                                                                .Width(150)
+                                                                .HeaderHtmlAttributes(new {title = "Diagnosis Codes."})
+                                                                .HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" })
+                                                                .HtmlAttributes(new { style = "text-align: left" });
+                                    c.Bound(p => p.DIAG_CD_DESC).Title("Diagnosis Description").HeaderHtmlAttributes(new {title = "Diagnosis Codes."}).HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                    c.Bound(p => p.DIAG_CD_TYPE).Title("ICD Version").HeaderHtmlAttributes(new {title = "ICD_Version."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" }).Width(100);
+                                    c.Bound(p => p.INCL_EXCL_CD).Hidden(true);
+                                    c.Bound(p => p.INCL_EXCL_CD_DESC)
+                                                                .Title("Include/Exclude")
+                                                                .EditorTemplateName("Incl_Excl_CD")
+                                                                .ClientTemplate("#:INCL_EXCL_CD_DESC#")
+                                                                .Width(200)
+                                                                .Filterable(false)
+                                                                .Editable("DiagCodesController.grid.isNotEditable")
+                                                                .HeaderHtmlAttributes(new {title = "Denotes if the status of Diagnosis is either included or excluded"})
+                                                                .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                                                                .HtmlAttributes(new { style = "text-align: left", required="required" });
+                                    c.Bound(p => p.PROG_MGD_BY).Title("Program Managed By")
+                                                                .Editable("DiagCodesController.grid.isNotEditable")
+                                                                .EditorTemplateName("Prog_Mgd_By")
+                                                                .Width(200)
+                                                                .Filterable(false)
+                                                                .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                                                                .HtmlAttributes(new { style = "text-align: left", required="required" });
+                                   c.Bound(p => p.LIST_NAME).Title(" ")
+                                                                .ClientTemplate("#if(data.LIST_NAME==='' || data.LIST_NAME===null) { #" +
+                                                                "<a class='btn btn-default btn-outline-primary noSubmit grid-column-button diagnosis-codes-delete' href='javascript:void(0);' title='Click to delete this row!'>" + 
+                                                                 "<i  class=\"k-icon k-i-delete\"></i> " + 
+                                                                 "</a>#} #")
+                                                                .Width(50)
+                                                                .Filterable(false)
+                                                                .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" });
+                                  @* c.Command(command => command.Custom(" ")
+                                                                //.Template("<a class='btn btn-default btn-outline-primary noSubmit grid-column-button diagnosis-codes-delete'  href='javascript:void(0);' title='Click to delete this row!' \\data-target='tooltip'\\><i  class=\"k-icon k-i-delete\"></i></a>")
+                                                                .Template("# if(data.LIST_NAME==='' || data.LIST_NAME===null) " + 
+                                                                "{# <a class='btn btn-default btn-outline-primary noSubmit grid-column-button diagnosis-codes-delete' href='javascript:void(0);' title='Click to delete this row!'>" + 
+                                                                 "<i  class=\"k-icon k-i-delete\"></i> " + 
+                                                                 "</a>#} #")
+                                                                .Click("DiagCodesController.grid.deleteRow"))
+                                                                .Width(50);*@
+                                })                                    
+                                .ToolBar(toolbar => {
+                                       if (@ViewBag.DiagListCount == 0 || @ViewBag.AddRecord == "Y")
+                                         {
+                                             toolbar.Create();                                    
+                                         }
+                                })
+  
+                                .Editable(editable => editable.Mode(GridEditMode.InCell).DisplayDeleteConfirmation(false))
+                                .Resizable(resize => resize.Columns(true))
+                                .HtmlAttributes(new { style = "height: 400px;" })    
+                                .Scrollable()
+                                .Sortable()
+                                .Events(events => events.DataBound("DiagCodesController.grid.onDataBound"))                                    
+                                .Pageable(pageable => pageable.Refresh(false))
+                                .DataSource(dataSource => dataSource
+                                    .Ajax()
+                                    .Batch(true)
+                                    .ServerOperation(false)
+                                    .PageSize(20)
+                                    .Model(model =>
+                                    {
+                                        model.Id(c => c.DIAG_CD);   
+                                        model.Field(c => c.LIST_NAME).Editable(false);
+                                        model.Field(c => c.DIAG_CD_DESC).Editable(false);
+                                        model.Field(c => c.DIAG_CD_TYPE).Editable(false);
+                                        model.Field(c => c.PROG_MGD_BY).Editable(false);
+                                        model.Field(c =>  c.INCL_EXCL_CD).DefaultValue("INCL");
+                                        model.Field(c =>  c.INCL_EXCL_CD_DESC).DefaultValue("Include");
+                                    })
+                                    .Read(read => read.Action("GetDiagCodes", "Home").Data("DiagCodesController.grid.param"))                                                                                
+                                )
+                                            )                            
+                                    </text>);
+
+                items.Add().Text("Revenue Codes")
+                    .Content(@<text>
+                                        @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.EPAL_Procedures_AssoCodes_V_RevCodes_Dto>()
+                            .Name("grid_RevCodes")                                    
+                            .Columns(c => {
+                                c.Bound(p => p.REV_CD).Title("Revenue Codes").EditorTemplateName("Rev_CD").ClientTemplate("#:REV_CD#").Width(150).HeaderHtmlAttributes(new {title = "Revenue Codes."}).HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                c.Bound(p => p.REV_CD_DESC).Title("Revenue Description").HeaderHtmlAttributes(new {title = "Revenue Description."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                c.Bound(p => p.INCL_EXCL_CD).Hidden(true);
+                                c.Bound(p => p.INCL_EXCL_CD_DESC).Title("Include/Exclude").EditorTemplateName("Incl_Excl_CD").ClientTemplate("#:INCL_EXCL_CD_DESC#").Width(200).Filterable(false).HeaderHtmlAttributes(new {title = "Denotes if the status of Modifier is either included or excluded"}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                c.Command(command => command.Custom(" ").Template("<a class='btn btn-default btn-outline-primary noSubmit grid-column-button revenue-codes-delete'  href='javascript:void(0);' title='Click to delete this row!' \\data-target='tooltip'\\><i  class=\"k-icon k-i-delete\"></i></a>").Click("RevCodesController.grid.deleteRow")).Width(50);
+                            })                                    
+                            .ToolBar(toolbar => {
+                                toolbar.Create();                                        
+                            })
+                            .Editable(editable => editable.Mode(GridEditMode.InCell).DisplayDeleteConfirmation(false))
+                            .Resizable(resize => resize.Columns(true))
+                            .HtmlAttributes(new { style = "height: 400px;" })
+                            .Scrollable()
+                            .Sortable()
+                            .Events(events => events.DataBound("RevCodesController.grid.onDataBound"))                                    
+                            .Pageable(pageable => pageable.Refresh(false))
+                            .DataSource(dataSource => dataSource
+                                .Ajax()
+                                .Batch(true)
+                                .ServerOperation(false)
+                                .PageSize(20)
+                                .Model(model =>
+                                {
+                                    model.Id(c => c.REV_CD);   
+                                    model.Field(c => c.REV_CD_DESC).Editable(false);
+                                    model.Field(c =>  c.INCL_EXCL_CD).DefaultValue("INCL");
+                                    model.Field(c =>  c.INCL_EXCL_CD_DESC).DefaultValue("Include");
+                                })
+                                .Read(read => read.Action("GetRevCodes", "Home").Data("RevCodesController.grid.param"))                                                                                
+                            )
+                                        )
+                                    </text>);
+
+                items.Add().Text("POS Codes")
+                    .Content(@<text>
+                                        @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.EPAL_Procedures_AssoCodes_V_AllocatedPlaces_Dto>()
+                            .Name("grid_AllocatedPlaces")                                    
+                            .Columns(c => {
+                                c.Bound(p => p.CODE).Title("POS Codes").EditorTemplateName("ALLWD_PLC_OF_SVC").ClientTemplate("#:CODE#").Width(150).HeaderHtmlAttributes(new {title = "Place of Service Codes."}).HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                c.Bound(p => p.ALLWD_PLC_OF_SVC).Title("POS Description").HeaderHtmlAttributes(new {title = "The places of service where the code is authorized to be rendered for the prior auth."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });                                
+                                c.Bound(p => p.INCL_EXCL_CD).Hidden(true);
+                                c.Bound(p => p.INCL_EXCL_CD_DESC).Title("Include/Exclude").EditorTemplateName("Incl_Excl_CD").ClientTemplate("#:INCL_EXCL_CD_DESC#").Width(200).Filterable(false).HeaderHtmlAttributes(new {title = "Denotes if the status of Modifier is either included or excluded"}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                c.Command(command => command.Custom(" ").Template("<a class='btn btn-default btn-outline-primary noSubmit grid-column-button allocated-places-codes-delete' href='javascript:void(0);' title='Click to delete this row!' \\data-target='tooltip'\\><i  class=\"k-icon k-i-delete\"></i></a>").Click("RevCodesController.grid.deleteRow")).Width(50);
+                            })
+                            .Editable(editable => editable.Mode(GridEditMode.InCell).DisplayDeleteConfirmation(false))
+                            .ToolBar(toolbar => {toolbar.Create();})
+                            .Resizable(resize => resize.Columns(true))
+                            .HtmlAttributes(new { style = "height: 400px;" })
+                            .Scrollable()
+                            .Sortable()
+                            .Pageable(pageable => pageable.Refresh(false))
+                            .Events(events => events.DataBound("AllocatedPlacesController.grid.onDataBound"))
+                            .DataSource(dataSource => dataSource
+                                .Ajax()
+                                .PageSize(1000)
+                                .Model(model =>
+                                {                                                                                
+                                    model.Field(c =>  c.INCL_EXCL_CD).DefaultValue("INCL");
+                                    model.Field(c =>  c.INCL_EXCL_CD_DESC).DefaultValue("Include");
+                                })
+                                .Read(read => read.Action("GetAllocatedPlaces", "Home").Data("AllocatedPlacesController.grid.param"))
+                            )
+                                        )
+                                    </text>);
+
+                items.Add().Text("Modifier Codes")
+                    .Content(@<text>
+                                        @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.EPAL_Procedures_Modifier_Dto>()
+                                .Name("grid_Modifiers")
+                                .Editable(editable => editable.Mode(GridEditMode.InCell).DisplayDeleteConfirmation(false))
+                                .Columns(c => {
+                                    c.Bound(p => p.MODIFIER).Title("Modifier Codes").EditorTemplateName("MODIFIER").ClientTemplate("#:MODIFIER#").Width(150).HeaderHtmlAttributes(new {title = "Modifier Codes."}).HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                    c.Bound(p => p.MOD_DESC).Title("Modifier Description").HeaderHtmlAttributes(new {title = "Modifier Description."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                    c.Bound(p => p.INCL_EXCL_CD).Hidden(true);
+                                    c.Bound(p => p.INCL_EXCL_CD_DESC).Title("Include/Exclude").EditorTemplateName("Incl_Excl_CD").ClientTemplate("#:INCL_EXCL_CD_DESC#").Width(200).Filterable(false).HeaderHtmlAttributes(new {title = "Denotes if the status of Modifier is either included or excluded"}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                    c.Command(command => command.Custom(" ").Template("<a class='btn btn-default btn-outline-primary noSubmit grid-column-button modifiers-codes-delete' href='javascript:void(0);' title='Click to delete this row!' \\data-target='tooltip'\\><i  class=\"k-icon k-i-delete\"></i></a>").Click("ModifiersController.grid.deleteRow")).Width(50);
+                                })
+                                .Resizable(resize => resize.Columns(true))
+                                .ToolBar(toolbar => {toolbar.Create();})
+                                //.HtmlAttributes(new { style = "height: 400px;" })
+                                .Scrollable()
+                                .Sortable()            
+                                .Pageable(pageable => pageable.Refresh(false))
+                                .Events(events => events.DataBound("ModifiersController.grid.onDataBound"))
+                                .DataSource(dataSource => dataSource
+                                    .Ajax()
+                                    .PageSize(1000)
+                                    .Model(model =>
+                                    {                                        
+                                        model.Field(c => c.MOD_DESC).Editable(false);
+                                        model.Field(c =>  c.INCL_EXCL_CD).DefaultValue("INCL");
+                                        model.Field(c =>  c.INCL_EXCL_CD_DESC).DefaultValue("Include");
+                                    })
+                                    .Read(read => read.Action("GetEPALProceduresModifiers", "Home").Data("ModifiersController.grid.param"))
+                                )
+                                            )
+                                    </text>);
+    
+            })
+        )        
+    </div>       
+</form>
+
+
+
+

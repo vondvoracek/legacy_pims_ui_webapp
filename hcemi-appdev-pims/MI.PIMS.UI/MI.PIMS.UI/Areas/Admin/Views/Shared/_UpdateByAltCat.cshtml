@@ -1,0 +1,140 @@
+﻿@using Kendo.Mvc.UI
+
+<!--UBAC = Update by Alternate Category-->
+
+<script src="~/js/Admin/_CategoryUpdate.js" asp-append-version="true"></script>
+
+<div class="modal fade updateByAltCatModal" id="updateByAltCatModal" tabindex="-1" role="dialog" aria-labelledby="updateByAltCatModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form id="formUBAC" onsubmit="return false;">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateByAltCatModalLabel">Update By Alternate Category</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="width: 50px;margin-left: 0px;">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Row 1 -->
+                    <div class="form-row my-row-padding">
+                        <label for="AlternateCategory_UBAC_Old:" class="col-lg-5 text-lg-right text-sm-left col-form-label font-modal-weight required">Old Alternate Category:</label>
+                        <div class="col-lg-7">
+                            <input type="hidden" readonly id="txtUBAC_OldAlternateCategory" />
+                            <input type="hidden" readonly id="txtUBAC_OldAlternateCategoryFilterText" />
+                            @(Html.Kendo().DropDownList()
+                                .Name("AlternateCategory_UBAC_Old")
+                                .DataTextField("CATEGORY")
+                                .DataValueField("CATEGORY")
+                                .OptionLabel("---Select old Alternate Category---")
+                                .HtmlAttributes(new { style = "width: 100%" })
+                                .Filter(FilterType.Contains)
+                                .Events(e =>
+                                {
+                                    e.Change("_categoryUpdateController.dropdown.onChange_UBAC_OldAlternateCategory").Filtering("_categoryUpdateController.dropdown.onFiltering_UBAC_OldAlternateCategory");
+                                })
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetAdminCategoriesByType", "Home", new { Area = "Admin" }).Data("_categoryUpdateController.dropdown.param.ALTERNATE_CATEGORY_UBAC_OLD");
+                                    });
+                                })
+                            )
+                        </div>
+                    </div>
+                    <!-- Row 2 -->
+                    <div class="form-row my-row-padding">
+                        <label for="AlternateSubCategory_UBAC_Old:" class="col-lg-5 text-lg-right text-sm-left col-form-label font-modal-weight">Old Alternate Sub Category:</label>
+                        <div class="col-lg-7">
+                            <input type="hidden" readonly id="txtUBAC_OldAlternateSubcategory" />
+                            <input type="hidden" readonly id="txtUBAC_OldAlternateSubCategoryFilterText" />
+                            @(Html.Kendo().DropDownList()
+                                .Name("AlternateSubCategory_UBAC_Old")
+                                .DataTextField("CATEGORY")
+                                .DataValueField("CATEGORY")
+                                .OptionLabel("---Select old Alternate Sub Category---")
+                                .HtmlAttributes(new { style = "width: 100%" })
+                                .Filter(FilterType.Contains)
+                                .Events(e =>
+                                {
+                                    e.Change("_categoryUpdateController.dropdown.onChange_UBAC_OldAlternateSubCategory").Filtering("_categoryUpdateController.dropdown.onFiltering_UBAC_OldAlternateSubCategory");
+                                })
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetAdminCategoriesByType", "Home", new { Area = "Admin" }).Data("_categoryUpdateController.dropdown.param.ALTERNATE_SUB_CATEGORY_UBAC_OLD");
+                                    })
+                                    .ServerFiltering(true);
+                                })
+                                )
+                        </div>
+                    </div>
+                    <!-- Row 3 -->
+                    <div class="form-row my-row-padding">
+                        <label for="AlternateCategory_UBAC_New:" class="col-lg-5 text-lg-right text-sm-left col-form-label font-modal-weight required">New Alternate Category:</label>
+                        <div class="col-lg-7">
+                            <input type="hidden" readonly id="txtUBAC_NewAlternateCategory" />
+                            <input type="hidden" readonly id="txtUBAC_NewAlternateCategoryFilterText" />
+                            @(Html.Kendo().DropDownList()
+                                .Name("AlternateCategory_UBAC_New")
+                                .DataTextField("CATEGORY")
+                                .DataValueField("CATEGORY")
+                                .OptionLabel("---Select new Alternate Category---")
+                                .HtmlAttributes(new { style = "width: 100%" })
+                                .Filter(FilterType.Contains)
+                                .Events(e =>
+                                {
+                                    e.Change("_categoryUpdateController.dropdown.onChange_UBAC_NewAlternateCategory").Filtering("_categoryUpdateController.dropdown.onFiltering_UBAC_NewAlternateCategory");
+                                })
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        //read.Action("GetSpecialtyCombination", "Home", new { Area = "Admin" }).Data("_categoryUpdateController.dropdown.param.ALTERNATE_CATEGORY");
+                                        read.Action("GetAdminCategoriesByType", "Home", new { Area = "Admin" }).Data("_categoryUpdateController.dropdown.param.ALTERNATE_CATEGORY_UBAC_NEW");
+                                    });
+                                })
+                                )
+                        </div>
+                    </div>
+                    <!-- Row 4 -->
+                    <div class="form-row my-row-padding">
+                        <label for="AlternateSubCategory_UBAC_New:" class="col-lg-5 text-lg-right text-sm-left col-form-label font-modal-weight">New Alternate Sub Category:</label>
+                        <div class="col-lg-7">
+                            <input type="hidden" readonly id="txtUBAC_NewAlternateSubcategory" />
+                            <input type="hidden" readonly id="txtUBAC_NewAlternateSubCategoryFilterText" />
+                            @(Html.Kendo().DropDownList()
+                                .Name("AlternateSubCategory_UBAC_New")
+                                .DataTextField("CATEGORY")
+                                .DataValueField("CATEGORY")
+                                .OptionLabel("---Select new Alternate Sub Category---")
+                                .HtmlAttributes(new { style = "width: 100%" })
+                                .Filter(FilterType.Contains)
+                                .Events(e =>
+                                {
+                                    e.Change("_categoryUpdateController.dropdown.onChange_UBAC_NewAlternateSubCategory").Filtering("_categoryUpdateController.dropdown.onFiltering_UBAC_NewAlternateSubCategory");
+                                })
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        //read.Action("GetSpecialtyCombination", "Home", new { Area = "Admin" }).Data("_categoryUpdateController.dropdown.param.ALTERNATE_SUB_CATEGORY");
+                                        read.Action("GetAdminCategoriesByType", "Home", new { Area = "Admin" }).Data("_categoryUpdateController.dropdown.param.ALTERNATE_SUB_CATEGORY_UBAC_NEW");
+                                    })
+                                    .ServerFiltering(true);
+                                })
+                                )
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button id="btnValidateUBAC" class="btn btn-primary noSubmit btnValidateUBAC" title="Click to validate record!"><i class="fas fa-save"></i> Validate </button>
+                    <button type="reset" id="btnResetUBAC" class="btn btn-secondary">Reset</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,206 @@
+﻿@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/js/Admin/Admin.js" asp-append-version="true"></script>
+
+@Html.Hidden("UpdateRoleUrl", Url.Action("UpdateRole", "Home", new { Area = "Admin" }))
+@Html.Hidden("TogglePIMSUserStatusUrl", Url.Action("TogglePIMSUserStatus", "Home", new { Area = "Admin" }))
+@Html.AntiForgeryToken()
+
+<form id="searchForm">
+    <div class="breadcrumb-background">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-background">
+                    <li class="breadcrumb-item">@Html.ActionLink("Home", "index", "/", new { Area = "" }, new { @class = "breadcrumb-item-font" })</li>
+                    <li class="breadcrumb-item active" style="color: black !important" aria-current="page">Manage Users</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container  search-section" style="padding-left:30px; padding-right:30px;">
+        <div class="section-heading">
+            <div class="row">
+                <div class="col-12" style="font-size: 14px;">
+                    Manage Users
+                </div>
+            </div>
+        </div>
+        <div class="section-border">
+            <!-- Row 1 -->
+            <div class="form-row">
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="txtMS_ID">MS ID:</label></b>
+                    <input type="text" class="form-control" id="txtMS_ID" value="">
+                </div>
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="txtFname">First Name:</label></b>
+                    <input type="text" class="form-control" id="txtFname" value="">
+                </div>
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="txtLname">Last Name:</label></b>
+                    <input type="text" class="form-control" id="txtLname" value="">
+
+                </div>
+@*                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="ddlAppRole">App Role:</label></b>
+                    @(Html.Kendo().DropDownList()
+                        .Name("ddlAppRole")
+                        .DataTextField("APP_ROLENAME")
+                        .DataValueField("ID")
+                        .OptionLabel("------")
+                        //.Filter(FilterType.Contains)
+                        .HtmlAttributes(new { style = "width: 100%" })
+                        .DataSource(source =>
+                        {
+                        source.Read(read =>
+                        {
+                        read.Action("GetAppRole", "AppRole", new { Area = "Admin" });
+                        });
+                        })
+                    )
+
+                </div>*@
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="txtLname">PIMS User:</label></b>
+                    @(Html.Kendo().DropDownList()
+                            .Name("ddlPIMSUser")
+                            .DataTextField("Text")
+                            .DataValueField("Value")
+                            .OptionLabel("------")
+                            .BindTo(new List<SelectListItem>() {
+                        new SelectListItem() {
+                        Text = "Yes",
+                        Value = "1"
+                        },
+                        new SelectListItem() {
+                        Text = "No",
+                        Value = "0"
+                        }
+                        })
+                            .HtmlAttributes(new { style = "width: 100%" })
+                            )
+
+                </div>
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="txtLname">Active:</label></b>
+                    @(Html.Kendo().DropDownList()
+                        .Name("ddlActive")
+                        .DataTextField("Text")
+                        .DataValueField("Value")
+                        .OptionLabel("------")
+                        .BindTo(new List<SelectListItem>() {
+                    new SelectListItem() {
+                    Text = "Active",
+                    Value = "1"
+                    },
+                    new SelectListItem() {
+                    Text = "Inactive",
+                    Value = "0"
+                    },
+                    new SelectListItem() {
+                    Text = "View All",
+                    Value = ""
+                    }
+                    })
+                        .HtmlAttributes(new { style = "width: 100%" })
+                        )
+
+                </div>
+            </div>
+            
+
+            <!-- Row 4 -->
+            <div class="form-row">
+                <div class="form-group col-md-12 col-sm-12 col-lg-12 text-center">
+                    <button id="btnSearch" class="btn btn-primary noSubmit" title="Click to search records!"><i class="fas fa-search"></i> Search </button>
+                    <button id="btnReset" class="btn btn-outline-primary noSubmit" title="Click to reset filters!"><i class="fas fa-times"></i> Reset </button>
+                    <button id="btnAddUser" class="btn btn-success noSubmit" data-toggle="modal" data-target="#activeDirectorySearchModal" title="Click to go Add New User!"><i class="fas fa-plus-circle"></i> Add User </button>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <div style="font-size:11px !important;">
+                    @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.UserInfo_T_Dto>()
+                    .Name("grid_UserInfo")
+                    .Columns(c => {
+                        c.Bound(p => p.MS_ID).Title("MS ID").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(100);
+                        c.Bound(p => p.FNAME).Title("First Name").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                        c.Bound(p => p.LNAME).Title("Last Name").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                        c.Bound(p => p.EMAIL).Title("Email Address").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                        c.Bound(p => p.DEPARTMENT_NAME).Title("Department Name").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                        c.Bound(p => p.SUP_NAME).Title("Manager").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                        //c.Bound(p => p.APP_ROLENAME).Title("App Role Name").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(100);
+                        c.Bound(p => p.ACTIVE)
+                            .ClientTemplate("#if(ACTIVE=='1') {#<i style='color:teal;' class='fas fa-check-circle 3x'></i> #} else {# <i style='color:red;' class='fas fa-times 3x'></i> #} #")
+                            .Title("<b>Active</b>")
+                            .Width(80)
+                            .HtmlAttributes(new { style = "text-align:center" })
+                            .HeaderHtmlAttributes(new { style = "text-align:center" })
+                            .Filterable(false);
+                                c.Bound(p => p.PIMS_USER)
+                                .ClientTemplate("#if(PIMS_USER=='1') {#<i style='color:teal;' class='fas fa-check-circle 3x'></i> #} else {# <i style='color:red;' class='fas fa-times 3x'></i> #} #")
+                                .Title("<b>PIMS User</b>")
+                                .Width(80)
+                                .HtmlAttributes(new { style = "text-align:center" })
+                                .HeaderHtmlAttributes(new { style = "text-align:center" })
+                                .Filterable(false);
+                        c.Command(command => command.Custom("View Access")
+                            .Template("<a class='btn btn-default btn-outline-primary noSubmit grid-column-button' href='javascript:void(0);' onclick=\'AdminController.methods.editAccess(this)\' data-toggle='modal' data-target='.user-role-modal' title='View Access'><i class='k-icon k-i-pencil'></i></a>"))
+                            .Width(50).Title(" ")
+                            .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                            .HtmlAttributes(new { style = "text-align: center" });
+                        c.Command(command => command.Custom("Delete")
+                            .Template("<a class='btn btn-default btn-outline-primary noSubmit grid-column-button' href='javascript:void(0);' onclick=\'_editUserController.message.showDeleteUser(this)\' data-toggle='modal' data-target='.user-role-modal' title='Delete user.'><i class='fas fa-trash-alt'></i></a>"))
+                            .Width(50).Title(" ")
+                            .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                            .HtmlAttributes(new { style = "text-align: center" });
+                     })
+                    .Resizable(resize => resize.Columns(true))
+                    .HtmlAttributes(new { style = "height: 100%" })
+                    .Sortable()
+                    .NoRecords()
+                    .Navigatable()
+                    .Pageable(pageable => pageable
+                        .Refresh(true)
+                        .PreviousNext(true)
+                        .Numeric(true)
+                    )
+                    //.AutoBind(false)
+                    .Scrollable()
+                    .Selectable()
+                    .Filterable()
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(100)
+                        .Read(read => read.Action("GetUsers", "Home").Data("AdminController.grid.param")))
+                    )
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+@await Html.PartialAsync("_EditUser")
+@await Html.PartialAsync("_ActiveDirectorySearch")
+<script>
+    $(function() {
+        UserAccessHistController.add({
+            "MODULE_NAME": "Admin",
+            "USERACTION": "Admin/Home/Index",
+            "USERSELECTION": "Admin/Home/AddNew",
+            "LST_UPDT_DT": null,
+            "LST_UPDT_BY": MS_ID,
+            "PAGE_ID": "3",
+            "__RequestVerificationToken": $('meta[name="request-verification-token"]')[0].content
+
+
+        });
+    });
+</script>

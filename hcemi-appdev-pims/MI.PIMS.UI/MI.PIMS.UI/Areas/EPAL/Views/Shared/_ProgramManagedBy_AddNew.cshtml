@@ -1,0 +1,104 @@
+﻿@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "Program Managed By";
+}
+
+<div class="container tab-section">
+    <h5>
+        Program Managed By
+    </h5>
+    <hr />
+    <form id="frmProgMgdByInfo">
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <div style="font-size:11px !important;">
+                    @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.EPAL_Procs_Prog_Mgd_By_V>()
+                        .Name("grid_ProgMgdBy")
+                        .Columns(c => {
+                            c.Bound(p => p.DELEGATED_UM).Title("Delegated UM").Editable("ProgMgdByController.grid.DELEGATED_UMEditable").EditorTemplateName("Delegate_Um").ClientTemplate("#:DELEGATED_UM#").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold; title:'asdf'" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                            c.Bound(p => p.PROG_MGD_BY).Title("Program Managed By").Editable("ProgMgdByController.grid.PROG_MGD_BYEditable").EditorTemplateName("Prog_Mgd_By").ClientTemplate("#:PROG_MGD_BY#").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(170);
+                            c.Bound(p => p.INT_EXT_CD)
+                                            .Title("Internal/External")
+                                            .EditorTemplateName("Int_Ext_CD")
+                                            .ClientTemplate("#:INT_EXT_CD#")
+                                            .Editable("ProgMgdByController.grid.INTERNAL_EXTERNALEditable")
+                                            .Filterable(false)
+                                            .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                                            .HtmlAttributes(new { style = "text-align: center" })
+                                            .Width(150);
+                            c.Bound(p => p.PMB_EFF_DT).Title("PMB Effective Date").EditorTemplateName("Date").Format("{0: MM/dd/yyyy}").ClientTemplate("#= (data.PMB_EFF_DT == null) ? ' ' : kendo.toString(kendo.parseDate(PMB_EFF_DT), 'MM/dd/yyyy') #").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                            c.Bound(p => p.PMB_EXP_DT)
+                                            .Title("PMB Expiration Date")
+                                            .EditorTemplateName("Date").Format("{0: MM/dd/yyyy}")
+                                            //.ClientTemplate("#= (data.PMB_EXP_DT == null) ? ' ' : kendo.toString(kendo.parseDate(PMB_EXP_DT), 'MM/dd/yyyy') #")
+                                            .ClientTemplate("#= ( kendo.toString(kendo.parseDate(PMB_EXP_DT), 'MM/dd/yyyy') == '12/31/2999' || (data.PMB_EXP_DT == null)) ? ' ' : kendo.toString(kendo.parseDate(PMB_EXP_DT), 'MM/dd/yyyy') #")
+                                            .Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                                            .HtmlAttributes(new { style = "text-align: center" })
+                                            .Width(150);
+                            c.Bound(p => p.PMB_BASED_ON_DX_IND)
+                                            .Title("DX Indicator")
+                                            .EditorTemplateName("DX_Ind")
+                                            .ClientTemplate("#:PMB_BASED_ON_DX_IND#")
+                                            .Editable("ProgMgdByController.grid.INTERNAL_EXTERNALEditable")
+                                            .Filterable(false)
+                                            .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                                            .HtmlAttributes(new { style = "text-align: center" }).Width(130);
+                            c.Bound(p => p.PMB_BASED_ON_ST_APP_IND)
+                                            .Title("State Indicator")
+                                            .EditorTemplateName("St_App_Ind")
+                                            .ClientTemplate("#:PMB_BASED_ON_ST_APP_IND#")
+                                            .Filterable(false)
+                                               .Editable("ProgMgdByController.grid.PMB_BASED_ON_ST_APP_INDEditable")
+                                            .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                                            .HtmlAttributes(new { style = "text-align: center" })
+                                            .Width(130);
+                            c.Bound(p => p.PMB_BASED_ON_AGE_MIN).Title("PMB Min Age").EditorTemplateName("Age").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                            c.Bound(p => p.PMB_BASED_ON_AGE_MAX).Title("PMB Max Age").EditorTemplateName("Age").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);                            
+                            c.Command(command => command.Custom(" ").Template("<a class='btn btn-default btn-outline-primary noSubmit grid-column-button progmgdby-delete'  href='javascript:void(0);' title='Click to delete this row!' \\data-target='tooltip'\\><i  class=\"k-icon k-i-delete\"></i></a>")).Width(50);
+                        })                        
+                        .ToolBar(toolbar => {
+                            toolbar.Create();
+                        })
+                       
+                        .Events(events => events.DataBound("ProgMgdByController.grid.onDataBound"))  
+                        .Editable(editable => editable.Mode(GridEditMode.InCell).DisplayDeleteConfirmation(false))
+                        .Resizable(resize => resize.Columns(true))
+                        .HtmlAttributes(new { style = "min-height: 400px;" })
+                        .Scrollable()
+                        .Sortable(false)                                            
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .PageSize(1000)
+                            .Events(events => events.Change("ProgMgdByController.grid.dataSource.onChange"))
+                            .Model(model =>
+                            {
+                                model.Field(c => c.DELEGATED_UM);
+                                model.Field(c => c.PROG_MGD_BY);
+                                model.Field(c => c.INT_EXT_CD).Editable(false);
+                                model.Field(c => c.PMB_EFF_DT);
+                                model.Field(c => c.PMB_EXP_DT);
+                                model.Field(c =>  c.PMB_BASED_ON_DX_IND).DefaultValue("No");
+                                model.Field(c =>  c.PMB_BASED_ON_ST_APP_IND).DefaultValue("No");
+                                model.Field(c =>  c.PMB_BASED_ON_AGE_MIN);
+                                model.Field(c =>  c.PMB_BASED_ON_AGE_MAX);
+                            })
+                            .Read(read => read.Action("GetProgramManagedByPIMSID", "Home").Data("ProgMgdByController.grid.params"))
+                  
+                        )
+                    )
+                </div>
+            </div>
+        </div>       
+    </form>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        var gridElement = $("#grid_ProgMgdBy");
+        var dataArea = gridElement.find(".k-grid-content");
+        gridElement.height("400px");
+        dataArea.height("305px");
+    });
+</script>
+
+<script src="@Url.Content("~/js/EPAL/ProgMgdBy.js")" asp-append-version="true"></script>

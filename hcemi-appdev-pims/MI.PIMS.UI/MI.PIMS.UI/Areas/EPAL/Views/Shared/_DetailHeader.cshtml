@@ -1,0 +1,484 @@
+﻿@inject MI.PIMS.UI.Services.MIAuthenticate.IMIAuthenticateService _miAuthenticateService
+@inject MI.PIMS.UI.Common.Helper _helper
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@model MI.PIMS.BO.Dtos.EPAL_Procedures_V_Dto
+
+@{
+    var _UserInfo_T_Dto = (MI.PIMS.BO.Dtos.UserInfo_T_Dto) _miAuthenticateService.UserInfo_T_Dto(_helper.MS_ID);
+    var s = _UserInfo_T_Dto.APP_ROLEIDS;
+    string[] appRoles = s.Split(',');
+}
+@Html.Hidden("RequestVerificationToken", @Xsrf.GetAndStoreTokens(Context).RequestToken) 
+<style>
+    .lbl-gc-eligible {
+        height: 25px !important;
+        display: block;
+        float: right;
+        text-align: right;
+        width: 80%;
+        line-height: 22px;
+        padding-right: 4px;
+    }
+</style>
+
+<div class="container  search-section" style="padding-left:30px; padding-right:30px;">
+    <div class="section-heading">
+        <div class="row">
+            <div class="col-md-7 col-sm-7 col-lg-7">
+                <div style="font-size: 14px; margin-top:4px; ">
+                    PIMS Detail &nbsp;
+
+                    @if (@Model.EPAL_STATUS.Contains("INACTIVE") || @Model.EPAL_STATUS.Contains("SUSPENDED"))
+                    {
+                        <label class="label-tag-red">@Model.EPAL_STATUS</label>
+                    }
+                    else
+                    {
+                        <label class="label-tag-green">@Model.EPAL_STATUS</label>
+                    }
+
+                    &nbsp;
+                    @if(@Model.IS_CURRENT=="N") 
+                    {
+                          <label class="label-tag-orange">HISTORICAL RECORD</label>
+                    }
+
+                    &nbsp;
+                    @if(@Model.HIERARCHY_CODES_IS_ACTIVE?.ToUpper()=="INACTIVE") 
+                    {
+                            <label id="lblCodeInactive" title="Hierarchy Code Combination Is Inactive! This record cannot be modified." class="label-tag-pink">INACTIVE HIERARCHY CODE COMBINATION</label>
+                    }
+                    <label class="badge badge-pill driving-status-badge hide" style="text-shadow: 1px 0 10px;color: cornflowerblue;font-size: 16px;font-family: math;">@Model.epalDrivingSourceRangeModel?.DisplayName</label>
+                    <input type="hidden" id="showHistoricalUpdateButton" readonly value="@ViewBag.ShowHistoricalUpdateButton.ToString()" />
+
+                </div>
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 text-lg-right text-md-right text-sm-right">
+                <!--===============================
+                     Show Save Buttons on Edit Screen
+                =================================-->
+                    @if ((string)ViewData["PageType"] != @Roles.EPALReadOnly.ToString() &&
+                   (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALReadWrite)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALAdmin))  ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRAdmin))   ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRReadWrite)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPReadWrite)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPAdmin)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.DonorRecordsReadWrite)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.DonorRecordsAdmin)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.ICHRAReadWrite)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.ICHRAAdmin))
+                    ))
+                    {
+                        <div>
+                            @if (ViewBag.ShowDeleteButton != false)
+                            {
+                                <button id="btnDelete" data-toggle="modal" data-target="#deleteModal" data-backdrop="static" data-keyboard="false" class="btn btn-danger noSubmit" title="Click to delete record!"><i class="fas fa-trash-alt"></i> Delete Version  </button>
+                            }
+
+                            @if (Model.EPAL_ENTITY_CD == "UMR")
+                            {
+                                @if (ViewBag.UMR_Edit == true)
+                                {
+                                    @if (ViewBag.ShowHistoricalUpdateButton == true)
+                                    {
+                                        <button id="btnSaveHistoric" data-toggle="tooltip" class="btn btn-primary noSubmit" title="Click to save record!"><i class="fas fa-save"></i> Save Historical Version </button>
+                                        <button id="btnReset" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click reset to revert changes!"><i class="fas fa-times-circle"></i> Reset </button>
+                                        @if (ViewBag.ShowDuplicateButton != false)
+                                        {
+                                            <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                                        }
+                                        @if (ViewBag.AddRecord != "Y")
+                                        {
+                                            <button id="btnViewOnly" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to View Only!"><i class="fas fa-book-open"></i> View Only </button>
+                                        }
+                                    }
+                                    else if (ViewBag.ShowHistoricalUpdateButton == false && 
+                                         @Model.IS_CURRENT != "N" 
+                                         && @Model.HIERARCHY_CODES_IS_ACTIVE?.ToUpper() != "INACTIVE"
+                                    )
+                                    {
+                                        <button id="btnSave" data-toggle="tooltip" class="btn btn-primary noSubmit" title="Click to save record!"><i class="fas fa-save"></i> Save </button>
+                                        <button id="btnReset" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click reset to revert changes!"><i class="fas fa-times-circle"></i> Reset </button>
+                                        @if (ViewBag.ShowDuplicateButton != false)
+                                        {
+                                            <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                                        }
+                                        @if (ViewBag.AddRecord != "Y")
+                                        {
+                                            <button id="btnViewOnly" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to View Only!"><i class="fas fa-book-open"></i> View Only </button>
+                                        }
+                                    }
+                                }
+                            }
+
+
+                            else @if (Model.EPAL_PRODUCT_CD == "ICHRA")
+                            {
+                                @if (ViewBag.ICHRA_Edit == true)
+                                {
+                                    @if (ViewBag.ShowHistoricalUpdateButton == true)
+                                    {
+                                        <button id="btnSaveHistoric" data-toggle="tooltip" class="btn btn-primary noSubmit" title="Click to save record!"><i class="fas fa-save"></i> Save Historical Version </button>
+                                        <button id="btnReset" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click reset to revert changes!"><i class="fas fa-times-circle"></i> Reset </button>
+                                        @if (ViewBag.ShowDuplicateButton != false)
+                                        {
+                                            <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                                        }
+                                        @if (ViewBag.AddRecord != "Y")
+                                        {
+                                            <button id="btnViewOnly" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to View Only!"><i class="fas fa-book-open"></i> View Only </button>
+                                        }
+                                    }
+                                    else if (ViewBag.ShowHistoricalUpdateButton == false &&
+                                    @Model.IS_CURRENT != "N"
+                                    && @Model.HIERARCHY_CODES_IS_ACTIVE?.ToUpper() != "INACTIVE"
+                                    )
+                                    {
+                                        <button id="btnSave" data-toggle="tooltip" class="btn btn-primary noSubmit" title="Click to save record!"><i class="fas fa-save"></i> Save </button>
+                                        <button id="btnReset" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click reset to revert changes!"><i class="fas fa-times-circle"></i> Reset </button>
+                                        @if (ViewBag.ShowDuplicateButton != false)
+                                        {
+                                            <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                                        }
+                                        @if (ViewBag.AddRecord != "Y")
+                                        {
+                                            <button id="btnViewOnly" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to View Only!"><i class="fas fa-book-open"></i> View Only </button>
+                                        }
+                                    }
+                                }
+                            }
+
+
+                            else @if (Model.IS_DONOR_RECORD == 1)
+                            {
+                                @if (ViewBag.DonorRecords_Edit == true)
+                                    {
+                                        @if (ViewBag.ShowHistoricalUpdateButton == true)
+                                        {
+                                            <button id="btnSaveHistoric" data-toggle="tooltip" class="btn btn-primary noSubmit" title="Click to save record!"><i class="fas fa-save"></i> Save Historical Version </button>
+                                            <button id="btnReset" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click reset to revert changes!"><i class="fas fa-times-circle"></i> Reset </button>
+                                            @if (ViewBag.ShowDuplicateButton != false)
+                                            {
+                                                <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                                            }
+                                            @if (ViewBag.AddRecord != "Y")
+                                            {
+                                                <button id="btnViewOnly" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to View Only!"><i class="fas fa-book-open"></i> View Only </button>
+                                            }
+                                        }
+                                        else if (ViewBag.ShowHistoricalUpdateButton == false &&
+                                        @Model.IS_CURRENT != "N"
+                                        && @Model.HIERARCHY_CODES_IS_ACTIVE?.ToUpper() != "INACTIVE"
+                                        )
+                                        {
+                                            <button id="btnSave" data-toggle="tooltip" class="btn btn-primary noSubmit" title="Click to save record!"><i class="fas fa-save"></i> Save </button>
+                                            <button id="btnReset" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click reset to revert changes!"><i class="fas fa-times-circle"></i> Reset </button>
+                                            @if (ViewBag.ShowDuplicateButton != false)
+                                            {
+                                                <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                                            }
+                                            @if (ViewBag.AddRecord != "Y")
+                                            {
+                                                <button id="btnViewOnly" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to View Only!"><i class="fas fa-book-open"></i> View Only </button>
+                                            }
+                                        }
+                                    }
+                            }
+
+                            else if (Model.EPAL_ENTITY_CD != "UMR")
+                            {
+                                @if (ViewBag.ShowHistoricalUpdateButton == true)
+                                {
+                                    <button id="btnSaveHistoric" data-toggle="tooltip" class="btn btn-primary noSubmit" title="Click to save record!"><i class="fas fa-save"></i> Save Historical Version </button>
+                                        <button id="btnReset" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click reset to revert changes!"><i class="fas fa-times-circle"></i> Reset </button>
+                                        @if (ViewBag.ShowDuplicateButton != false)
+                                        {
+                                            <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                                        }
+                                        @if (ViewBag.AddRecord != "Y")
+                                        {
+                                            <button id="btnViewOnly" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to View Only!"><i class="fas fa-book-open"></i> View Only </button>
+                                        }
+                                    }
+                                else if (ViewBag.ShowHistoricalUpdateButton == false &&
+                                    @Model.IS_CURRENT != "N"
+                                    && @Model.HIERARCHY_CODES_IS_ACTIVE?.ToUpper() != "INACTIVE"
+                                )
+                                {
+                                    <button id="btnSave" data-toggle="tooltip" class="btn btn-primary noSubmit" title="Click to save record!"><i class="fas fa-save"></i> Save </button>
+                                    <button id="btnReset" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click reset to revert changes!"><i class="fas fa-times-circle"></i> Reset </button>
+                                    @if (ViewBag.ShowDuplicateButton != false)
+                                    {
+                                        <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                                    }
+                                    @if (ViewBag.AddRecord != "Y")
+                                    {
+                                        <button id="btnViewOnly" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to View Only!"><i class="fas fa-book-open"></i> View Only </button>
+                                    }
+                                }
+                            }
+                        </div>
+                    }
+
+                    <!--======================================
+                         Show Save Buttons for AddNew Screen
+                    =======================================-->
+                    @if (ViewBag.AddRecord == "Y" &&
+                    (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALReadWrite)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALAdmin)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRAdmin)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRReadWrite)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPAdmin)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPReadWrite)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.DonorRecordsReadWrite)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.DonorRecordsAdmin)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.ICHRAReadWrite)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.ICHRAAdmin))
+                    )
+                        && @Model.IS_CURRENT != "N" 
+                        && @Model.HIERARCHY_CODES_IS_ACTIVE?.ToUpper() != "INACTIVE")
+                    {
+                        <div>
+                            <button id="btnSave" data-toggle="tooltip" class="btn btn-primary noSubmit" title="Click to save record!"><i class="fas fa-save"></i> Save </button>
+                            <button id="btnReset" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click reset to revert changes!"><i class="fas fa-times-circle"></i> Reset </button>
+                        </div>
+                    }
+
+
+                    <!--==================================================
+                         Show Edit Record Buttons for ViewDetail Screen
+                    ===================================================-->
+                    @if (
+                    (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALReadWrite)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALAdmin)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRAdmin)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRReadWrite)) || 
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPAdmin)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPReadWrite)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.DonorRecordsReadWrite)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.DonorRecordsAdmin)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.ICHRAReadWrite)) ||
+                        appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.ICHRAAdmin))
+                    )
+                        && ViewBag.ShowEditButton == true)
+                    {
+                    @if (ViewBag.ShowHistoricalUpdateButton == true)
+                    {
+                        @if (Model.EPAL_ENTITY_CD == "UMR")
+                        {
+                            @if (ViewBag.UMR_Edit == true)
+                            {
+                                <button id="btnGoToEdit" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to edit this record!"><i class="fas fa-pencil-alt"></i> Edit Record </button>
+                                <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                            }
+                        }
+
+                        else if (Model.EPAL_PRODUCT_CD == "ICHRA")
+                        {
+                            @if (ViewBag.ICHRA_Edit == true)
+                                {
+                                    <button id="btnGoToEdit" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to edit this record!"><i class="fas fa-pencil-alt"></i> Edit Record </button>
+                                    <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                                }
+                            }
+                        }
+
+                        else if (Model.IS_DONOR_RECORD == 1)
+                        {
+                        @if (ViewBag.DonorRecords_Edit == true)
+                            {
+                                <button id="btnGoToEdit" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to edit this record!"><i class="fas fa-pencil-alt"></i> Edit Record </button>
+                                <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                            }
+                        }
+
+                        else if (Model.EPAL_PRODUCT_CD == "ICHRA")
+                            {
+                                @if (ViewBag.ICHRA_Edit == true)
+                                {
+                                    <button id="btnGoToEdit" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to edit this record!"><i class="fas fa-pencil-alt"></i> Edit Record </button>
+                                    <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                                }
+                            }
+                        
+
+                        else if (Model.EPAL_ENTITY_CD != "UMR")
+                        {
+                            @if (Model.EPAL_BUS_SEG_CD.ToUpper().Contains("_CMP"))
+                            {
+                                @if (ViewBag.CMP_Edit == true)
+                                {
+                                    <button id="btnGoToEdit" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to edit this record!"><i class="fas fa-pencil-alt"></i> Edit Record </button>
+                                    <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                                }
+                            }
+
+
+                            else
+                            {
+                                @if (ViewBag.EPAL_Edit == true)
+                                {
+                                    <button id="btnGoToEdit" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to edit this record!"><i class="fas fa-pencil-alt"></i> Edit Record </button>
+                                    <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                                }
+                            }
+                        }
+               
+
+                    else if (ViewBag.ShowHistoricalUpdateButton == false 
+                        && @Model.IS_CURRENT == "Y" 
+                        && @Model.HIERARCHY_CODES_IS_ACTIVE?.ToUpper() != "INACTIVE")
+                        {
+                            @if (Model.EPAL_ENTITY_CD == "UMR")
+                            {
+                                @if (ViewBag.UMR_Edit == true)
+                                {
+                                    <button id="btnGoToEdit" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to edit this record!"><i class="fas fa-pencil-alt"></i> Edit Record </button>
+                                    <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                                }
+                            }
+                            else if (Model.EPAL_PRODUCT_CD == "ICHRA")
+                            {
+                                @if (ViewBag.ICHRA_Edit == true)
+                                {
+                                    <button id="btnGoToEdit" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to edit this record!"><i class="fas fa-pencil-alt"></i> Edit Record </button>
+                                    <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                                }
+                            }
+                            else if (Model.IS_DONOR_RECORD == 1)
+                            {
+                                @if (ViewBag.DonorRecords_Edit == true)
+                                {
+                                    <button id="btnGoToEdit" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to edit this record!"><i class="fas fa-pencil-alt"></i> Edit Record </button>
+                                    <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                                }
+                            }
+                            else if (Model.EPAL_ENTITY_CD != "UMR")
+                            {
+                                @if (Model.EPAL_BUS_SEG_CD.ToUpper().Contains("_CMP"))
+                                {
+                                    @if (ViewBag.CMP_Edit == true)
+                                    {
+                                        <button id="btnGoToEdit" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to edit this record!"><i class="fas fa-pencil-alt"></i> Edit Record </button>
+                                        <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                                    }
+                                }
+                                else
+                                {
+                                    @if (ViewBag.EPAL_Edit == true)
+                                    {
+                                        <button id="btnGoToEdit" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to edit this record!"><i class="fas fa-pencil-alt"></i> Edit Record </button>
+                                        <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                                    }
+                                }
+                            }
+                    }
+                }
+             
+            </div> 
+        </div>
+    </div>
+
+    @if (Model != null)
+    {
+    <div class="section-border">
+        <div style="margin-top:-15px;">
+             <span style="font-size:11px; font-weight:bold; color: red;">* Required Fields</span>
+            <div class="form-row">
+                <label for="txtPIMSID" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">PIMS ID:</label>
+                <div class="col-lg-2 cell-padding">
+                    <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtPIMSID" name="txtPIMSID" value="@Model.EPAL_HIERARCHY_KEY" />
+                </div>
+                <label for="txtBusinessSegment" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Business Segment:</label>
+                <div class="col-lg-2 cell-padding">
+                    <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtBusinessSegment" name="txtBusinessSegment" value="@Model.EPAL_BUS_SEG_CD">
+                </div>
+                <label for="txtEntity" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Entity:</label>
+                <div class="col-lg-2 cell-padding">
+                    <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtEntity" name="txtEntity" value="@Model.EPAL_ENTITY_CD">
+                </div>
+                <label for="txtProcedureCode" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Procedure Code:</label>
+                <div class="col-lg-2 cell-padding">
+                    <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtProcedureCode" name="txtProcedureCode" value="@Model.PROC_CD">
+                </div>
+            </div>
+            <div class="form-row">
+                <label for="txtPlan" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Plan:</label>
+                <div class="col-lg-2 cell-padding">
+                    <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtPlan" name="txtPlan" value="@Model.EPAL_PLAN_CD">
+                </div>
+                <label for="txtProduct" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Product:</label>
+                <div class="col-lg-2 cell-padding">
+                    <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtProduct" name="txtProduct" value="@Model.EPAL_PRODUCT_CD">
+                </div>
+
+                <label for="txtFunding" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Funding:</label>
+                <div class="col-lg-2 cell-padding">
+                    <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtFunding" name="txtFunding" value="@Model.EPAL_FUND_ARNGMNT_CD">
+                </div>
+                <label for="txtDrugName" class="col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Drug Name:</label>
+                 <div class="col-lg-2 cell-padding">
+                    <input type="text" class="form-control" data-toggle="tooltip" readonly id="txtDrugName" name="txtDrugName" value="@Model.DRUG_NM">
+                </div>
+            </div>
+            <div class="form-row">
+                <label for="txtEPALVersionDt" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">EPAL Version Eff Date:</label>
+                <div class="col-lg-2 cell-padding">
+                    <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtEPALVersionDt" name="txtEPALVersionDt" value="@Model.EPAL_VER_EFF_DT?.ToString("MM/dd/yyyy hh:mm:ss tt")">
+                </div>
+                <label class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">
+                    <span class="@(Model.GOLD_CARD_ELIG_IND == "Yes" ? "label-tag-gold lbl-gc-eligible": "")">
+                        Gold Card Eligible
+                    </span>
+                    </label>
+                <div class="col-lg-2 cell-padding">
+                    <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtGoldCardEligible" name="txtGoldCardEligible" value="@Model.GOLD_CARD_ELIG_IND">
+                </div>
+            </div>
+        </div>
+    </div>
+}
+ </div>
+<script>
+    $(document).ready(function () {
+        const headerContainer = document.getElementsByClassName("container search-section")[0];
+        const buttons = headerContainer.querySelectorAll("button")
+        buttons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const appInsightsClient = new TelemetryLogger();
+                var pageView = $(document).find('#epal-page-view').first().get(0).value.toLowerCase();
+                var pageType;
+                switch(pageView){
+                    case "adddetail":
+                        pageType = "EPALAdd";
+                        break;
+                    case "editdetail":
+                        pageType = "EPALEdit";
+                        break;
+                    case "addnew":
+                        pageType = "EPALNew";
+                        break;
+                    case "duplicaterecorddetail":
+                        pageType = "EPALDuplicate";
+                        break;
+                    case "viewdetail":
+                    default:
+                        pageType = "EPALView";
+                }
+                if(appInsightsClient.isAppInsightsEnabled("Client." + pageView)) {
+                    var buttonStr = event.target.innerText;
+                    const logProperties = new LogInfo(event.target.id, MS_ID, pageType + " " + buttonStr + " Tab click");
+                    appInsightsClient.trackEvent('Client.' + pageType + '.' + buttonStr.replaceAll(' ', ''), logProperties);
+                }
+            });
+        });
+    });
+</script>
+@if (ViewBag.ShowDeleteButton != false)
+{
+    @await Html.PartialAsync("_DeleteModal")
+}

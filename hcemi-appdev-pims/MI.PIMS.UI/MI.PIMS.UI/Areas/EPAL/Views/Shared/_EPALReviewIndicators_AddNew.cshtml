@@ -1,0 +1,487 @@
+﻿@inject MI.PIMS.UI.Services.MIAuthenticate.IMIAuthenticateService _miAuthenticateService
+@inject MI.PIMS.UI.Common.Helper _helper
+
+@model MI.PIMS.BO.Dtos.EPAL_Procedures_V_Dto
+@using MI.PIMS.UI.Common
+@using Kendo.Mvc.UI
+@{
+    var _UserInfo_T_Dto = (MI.PIMS.BO.Dtos.UserInfo_T_Dto)_miAuthenticateService.UserInfo_T_Dto(_helper.MS_ID);
+    var s = _UserInfo_T_Dto.APP_ROLEIDS;
+    string[] appRoles = s.Split(',');
+
+    string IsDuplicatedRecord = ViewBag.DuplicateRecord;
+}
+
+<style>
+    .wrapper {
+        width: 100%;
+        overflow: hidden; /* add this to contain floated children */
+    }
+
+    .div-wrap {
+        display: inline-block;
+        float: left; /* add this */
+        padding-right: 15px;
+        padding-bottom: 15px;
+    }
+</style>
+    <style>
+        div.k-grid tbody tr {
+            height: 40px;
+        }
+    </style>
+
+<div class="container tab-section">
+    <h5>
+        EPAL Review Indicators
+    </h5>
+    <hr />
+    <div class="row">
+        <div class="col-6">
+            <div class="section-border">
+                <span>
+                    <strong>Site of Service</strong>
+                </span>
+                <hr  style="margin-top:4px;" />
+
+                <div class="form-row my-row-padding">
+                    <label for="txtSiteofServiceApplies" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">SOS Applies:</label>
+                    <div class="col-lg-2">
+                        <input type="text" class="form-control" id="txtSiteofServiceApplies" data-toggle="tooltip" ovalue="@Model.SOS_IND" value="@Model.SOS_IND" readonly >
+                    </div>
+                    <label for="dpSOSEffectiveDate" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight label-sos-effective-date">SOS Effective Date:</label>
+                    <div id="divSOSEffectiveDate" class="col-lg-2" data-toggle="tooltip">
+                        @(Html.Kendo().DatePicker()
+                            .Name("dpSOSEffectiveDate")
+                            .Value(@Model.SOS_EFF_DT)
+                            .Format("MM/dd/yyyy")
+                            //.Min(@Model.PRIOR_AUTH_EFF_DT.ToStringNullSafe() == "" ? "1900/1/1": @Model.PRIOR_AUTH_EFF_DT.ToStringNullSafe())
+                            //.Max(@Model.PRIOR_AUTH_EXP_DT.ToStringNullSafe() == "" ? "2099/12/12": @Model.PRIOR_AUTH_EXP_DT.ToStringNullSafe())
+                            .ParseFormats(new string[] {"MMddyyyy", 
+                                                        "MMddyy",
+                                                        "MM.dd.yyyy", 
+                                                        "MM.dd.yy",
+                                                        "MM.d.yyyy",
+                                                        "M.d.yy",
+                                                        "M.d.yyyy",
+                                                        "MM/dd/yyyy", 
+                                                        "MM/dd/yy",
+                                                        "MM/d/yyyy",
+                                                        "M/d/yy",
+                                                        "M/d/yyyy",
+                                                        "MM-dd-yyyy", 
+                                                        "MM-dd-yy",
+                                                        "MM-d-yyyy",
+                                                        "M-d-yy",
+                                                        "M-d-yyyy"
+                                                        })
+                            .Enable((appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALReadWrite))
+                                    || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALAdmin))
+                                    || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRAdmin))
+                                    || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRReadWrite))
+                                    || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPAdmin))
+                                    || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPReadWrite))
+                                    || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin)) ? true : (@Model.PRIOR_AUTH_IND.ToStringNullSafe() == "No" ? true : false)))
+
+                            .HtmlAttributes(new { style = "width: 100%", @class= "form-to-update", ovalue=@Model.SOS_EFF_DT })
+                            .Events(events => events.Change("DetailController.methods.SOSEffectiveDateChange"))
+                        )
+                    </div>
+                    <label for="dpSOSExpirationDate" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">SOS Expiration Date:</label>
+                    <div id="divSOSExpirationDate" class="col-lg-2" data-toggle="tooltip">
+                        <input type="hidden" id="dpSOSExpirationDateOrignal" value="@(Model.SOS_EXP_DT.ToString() == "12/31/2999 12:00:00 AM" ? null : @Model.SOS_EXP_DT)" />
+                        @(Html.Kendo().DatePicker()
+                            .Name("dpSOSExpirationDate")
+                            .Value(@Model.SOS_EXP_DT.ToString() == "12/31/2999 12:00:00 AM" ? null : @Model.SOS_EXP_DT)
+                            .Format("MM/dd/yyyy")
+                            .ParseFormats(new string[] {"MMddyyyy", 
+                                                        "MMddyy",
+                                                        "MM.dd.yyyy", 
+                                                        "MM.dd.yy",
+                                                        "MM.d.yyyy",
+                                                        "M.d.yy",
+                                                        "M.d.yyyy",
+                                                        "MM/dd/yyyy", 
+                                                        "MM/dd/yy",
+                                                        "MM/d/yyyy",
+                                                        "M/d/yy",
+                                                        "M/d/yyyy",
+                                                        "MM-dd-yyyy", 
+                                                        "MM-dd-yy",
+                                                        "MM-d-yyyy",
+                                                        "M-d-yy",
+                                                        "M-d-yyyy"
+                                                        })
+                            @*.Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : (@Model.PRIOR_AUTH_IND.ToStringNullSafe() == "No" ? false : true)))*@
+                            .Enable(@Model.SOS_IND.ToStringNullSafe() == "No" ? false : true)
+                            .HtmlAttributes(new { style = "width: 100%", @class= "form-to-update", ovalue=@Model.SOS_EXP_DT })
+                            .Events(events => events.Change("DetailController.methods.SOSExpirationDateChange"))
+                        )          
+                    </div>
+                </div>
+
+                         <div class="form-row my-row-padding">
+                    <label for="ddlURGCategory" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight sos-required-label @(Model.SOS_EFF_DT.ToString() == "" ? "" : "required")">URG Category:</label>
+                    <div class="col-lg-2">
+                        @(Html.Kendo().DropDownList()
+                            .Name("ddlURGCategory")
+                            .DataTextField("VV_CD")
+                            .OptionLabel("------")
+                            .DataValueField("VV_CD")
+                            .Value(Model.SOS_URG_CAT_MDLTY ?? "")   
+                            .HtmlAttributes(new { style = "width: 100%", @class="sos-required-field", ovalue=Model.SOS_URG_CAT_MDLTY ?? "" })
+                            .AutoWidth(true)
+                            .Enable(@Model.SOS_IND.ToStringNullSafe() == "No" ? false : true)
+                            //.Value(Model.)
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("DetailController.dropdown.param.SOS_URG_CAT_MDLTY");
+                                })
+                                .ServerFiltering(false);
+                            })                
+                        )
+                    </div>
+                    <label for="ddlSOSTypeReview" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight sos-required-label @(Model.SOS_EFF_DT.ToString() == "" ? "" : "required")">SOS Type Review:</label>
+                    <div id="divSOSTypeReview" class="col-lg-2" data-toggle="tooltip">
+                        @(Html.Kendo().DropDownList()
+                            .Name("ddlSOSTypeReview")
+                            .DataTextField("VV_CD")
+                            .DataValueField("VV_CD_DESC")      
+                            .Value(Model.SOS_TYPE ?? "")      
+                            .DataValueField("VV_CD_DESC")   
+                            .OptionLabel("------")                   
+                            .HtmlAttributes(new { style = "width: 100%", ovalue=Model.SOS_TYPE ?? "" })
+                            .AutoWidth(true)
+                            .Enable(@Model.SOS_IND.ToStringNullSafe() == "No" ? false : true)                            
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                           read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("DetailController.dropdown.param.SOS_TYPE");
+                                })
+                                .ServerFiltering(false);
+                            })                
+                        )
+                    </div>
+            </div>
+            <div class="form-row my-row-padding">
+                     <label  class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight sos-required-label @(Model.SOS_EFF_DT.ToString() == "" ? "" : "required")">SOS Site Indicator:</label>
+                     <div class="col-lg-2"  style="margin-top: 10px;">
+                        @(Html.Kendo().RadioButton()
+                            .Name("sossite")
+                            .Label(Model.SOS_SITE_ONLY_VV == null ? "Site Only" : Model.SOS_SITE_ONLY_VV)
+                            .Value(Model.SOS_SITE_ONLY_VV == null ? "Site Only" : Model.SOS_SITE_ONLY_VV)
+                            .Checked(Model.SOS_SITE_IND.ToStringNullSafe().ToLower() == Model.SOS_SITE_ONLY_VV.ToStringNullSafe().ToLower() ? true : false)
+                            .Enable((@Model.PRIOR_AUTH_IND.ToStringNullSafe() == "No" ? false : (@Model.SOS_IND.ToStringNullSafe() == "No"? false: true)))
+                        )
+                     </div>
+                     <div class="col-lg-4"  style="margin-top: 10px;">
+                        @(Html.Kendo().RadioButton()
+                            .Name("sossite")
+                            .Label(Model.SOS_SITE_AND_SERVICE_VV == null ? "Site and Service" : Model.SOS_SITE_AND_SERVICE_VV)
+                            .Value(Model.SOS_SITE_AND_SERVICE_VV == null ? "Site and Service" : Model.SOS_SITE_AND_SERVICE_VV)
+                            .Checked(Model.SOS_SITE_IND.ToStringNullSafe().ToLower() == Model.SOS_SITE_AND_SERVICE_VV.ToStringNullSafe().ToLower() ? true : false)
+                            .Enable((@Model.PRIOR_AUTH_IND.ToStringNullSafe() == "No" ? false : (@Model.SOS_IND.ToStringNullSafe() == "No"? false: true)))
+                        )
+                        @Html.Hidden("sossite-ovalue", @Model.SOS_SITE_IND)                                      
+                    </div>
+             </div>
+        </div>
+        </div>
+        <div class="col-6">
+            <div class="section-border" style="min-height:170px !important;">
+                <span>
+                    <strong>Suspension</strong>
+                </span>
+                <hr style="margin-top:4px;" />
+                <div>
+                    <div class="form-row my-row-padding">
+                        <label for="txtSuspensionInd" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Suspension Indicator:</label>
+                        <div class="col-lg-3">
+                            <input type="text" class="form-control" id="txtSuspensionInd" data-toggle="tooltip" value="@(IsDuplicatedRecord == "Y" ? string.Empty : Model.SUSP_IND)" readonly>
+                        </div>
+                        <label id="lblSUSPEffDt" for="dpSUSPEffectiveDate" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Suspension Effective Date:</label>
+                        <div id="divSUSPEffectiveDate" class="col-lg-3" data-toggle="tooltip">
+                            @(Html.Kendo().DatePicker()
+                                .Name("dpSUSPEffectiveDate")
+                                .Value(ViewBag.DuplicateRecord == "Y" ? null : Model.SUSP_EFF_DT)
+                                .Format("MM/dd/yyyy")
+                                .ParseFormats(new string[] {"MMddyyyy",
+                                    "MMddyy",
+                                    "MM.dd.yyyy",
+                                    "MM.dd.yy",
+                                    "MM.d.yyyy",
+                                    "M.d.yy",
+                                    "M.d.yyyy",
+                                    "MM/dd/yyyy",
+                                    "MM/dd/yy",
+                                    "MM/d/yyyy",
+                                    "M/d/yy",
+                                    "M/d/yyyy",
+                                    "MM-dd-yyyy",
+                                    "MM-dd-yy",
+                                    "MM-d-yyyy",
+                                    "M-d-yy",
+                                    "M-d-yyyy"
+                                })                                
+                                .Enable(false)
+                                .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                                )
+                        </div>
+                    </div>
+                    <div class="form-row my-row-padding">
+                        <label id="lblSUSPType" for="ddlSUSPType" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Suspension Type:</label>
+
+                        <div class="col-lg-3">
+                            @(Html.Kendo().DropDownList()
+                                .Name("ddlSUSPType")
+                                .DataTextField("VV_CD_DESC")
+                                .DataValueField("VV_CD")
+                                .OptionLabel("------")
+                                .HtmlAttributes(new { style = "width: 100%" })
+                                .Enable(false)
+                                .Value(IsDuplicatedRecord == "Y" ? string.Empty : Model.SUSP_TYPE)
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("DetailController.dropdown.param.SUSP_TYPE");
+                                    })
+                                    .ServerFiltering(false);
+                                })
+                            )
+                        </div>
+                        <label id="lblSUSPExpirationDate" for="dpSUSPExpirationDate" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Suspension Expiration Date:</label>
+                        <div id="divSUSPExpirationDate" class="col-lg-3" data-toggle="tooltip">
+                            <input type="hidden" id="dpSUSPExpirationDateOrignal" value="@Model.SUSP_EXP_DT" />
+                            @(Html.Kendo().DatePicker()
+                                .Name("dpSUSPExpirationDate")
+                                .Value(IsDuplicatedRecord == "Y" ? null : Model.SUSP_EXP_DT)
+                                .Format("MM/dd/yyyy")
+                                .ParseFormats(new string[] {"MMddyyyy",
+                                    "MMddyy",
+                                    "MM.dd.yyyy",
+                                    "MM.dd.yy",
+                                    "MM.d.yyyy",
+                                    "M.d.yy",
+                                    "M.d.yyyy",
+                                    "MM/dd/yyyy",
+                                    "MM/dd/yy",
+                                    "MM/d/yyyy",
+                                    "M/d/yy",
+                                    "M/d/yyyy",
+                                    "MM-dd-yyyy",
+                                    "MM-dd-yy",
+                                    "MM-d-yyyy",
+                                    "M-d-yy",
+                                    "M-d-yyyy"
+                                })
+                                .Enable(false)
+                                .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                                )
+                        </div>
+                    </div>
+                    @*User Story 131795*@
+                    <div class="form-row my-row-padding">                        
+                        <label class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Suspension Notes:</label>
+                        <div class="col-lg-9">
+                            <textarea class="form-control" readonly>@Model.SUSP_RSN</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-6">
+            <div class="section-border" style="min-height:170px !important;">
+                <span>
+                    <strong>Auto Approval</strong>
+                </span>
+                <hr  style="margin-top:4px;" />
+                <div>
+                    <div class="form-row my-row-padding">
+                        <label for="txtAutoApproval" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Auto Approval:</label>
+                        <div class="col-lg-3">
+                            <input type="text" class="form-control" id="txtAutoApproval" data-toggle="tooltip" value="@Model.AUTO_APRVL_IND" readonly >
+                        </div>
+                    </div>
+                    <div class="form-row my-row-padding">
+                        <label id="lblAAEffectiveDate" for="dpAAEffectiveDate" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">AA Effective Date:</label>
+                        <div id="divAAEffectiveDate" class="col-lg-3" data-toggle="tooltip">
+                            @(Html.Kendo().DatePicker()
+                            .Name("dpAAEffectiveDate")
+                            .Value(Model.AUTO_APRVL_EFF_DT)
+                            .Format("MM/dd/yyyy")
+                            .ParseFormats(new string[] {"MMddyyyy", 
+                                                        "MMddyy",
+                                                        "MM.dd.yyyy", 
+                                                        "MM.dd.yy",
+                                                        "MM.d.yyyy",
+                                                        "M.d.yy",
+                                                        "M.d.yyyy",
+                                                        "MM/dd/yyyy", 
+                                                        "MM/dd/yy",
+                                                        "MM/d/yyyy",
+                                                        "M/d/yy",
+                                                        "M/d/yyyy",
+                                                        "MM-dd-yyyy", 
+                                                        "MM-dd-yy",
+                                                        "MM-d-yyyy",
+                                                        "M-d-yy",
+                                                        "M-d-yyyy"
+                                                        }) 
+                            @*.Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))*@
+                                .Enable((appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALReadWrite))
+                                || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALAdmin))
+                                || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRAdmin))
+                                || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRReadWrite))
+                                || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPAdmin))
+                                || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPReadWrite))
+                                || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin)) ? true : false))
+                            .HtmlAttributes(new { style = "width: 100%", @class= "form-to-update" })
+                            )
+                        </div>
+                        <label id="lblAAExpirationDate"  for="dpAAExpirationDate" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">AA Expiration Date:</label>
+                        <div id="divAAExpirationDate" class="col-lg-3" data-toggle="tooltip">
+                            <input type="hidden" id="dpAAExpirationDateOrignal" value="@Model.AUTO_APRVL_EXP_DT" />
+                            @(Html.Kendo().DatePicker()
+                            .Name("dpAAExpirationDate")
+                              .Value(Model.AUTO_APRVL_EXP_DT)
+                            @*.Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))*@
+                                .Enable((appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALReadWrite))
+                                || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALAdmin))
+                                || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin))) && Model.AUTO_APRVL_EFF_DT !=null ? true : false)
+                            .HtmlAttributes(new { style = "width: 100%", @class= "form-to-update" })
+                            )
+                        </div>
+                    </div>
+@*                    <div class="form-row my-row-padding">
+                        <label for="txtFurtherConsiderations" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Further Considerations:</label>
+                        <div class="col-lg-9">
+                            <textarea rows="3" type="text" data-toggle="tooltip" class="form-control" id="txtFurtherConsiderations" value="" @((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? "readonly='readonly'" : "")>@Model.FURTHER_INST</textarea>
+                        </div>
+                    </div>*@
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="section-border" style="min-height:170px !important;">
+                <span>
+                    <strong>Medicare Special Processing</strong>
+                </span>
+               <hr  style="margin-top:4px;" />
+                <div>
+                    <div class="form-row my-row-padding">
+                        <label id="lblMedicareSpecialProcessing" for="txtMedicareSpecialProcessing" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Medicare Special Processing:</label>
+                        <div class="col-lg-3">
+                            <input type="text" class="form-control" id="txtMedicareSpecialProcessing" data-toggle="tooltip" value="@Model.MCARE_SPCL_PRCSNG_IND" readonly >
+                        </div>
+
+                        <label id="lblMSPEffectiveDate" for="dpMSPEffectiveDate" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">MSP Effective Date:</label>
+                        <div id="divMSPEffectiveDate" class="col-lg-3" data-toggle="tooltip">
+                            @(Html.Kendo().DatePicker()
+                                .Name("dpMSPEffectiveDate")
+                                .Value(Model.MCARE_SPCL_PRCSNG_EFF_DT)
+                                .Format("MM/dd/yyyy")
+                                .ParseFormats(new string[] {"MMddyyyy", 
+                                                            "MMddyy",
+                                                            "MM.dd.yyyy", 
+                                                            "MM.dd.yy",
+                                                            "MM.d.yyyy",
+                                                            "M.d.yy",
+                                                            "M.d.yyyy",
+                                                            "MM/dd/yyyy", 
+                                                            "MM/dd/yy",
+                                                            "MM/d/yyyy",
+                                                            "M/d/yy",
+                                                            "M/d/yyyy",
+                                                            "MM-dd-yyyy", 
+                                                            "MM-dd-yy",
+                                                            "MM-d-yyyy",
+                                                            "M-d-yy",
+                                                            "M-d-yyyy"
+                                                            }) 
+                                .Enable((appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALReadWrite))
+                                || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALAdmin))
+                                || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRAdmin))
+                                || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRReadWrite))
+                                || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPAdmin))
+                                || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPReadWrite))
+                                || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin)) ? true : false))
+                                .HtmlAttributes(new { style = "width: 100%", @class= "form-to-update" })
+                                .Events(events => events.Change("DetailController.methods.MSPEffectiveDateChange"))
+                            )
+                        </div>
+                    </div>
+                    <div class="form-row my-row-padding">
+                        @if (Model.MCARE_SPCL_PRCSNG_EFF_DT != null)
+                        {
+                             <label id="lblTypeofSpecialProcessing"  for="txtTypeofSpecialProcessing" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight required">Type of Special Processing:</label>
+                        }
+
+                        else if (Model.MCARE_SPCL_PRCSNG_EFF_DT == null)
+                        {
+                             <label id="lblTypeofSpecialProcessing"  for="txtTypeofSpecialProcessing" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Type of Special Processing:</label>
+                        }
+
+                        <div class="col-lg-3">
+                            @(Html.Kendo().DropDownList()
+                                .Name("ddlTypeofSpecialProcessing")
+                                .DataTextField("VV_CD")
+                                .DataValueField("VV_CD")
+                                .OptionLabel("------")
+                                .HtmlAttributes(new { style = "width: 100%" })
+                                .Enable(@Model.MCARE_SPCL_PRCSNG_IND == "No" && Model.MCARE_SPCL_PRCSNG_EFF_DT == null ? false : true)
+                                .Value(Model.MCARE_SPCL_PRCSNG_TYPE)
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("DetailController.dropdown.param.MCARE_SPCL_PRCSNG_TYPE");
+                                    })
+                                    .ServerFiltering(false);
+                                })                
+                            )
+                        </div>
+                        <label id="lblMSPExpirationDate" for="dpMSPExpirationDate" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">MSP Expiration Date:</label>
+                        <div id="divMSPExpirationDate" class="col-lg-3" data-toggle="tooltip">
+                            <input type="hidden" id="dpMSPExpirationDateOrignal" value="@Model.MCARE_SPCL_PRCSNG_EXP_DT" />
+                            @(Html.Kendo().DatePicker()
+                            .Name("dpMSPExpirationDate")
+                            .Value(Model.MCARE_SPCL_PRCSNG_EXP_DT)                             
+                            .Format("MM/dd/yyyy")
+                            .ParseFormats(new string[] {"MMddyyyy", 
+                                                        "MMddyy",
+                                                        "MM.dd.yyyy", 
+                                                        "MM.dd.yy",
+                                                        "MM.d.yyyy",
+                                                        "M.d.yy",
+                                                        "M.d.yyyy",
+                                                        "MM/dd/yyyy", 
+                                                        "MM/dd/yy",
+                                                        "MM/d/yyyy",
+                                                        "M/d/yy",
+                                                        "M/d/yyyy",
+                                                        "MM-dd-yyyy", 
+                                                        "MM-dd-yy",
+                                                        "MM-d-yyyy",
+                                                        "M-d-yy",
+                                                        "M-d-yyyy"
+                                                        })
+                            .Enable(Model.MCARE_SPCL_PRCSNG_EFF_DT != null ? true : false)
+                            .HtmlAttributes(new { style = "width: 100%", @class= "form-to-update" })
+                            )
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+
+</div>
+

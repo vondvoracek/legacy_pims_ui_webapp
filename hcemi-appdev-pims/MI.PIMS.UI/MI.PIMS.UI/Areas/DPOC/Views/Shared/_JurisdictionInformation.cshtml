@@ -1,0 +1,37 @@
+﻿@model MI.PIMS.BO.Dtos.DPOC_Inventories_V_Dto
+@using Kendo.Mvc.UI
+@using MI.PIMS.UI.Common
+
+<div class="container tab-section">
+    <div class="form-row">
+        <div class="form-group col-md-12">
+            <h5>
+                Jurisdiction Information
+            </h5>
+            <hr />
+            <div style="font-size:11px !important;">
+                @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.EPAL_Procedures_AssoCodes_V_APPL_TO_STATES_Dto>()
+                    .Name("grid_JurisdictionInformation")                    
+                    .Columns(c => {
+                        c.Bound(p => p.STATE_NAME).Title("Palmetto").Filterable(false).HeaderHtmlAttributes(new {title = "", style = "text-align: center; font-weight:bold;" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                        c.Bound(p => p.STATE_MANDATED_IND).Title("CGS").Filterable(false).HeaderHtmlAttributes(new {title = ""}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(250);                        
+                        c.Bound(p => p.INCL_EXCL_CD_DESC).Title("Noridian F").Filterable(false).HeaderHtmlAttributes(new {title = "Denotes if the status of state is either included or excluded."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);                            
+                        c.Bound(p => p.ATS_EFF_DT).Title("NGS").Filterable(false).HeaderHtmlAttributes(new {title = "The effective date of the Program Managed By vendor if there is one on the record."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                        c.Bound(p => p.ATS_EXP_DT).Title("Novitas").Filterable(false).HeaderHtmlAttributes(new {title = "The expiration date of the Program Managed By vendor if there is one on the record."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                        c.Bound(p => p.ATS_ISSUE_GOV).Title("WPS Part A&B").Filterable(false).HeaderHtmlAttributes(new {title = "The issue status of the record."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                        c.Bound(p => p.ATS_PROG_MGD_BY).Title("First Coast").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" });
+                        c.Bound(p => p.ATS_PROG_MGD_BY).Title("NCD").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" });                        
+                    })            
+                    .ToolBar(toolbar => {
+                        toolbar.Create();
+                    })
+                    .Editable(editable => editable.Mode(GridEditMode.InCell).DisplayDeleteConfirmation(false))
+                    .Resizable(resize => resize.Columns(true))
+                    .HtmlAttributes(new { style = "min-height: 400px;" })
+                    .Scrollable()
+                    .Pageable(pageable => pageable.Refresh(false))                      
+                )    
+            </div>
+        </div>
+    </div>
+</div>

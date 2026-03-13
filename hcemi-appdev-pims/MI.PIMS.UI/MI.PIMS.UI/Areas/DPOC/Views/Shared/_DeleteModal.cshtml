@@ -1,0 +1,22 @@
+﻿
+<div id="deleteVersionWindow" style="display:none;" data-deleteversionurl='@Url.Action("DeleteVersion", "Home", new { area = "DPOC" })'>
+    <form id="deleteModalForm" class="k-form">
+        <span style="font-size:11px; font-weight:bold; color: red;">* Required Fields</span>
+        <div class="form-row my-row-padding">
+            <label for="CRNumber" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight required">CR #:</label>
+            <div class="col-lg-8">
+                <input type="text" id="CRNumber" name="CRNumber" class="k-textbox" required />
+            </div>
+        </div>
+        <div class="form-row my-row-padding">
+            <label for="DeleteReason" class="col-lg-4 text-lg-right text-sm-left col-form-label font-modal-weight required">Delete Reason:</label>
+            <div class="col-lg-8">
+                <input type="text" id="DeleteReason" name="DeleteReason" class="k-textbox" required />                
+            </div>
+        </div>
+        <div style="margin-top:15px; text-align:right;">
+            <button id="deleteVersionOK" class="k-button k-primary">OK</button>
+            <button id="deleteVersionCancel" class="k-button">Cancel</button>
+        </div>
+    </form>
+</div>

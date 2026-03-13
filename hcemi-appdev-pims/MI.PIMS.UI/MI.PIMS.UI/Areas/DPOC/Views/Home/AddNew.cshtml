@@ -1,0 +1,60 @@
+﻿@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "Add New";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="breadcrumb-background">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-background">
+                <li class="breadcrumb-item"><a>@Html.ActionLink("Home", "index", "/", new { Area = "" }, new { @class = "breadcrumb-item-font" })</a></li>
+                <li class="breadcrumb-item"><a>@Html.ActionLink("DPOC Search", "Index", "Home", new { Area = "DPOC" }, new { @class = "breadcrumb-item-font" })</a></li>
+                <li class="breadcrumb-item active" style="color: black !important; cursor: initial;" aria-current="page">Add New</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="container  search-section" style="padding-left:30px; padding-right:30px;">
+    <div class="section-heading">
+        <div class="row">
+            <div class="col-md-7 col-sm-7 col-lg-7">
+                <div style="font-size: 14px; margin-top:4px; ">
+                    Add New Record
+                </div>
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 text-lg-right text-md-right text-sm-right">
+                <div>
+                    <button id="btnValidate" class="btn btn-primary noSubmit" title="Click to validate record!"><i class="far fa-check-circle"></i> Validate </button>
+                    <button id="btnReset_AddNew" class="btn btn-outline-primary noSubmit resetAddNew" title="Click to go reset!"><i class="fas fa-times-circle"></i> Reset </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="section-border">
+        <div class="addnew-screen" style="width:40%">
+            <partial name="_AddNewDetail" />
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(function () {
+
+        // Log User Access Hist for the page and logged in user
+
+        UserAccessHistController.add({
+            "MODULE_NAME": "DPOC",
+            "USERACTION": "DPOC/Home/AddNew",
+            "USERSELECTION": "DPOC/Home/AddNew",
+            "LST_UPDT_DT": null,
+            "LST_UPDT_BY": MS_ID,
+            "PAGE_ID": "15",
+            "__RequestVerificationToken": $('meta[name="request-verification-token"]')[0].content
+
+        });
+    });
+</script>

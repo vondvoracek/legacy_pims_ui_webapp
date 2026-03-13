@@ -1,0 +1,73 @@
+﻿@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "StateInfo";
+}
+<script src="~/js/DPOC/_DPOC_GuidelineState.js" asp-append-version="true"></script>
+
+<style>
+    #grid_GSStateInfo .k-pager-wrap, .k-grid-pager {
+        position: absolute !important;
+        width: 100%;
+        bottom: 0px;
+    }
+
+    .position-absolute {
+        position: absolute !important;
+    }
+</style>
+<!--Guideline Configuration State Modal-->
+<div class="container">
+    <div class="form-row my-row-padding">
+        <label class="col-md-3 text-lg-left text-sm-left col-form-label font-modal-weight required">State Include/Exclude</label>
+        <div class="col-md-6">
+            @(Html.Kendo().DropDownList()
+                .Name("ddlStateInclExcl")
+                .DataTextField("DESC")
+                .DataValueField("INCL_EXCL_CD")
+                .OptionLabel("Type or Click for Dropdown")
+                .HtmlAttributes(new { style = "width: 100%" })
+                .Enable(false)
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetInclExclCDs", "Home", new { Area = "EPAL" });
+                    })
+                    .ServerFiltering(false);
+                })
+                )
+        </div>
+    </div>
+    @(
+        Html.Kendo().Grid<MI.PIMS.BO.Dtos.DPOC_Inv_Gdln_Appl_To_States_T_Dto>()
+        .Name("grid_GSStateInfo")
+        .AutoBind(false)
+        .Columns(c =>
+        {
+            c.Bound(p => p.STATE_NAME).Title("State").Filterable(false).HeaderHtmlAttributes(new { title = "The state that the prior auth applies to.", style = "text-align: center; font-weight:bold;" }).HtmlAttributes(new { style = "text-align: center" }).Width(120);
+            c.Bound(p => p.ATS_INCL_EXCL_CD).Hidden(true);
+            c.Bound(p => p.STATE_CD).Hidden(true);
+        })
+        .Events(events => events.DataBound("StateInfoController.grid.onDataBound"))
+        .Resizable(resize => resize.Columns(true))
+        .HtmlAttributes(new { style = "min-height: 450px;" })
+        .Scrollable()
+        .Sortable()
+        .Pageable(pageable => pageable.Refresh(false))
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .PageSize(10)
+            //.Read(read => read.Action("GetByGuidelineConfigID", "GuidelineSummary").Data("StateInfoController.grid.param"))
+            //.ServerOperation(false)
+            .Model(model =>
+            {
+                model.Field(c => c.STATE_NAME);
+                model.Field(c => c.ATS_INCL_EXCL_CD).DefaultValue("INCL");
+                model.Field(c => c.ATS_INCL_EXCL_CD_DESC).DefaultValue("Include");
+            })
+        )
+    )
+</div>
+<div class="window-footer dpoc-guideline-state-footer">
+    <button type="button" class="btn btn-default btn-sm dpoc-guideline-config-state-widget-window-close" onclick="gsStateWindow.close();" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+</div>

@@ -1,0 +1,569 @@
+﻿@model MI.PIMS.BO.Dtos.EPAL_Procedures_V_Dto
+@using Kendo.Mvc.UI
+@using MI.PIMS.UI.Common;
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+<style>
+    .wrapper {
+        width: 100%;
+        overflow: hidden; /* add this to contain floated children */
+    }
+
+    .div-wrap {
+        display: inline-block;
+        float: left; /* add this */
+        padding-right: 15px;
+        padding-bottom: 15px;
+    }
+</style>
+
+<div class="container tab-section">
+    <h5>
+        EPAL Review Indicators
+    </h5>
+    <hr />
+    <div class="row">
+        <div class="col-6">
+            <div class="section-border">
+                <span>
+                    <strong>Site of Service</strong>
+                </span>
+                <hr  style="margin-top:4px;" />
+
+                <div class="form-row my-row-padding">
+                    <label for="txtSiteofServiceApplies" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight required">SOS Applies:</label>
+                    <div class="col-lg-2">
+                        <input type="text" class="form-control" id="txtSiteofServiceApplies" data-toggle="tooltip" value="@Model.SOS_IND" readonly >
+                        @*<input type="text" class="form-control" id="txtSiteofServiceApplies" data-toggle="tooltip" value="" @((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? "readonly='readonly'" : "")>*@
+                        @*@(Html.Kendo().DropDownList()
+                            .Name("ddlSiteofServiceApplies")
+                            .DataTextField("VV_CD")
+                            .DataValueField("VV_CD_DESC")        
+                            .Value(Model.SOS_IND ?? "")   
+                            .OptionLabel("------")
+                            .HtmlAttributes(new { style = "width: 100%" })
+                            .AutoWidth(true)
+                            .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                            //.Value(Model.)
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                           read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("DetailController.dropdown.param.SOS_IND");
+                                })
+                                .ServerFiltering(false);
+                            })                
+                        )*@
+                    </div>
+                    <label for="dpSOSEffectiveDate" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">SOS Effective Date:</label>
+                    <div id="divSOSEffectiveDate" class="col-lg-2" data-toggle="tooltip">
+                        @(Html.Kendo().DatePicker()
+                            .Name("dpSOSEffectiveDate")
+                            .Value(@Model.SOS_EFF_DT)
+                            .Format("MM/dd/yyyy")
+                            .ParseFormats(new string[] {"MMddyyyy", 
+                                                        "MMddyy",
+                                                        "MM.dd.yyyy", 
+                                                        "MM.dd.yy",
+                                                        "MM.d.yyyy",
+                                                        "M.d.yy",
+                                                        "M.d.yyyy",
+                                                        "MM/dd/yyyy", 
+                                                        "MM/dd/yy",
+                                                        "MM/d/yyyy",
+                                                        "M/d/yy",
+                                                        "M/d/yyyy",
+                                                        "MM-dd-yyyy", 
+                                                        "MM-dd-yy",
+                                                        "MM-d-yyyy",
+                                                        "M-d-yy",
+                                                        "M-d-yyyy"
+                                                        }) 
+                            .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                            .HtmlAttributes(new { style = "width: 100%", @class= "form-to-update" })
+                        )
+                    </div>
+                    <label for="dpSOSExpirationDate" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">SOS Expiration Date:</label>
+                    <div id="divSOSExpirationDate" class="col-lg-2" data-toggle="tooltip">
+                        @(Html.Kendo().DatePicker()
+                        .Name("dpSOSExpirationDate")
+                        .Value(@Model.SOS_EXP_DT.ToString() == "12/31/2999 12:00:00 AM" ? null : @Model.SOS_EXP_DT)
+                        .Format("MM/dd/yyyy")
+                        .ParseFormats(new string[] {"MMddyyyy", 
+                                                    "MMddyy",
+                                                    "MM.dd.yyyy", 
+                                                    "MM.dd.yy",
+                                                    "MM.d.yyyy",
+                                                    "M.d.yy",
+                                                    "M.d.yyyy",
+                                                    "MM/dd/yyyy", 
+                                                    "MM/dd/yy",
+                                                    "MM/d/yyyy",
+                                                    "M/d/yy",
+                                                    "M/d/yyyy",
+                                                    "MM-dd-yyyy", 
+                                                    "MM-dd-yy",
+                                                    "MM-d-yyyy",
+                                                    "M-d-yy",
+                                                    "M-d-yyyy"
+                                                    }) 
+                        .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                        .HtmlAttributes(new { style = "width: 100%", @class= "form-to-update" })
+                        )
+                    </div>
+                </div>
+
+                <div class="form-row my-row-padding">
+                    <label for="ddlURGCategory" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight required">URG Category:</label>
+                    <div class="col-lg-2">
+                        @(Html.Kendo().DropDownList()
+                            .Name("ddlURGCategory")
+                            .DataTextField("VV_CD")
+                            .DataValueField("VV_CD")
+                            .Value(Model.SOS_URG_CAT_MDLTY ?? "")    
+                            .OptionLabel("------")
+                            .HtmlAttributes(new { style = "width: 100%" })
+                            .AutoWidth(true)
+                            .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                            //.Value(Model.)
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                           read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("DetailController.dropdown.param.SOS_URG_CAT_MDLTY");
+                                })
+                                .ServerFiltering(false);
+                            })                
+                        )
+                    </div>
+                    <label for="ddlSOSTypeReview" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">SOS Type Review:</label>
+                    <div id="divSOSTypeReview" class="col-lg-2" data-toggle="tooltip">
+                        @(Html.Kendo().DropDownList()
+                            .Name("ddlSOSTypeReview")
+                            .DataTextField("VV_CD")
+                            .DataValueField("VV_CD_DESC")       
+                            .Value(Model.SOS_TYPE ?? "")                      
+                            .OptionLabel("------")
+                            .HtmlAttributes(new { style = "width: 100%" })
+                            .AutoWidth(true)
+                            .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                            //.Value(Model.)
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                           read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("DetailController.dropdown.param.SOS_TYPE");
+                                })
+                                .ServerFiltering(false);
+                            })                
+                        )
+                    </div>
+
+                </div>
+                 <div class="form-row my-row-padding">
+                     <label  class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">SOS Site Indicator:</label>
+                    <div class="col-lg-2" style="margin-top: 10px;">
+                        @(Html.Kendo().RadioButton()
+                            .Name("sossite")
+                            .Label(Model.SOS_SITE_ONLY_VV == null ? "Site Only" : Model.SOS_SITE_ONLY_VV)
+                            .Value(Model.SOS_SITE_ONLY_VV == null ? "Site Only" : Model.SOS_SITE_ONLY_VV)
+                            .Checked(Model.SOS_SITE_IND.ToStringNullSafe().ToLower() == Model.SOS_SITE_ONLY_VV.ToStringNullSafe().ToLower() ? true : false)
+                            .Enable(false)
+                            )
+                    </div>
+                    <div class="col-lg-4" style="margin-top: 10px;">
+                        @(Html.Kendo().RadioButton()
+                            .Name("sossite")
+                            .Label(Model.SOS_SITE_AND_SERVICE_VV == null ? "Site and Service" : Model.SOS_SITE_AND_SERVICE_VV)
+                            .Value(Model.SOS_SITE_AND_SERVICE_VV == null ? "Site and Service" : Model.SOS_SITE_AND_SERVICE_VV)
+                            .Checked(Model.SOS_SITE_IND.ToStringNullSafe().ToLower() == Model.SOS_SITE_AND_SERVICE_VV.ToStringNullSafe().ToLower() ? true : false)
+                            .Enable(false)
+                            )
+                        @Html.Hidden("sossite-ovalue", @Model.SOS_SITE_IND)
+                    </div>
+                 </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="section-border">
+                <span>
+                    <strong>Suspension</strong>
+                </span>
+                <hr style="margin-top:4px;" />
+                <div>
+                    <div class="form-row my-row-padding">
+                        <label for="txtSuspensionInd" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Suspension Indicator:</label>
+                        <div class="col-lg-3">
+                            <input type="text" class="form-control" id="txtSuspensionInd" data-toggle="tooltip" value="@Model.SUSP_IND" readonly>
+                        </div>
+                        <label id="lblSUSPEffDt" for="dpSUSPEffectiveDate" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Suspension Effective Date:</label>
+                        <div id="divSUSPEffectiveDate" class="col-lg-3" data-toggle="tooltip">
+                            @(Html.Kendo().DatePicker()
+                                .Name("dpSUSPEffectiveDate")
+                                .Value(Model.SUSP_EFF_DT)
+                                .Format("MM/dd/yyyy")
+                                .ParseFormats(new string[] {"MMddyyyy",
+                            "MMddyy",
+                            "MM.dd.yyyy",
+                            "MM.dd.yy",
+                            "MM.d.yyyy",
+                            "M.d.yy",
+                            "M.d.yyyy",
+                            "MM/dd/yyyy",
+                            "MM/dd/yy",
+                            "MM/d/yyyy",
+                            "M/d/yy",
+                            "M/d/yyyy",
+                            "MM-dd-yyyy",
+                            "MM-dd-yy",
+                            "MM-d-yyyy",
+                            "M-d-yy",
+                            "M-d-yyyy"
+                                })
+                                .Enable(false)
+                                .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                                )
+                        </div>
+                    </div>
+                    <div class="form-row my-row-padding">
+                        <label id="lblSUSPType" for="ddlSUSPType" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Suspension Type:</label>
+
+                        <div class="col-lg-3">
+                            @(Html.Kendo().DropDownList()
+                                .Name("ddlSUSPType")
+                                .DataTextField("VV_CD_DESC")
+                                .DataValueField("VV_CD")
+                                .OptionLabel("------")
+                                .HtmlAttributes(new { style = "width: 100%" })
+                                .Enable(false)
+                                .Value(Model.SUSP_TYPE)
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("DetailController.dropdown.param.SUSP_TYPE");
+                                    })
+                                    .ServerFiltering(false);
+                                })
+                                )
+                        </div>
+                        <label id="lblSUSPExpirationDate" for="dpSUSPExpirationDate" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Suspension Expiration Date:</label>
+                        <div id="divSUSPExpirationDate" class="col-lg-3" data-toggle="tooltip">
+                            <input type="hidden" id="dpSUSPExpirationDateOrignal" value="@Model.SUSP_EXP_DT" />
+                            @(Html.Kendo().DatePicker()
+                                .Name("dpSUSPExpirationDate")
+                                .Value(Model.SUSP_EXP_DT)
+                                .Format("MM/dd/yyyy")
+                                .ParseFormats(new string[] {"MMddyyyy",
+                            "MMddyy",
+                            "MM.dd.yyyy",
+                            "MM.dd.yy",
+                            "MM.d.yyyy",
+                            "M.d.yy",
+                            "M.d.yyyy",
+                            "MM/dd/yyyy",
+                            "MM/dd/yy",
+                            "MM/d/yyyy",
+                            "M/d/yy",
+                            "M/d/yyyy",
+                            "MM-dd-yyyy",
+                            "MM-dd-yy",
+                            "MM-d-yyyy",
+                            "M-d-yy",
+                            "M-d-yyyy"
+                                })
+                                .Enable(false)
+                                .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                                )
+                        </div>
+                    </div>
+                    @*User Story 131795*@
+                    <div class="form-row my-row-padding">
+                        <label class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Suspension Notes:</label>
+                        <div class="col-lg-9">
+                            <textarea class="form-control" readonly>@Model.SUSP_RSN</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-6">
+            <div class="section-border" style="min-height:170px !important;">
+                <span>
+                    <strong>Auto Approval</strong>
+                </span>
+                <hr  style="margin-top:4px;" />
+                <div>
+                    <div class="form-row my-row-padding">
+                        <label for="ddlAutoApproval" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Auto Approval:</label>
+                        <div class="col-lg-3">
+                            @*<input type="text" class="form-control" id="txtAutoApproval" data-toggle="tooltip" value="@Model.AUTO_APRVL_IND" @((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? "readonly='readonly'" : "")>*@
+                            <input type="text" class="form-control" id="txtAutoApproval" data-toggle="tooltip" value="@Model.AUTO_APRVL_IND" readonly >
+                            @*@(Html.Kendo().DropDownList()
+                                .Name("ddlAutoApproval")
+                                .DataTextField("VV_CD")
+                                .DataValueField("VV_CD_DESC")                            
+                                .HtmlAttributes(new { style = "width: 100%" })
+                                .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                                .Value(Model.AUTO_APRVL_IND)
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("DetailController.dropdown.param.AUTO_APRVL_IND");
+                                    })
+                                    .ServerFiltering(false);
+                                })                
+                            )*@
+                        </div>
+                    </div>
+                    <div class="form-row my-row-padding">
+                        <label for="dpAAEffectiveDate" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">AA Effective Date:</label>
+                        <div id="divAAEffectiveDate" class="col-lg-3" data-toggle="tooltip">
+                            @(Html.Kendo().DatePicker()
+                            .Name("dpAAEffectiveDate")
+                            .Value(Model.AUTO_APRVL_EFF_DT)
+                            .Format("MM/dd/yyyy")
+                            .ParseFormats(new string[] {"MMddyyyy", 
+                                                        "MMddyy",
+                                                        "MM.dd.yyyy", 
+                                                        "MM.dd.yy",
+                                                        "MM.d.yyyy",
+                                                        "M.d.yy",
+                                                        "M.d.yyyy",
+                                                        "MM/dd/yyyy", 
+                                                        "MM/dd/yy",
+                                                        "MM/d/yyyy",
+                                                        "M/d/yy",
+                                                        "M/d/yyyy",
+                                                        "MM-dd-yyyy", 
+                                                        "MM-dd-yy",
+                                                        "MM-d-yyyy",
+                                                        "M-d-yy",
+                                                        "M-d-yyyy"
+                                                        }) 
+                            .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                            .HtmlAttributes(new { style = "width: 100%", @class= "form-to-update" })
+                            )
+                        </div>
+                        <label for="dpAAExpirationDate" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">AA Expiration Date:</label>
+                        <div id="divAAExpirationDate" class="col-lg-3" data-toggle="tooltip">
+                            @(Html.Kendo().DatePicker()
+                            .Name("dpAAExpirationDate")
+                            .Value(Model.AUTO_APRVL_EXP_DT)
+                            .Format("MM/dd/yyyy")
+                            .ParseFormats(new string[] {"MMddyyyy", 
+                                                        "MMddyy",
+                                                        "MM.dd.yyyy", 
+                                                        "MM.dd.yy",
+                                                        "MM.d.yyyy",
+                                                        "M.d.yy",
+                                                        "M.d.yyyy",
+                                                        "MM/dd/yyyy", 
+                                                        "MM/dd/yy",
+                                                        "MM/d/yyyy",
+                                                        "M/d/yy",
+                                                        "M/d/yyyy",
+                                                        "MM-dd-yyyy", 
+                                                        "MM-dd-yy",
+                                                        "MM-d-yyyy",
+                                                        "M-d-yy",
+                                                        "M-d-yyyy"
+                                                        }) 
+                            .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                            .HtmlAttributes(new { style = "width: 100%", @class= "form-to-update" })
+                            )
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="section-border" style="min-height:170px !important;">
+                <span>
+                    <strong>Medicare Special Processing</strong>
+                </span>
+               <hr  style="margin-top:4px;" />
+                <div>
+                    <div class="form-row my-row-padding">
+                        <label for="ddlMedicareSpecialProcessing" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Medicare Special Processing:</label>                        
+                        <div class="col-lg-3">
+                            <input type="text" class="form-control" id="txtMedicareSpecialProcessing" data-toggle="tooltip" value="@Model.MCARE_SPCL_PRCSNG_IND" readonly >
+                            @*@(Html.Kendo().DropDownList()
+                                .Name("ddlMedicareSpecialProcessing")
+                                .DataTextField("VV_CD")
+                                .DataValueField("VV_CD_DESC")                            
+                                .HtmlAttributes(new { style = "width: 100%" })
+                               
+                                .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                                .Value(Model.MCARE_SPCL_PRCSNG_IND)
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("DetailController.dropdown.param.MCARE_SPCL_PRCSNG_IND");
+                                    })
+                                    .ServerFiltering(false);
+                                })                
+                            )*@
+                        </div>
+
+                        <label for="dpMSPEffectiveDate" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">MSP Effective Date:</label>
+                        <div id="divMSPEffectiveDate" class="col-lg-3" data-toggle="tooltip">
+                            @(Html.Kendo().DatePicker()
+                            .Name("dpMSPEffectiveDate")
+                            .Value(Model.MCARE_SPCL_PRCSNG_EFF_DT)
+                            .Format("MM/dd/yyyy")
+                            .ParseFormats(new string[] {"MMddyyyy", 
+                                                        "MMddyy",
+                                                        "MM.dd.yyyy", 
+                                                        "MM.dd.yy",
+                                                        "MM.d.yyyy",
+                                                        "M.d.yy",
+                                                        "M.d.yyyy",
+                                                        "MM/dd/yyyy", 
+                                                        "MM/dd/yy",
+                                                        "MM/d/yyyy",
+                                                        "M/d/yy",
+                                                        "M/d/yyyy",
+                                                        "MM-dd-yyyy", 
+                                                        "MM-dd-yy",
+                                                        "MM-d-yyyy",
+                                                        "M-d-yy",
+                                                        "M-d-yyyy"
+                                                        }) 
+                            .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                            .HtmlAttributes(new { style = "width: 100%", @class= "form-to-update" })
+                            )
+                        </div>
+                    </div>
+                    <div class="form-row my-row-padding">
+                        <label for="txtTypeofSpecialProcessing" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Type of Special Processing:</label>
+                        <div class="col-lg-3">
+                            @*<input type="text" class="form-control" data-toggle="tooltip" id="txtTypeofSpecialProcessing" value="@Model.MCARE_SPCL_PRCSNG_TYPE" @((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? "readonly='readonly'" : "")>*@
+                            @(Html.Kendo().DropDownList()
+                                .Name("ddlTypeofSpecialProcessing")
+                                .DataTextField("VV_CD")
+                                .DataValueField("VV_CD")
+                                .OptionLabel("------")
+                                .HtmlAttributes(new { style = "width: 100%" })
+                                .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                                .Value(Model.MCARE_SPCL_PRCSNG_TYPE)
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("DetailController.dropdown.param.MCARE_SPCL_PRCSNG_TYPE");
+                                    })
+                                    .ServerFiltering(false);
+                                })                
+                            )
+                        </div>
+                        <label for="dpMSPExpirationDate" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">MSP Expiration Date:</label>
+                        <div id="divMSPExpirationDate" class="col-lg-3" data-toggle="tooltip">
+                            @(Html.Kendo().DatePicker()
+                            .Name("dpMSPExpirationDate")
+                            .Value(Model.MCARE_SPCL_PRCSNG_EXP_DT)
+                            .Format("MM/dd/yyyy")
+                            .ParseFormats(new string[] {"MMddyyyy", 
+                                                        "MMddyy",
+                                                        "MM.dd.yyyy", 
+                                                        "MM.dd.yy",
+                                                        "MM.d.yyyy",
+                                                        "M.d.yy",
+                                                        "M.d.yyyy",
+                                                        "MM/dd/yyyy", 
+                                                        "MM/dd/yy",
+                                                        "MM/d/yyyy",
+                                                        "M/d/yy",
+                                                        "M/d/yyyy",
+                                                        "MM-dd-yyyy", 
+                                                        "MM-dd-yy",
+                                                        "MM-d-yyyy",
+                                                        "M-d-yy",
+                                                        "M-d-yyyy"
+                                                        }) 
+                            .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                            .HtmlAttributes(new { style = "width: 100%", @class= "form-to-update" })
+                            )
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-6">
+            <div class="section-border">
+                <span>
+                    <strong>Level of Care Review</strong>
+                </span>
+                <hr  style="margin-top:4px;" />
+                <div>
+                    <div class="form-row my-row-padding">
+                        <label for="ddlLevelOfCareReview" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Level of Care Review:</label>
+                        <div class="col-lg-3">
+                            @*<input type="text" class="form-control" id="txtLevelOfCareReview" data-toggle="tooltip" value="@Model.LVL_CARE_RVW_RQD_IND" @((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? "readonly='readonly'" : "")>*@
+                            @(Html.Kendo().DropDownList()
+                                .Name("ddlLevelOfCareReview")
+                                .DataTextField("VV_CD")
+                                .DataValueField("VV_CD_DESC")        
+                                .OptionLabel("------")
+                                .HtmlAttributes(new { style = "width: 100%" })
+                                .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                                .Value(Model.LVL_CARE_RVW_RQD_IND)
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("DetailController.dropdown.param.LVL_CARE_RVW_RQD_IND");
+                                    })
+                                    .ServerFiltering(false);
+                                })                
+                            )
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+             <div class="section-border">
+                <span>
+                    <strong>Medical Neccessity Review</strong>
+                </span>
+               <hr  style="margin-top:4px;" />
+                <div>
+                    <div class="form-row my-row-padding">
+                        <label for="ddlMedicalNeccessityReview" class="col-lg-3 text-lg-right text-sm-left col-form-label font-modal-weight">Medical Neccessity Review:</label>
+                        <div class="col-lg-3">
+                            @*<input type="text" data-toggle="tooltip" class="form-control" id="txtMedicalNeccessityReview" value="@Model.MDCL_NCSSTY_IND" @((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? "readonly='readonly'" : "")>*@
+                            @(Html.Kendo().DropDownList()
+                                .Name("ddlMedicalNeccessityReview")
+                                .DataTextField("VV_CD")
+                                .DataValueField("VV_CD_DESC")        
+                                .OptionLabel("------")
+                                .HtmlAttributes(new { style = "width: 100%" })
+                                .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                                .Value(Model.MDCL_NCSSTY_IND)
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("DetailController.dropdown.param.MDCL_NCSSTY_IND");
+                                    })
+                                    .ServerFiltering(false);
+                                })                
+                            )
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

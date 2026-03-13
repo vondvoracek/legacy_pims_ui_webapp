@@ -1,0 +1,24 @@
+﻿@{
+    ViewData["Title"] = "View Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<partial name="_Detail" />
+
+@*<script>
+    $(function () {
+
+        // Log User Access Hist for the page and logged in user
+        var pims_id = "@Model" != null ? "@Model.EPAL_HIERARCHY_KEY.ToStringNullSafe()" : "";
+
+        UserAccessHistController.add({
+            "MODULE_NAME": "PayCodes",
+            "USERACTION": "PayCodes/Home/ViewDetail?pims_id=" + pims_id,
+            "USERSELECTION": "PayCodes/Home/ViewDetail",
+            "LST_UPDT_DT": null,
+            "LST_UPDT_BY": MS_ID,
+            "PAGE_ID": "29",
+            "__RequestVerificationToken": $('meta[name="request-verification-token"]')[0].content
+
+        });
+    });
+</script>*@

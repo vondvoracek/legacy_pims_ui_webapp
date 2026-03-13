@@ -1,0 +1,44 @@
+﻿@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "Program Managed By";
+}
+
+<div class="container tab-section">
+    <h5>
+        Program Managed By
+    </h5>
+    <hr />
+    <form id="frmProgMgdByInfo">
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <div style="font-size:11px !important;">
+                    @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.EPAL_Procs_Prog_Mgd_By_V>()
+                        .Name("grid_ProgMgdBy")                        
+                        .Columns(c => {
+                            c.Bound(p => p.DELEGATED_UM).Title("Delegated UM").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold; title:'asdf'" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                            c.Bound(p => p.PROG_MGD_BY).Title("Program Managed By").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(170);
+                            c.Bound(p => p.INT_EXT_CD).Title("Internal/External").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                            c.Bound(p => p.PMB_EFF_DT).Title("PMB Effective Date").ClientTemplate("#= (data.PMB_EFF_DT == null) ? ' ' : kendo.toString(kendo.parseDate(PMB_EFF_DT), 'MM/dd/yyyy') #").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                            c.Bound(p => p.PMB_EXP_DT).Title("PMB Expiration Date").ClientTemplate("#= (data.PMB_EXP_DT == null) ? ' ' : kendo.toString(kendo.parseDate(PMB_EXP_DT), 'MM/dd/yyyy') #").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                            c.Bound(p => p.PMB_BASED_ON_DX_IND).Title("DX Indicator").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                            c.Bound(p => p.PMB_BASED_ON_ST_APP_IND).Title("State Indicator").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                            c.Bound(p => p.PMB_BASED_ON_AGE_MIN).Title("PMB Min Age").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                            c.Bound(p => p.PMB_BASED_ON_AGE_MAX).Title("PMB Max Age").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                        })                        
+                        .Resizable(resize => resize.Columns(true))
+                        .HtmlAttributes(new { style = "min-height: 400px;width:1400px;overflow-x:auto;" })
+                        .Scrollable()
+                        .Sortable()                    
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .PageSize(1000)
+                            .Read(read => read.Action("GetProgramManagedByPIMSID", "Home", new { Area = "EPAL"}).Data("ProgMgdByController.grid.params"))
+                        )
+                    )
+                </div>
+            </div>
+        </div>       
+    </form>
+</div>
+
+<script src="~/js/EPAL/ProgMgdBy.js" asp-append-version="true"></script>

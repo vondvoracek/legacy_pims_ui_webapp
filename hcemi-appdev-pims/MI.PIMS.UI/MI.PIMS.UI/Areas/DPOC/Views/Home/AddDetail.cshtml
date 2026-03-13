@@ -1,0 +1,71 @@
+﻿@model MI.PIMS.BO.Dtos.DPOC_Inventories_V_Dto
+@using Kendo.Mvc.UI
+@using MI.PIMS.UI.Common
+@{
+    ViewData["Title"] = "Add Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="~/css/DPOC/Detail.css" asp-append-version="true" />
+<script src="~/js/GridLoadTracker.js" asp-append-version="true"></script>
+<script src="~/js/GridAndFormDirtyChecker.js" asp-append-version="true"></script>
+<script src="~/js/DPOC/Detail.js" asp-append-version="true"></script>
+@{
+    ViewData["PageType"] = Roles.DPOCReadWrite.ToString();
+    ViewData["DPOCPageView"] = DPOCPageView.AddDetail.ToString();
+}
+
+@if (Model != null)
+{
+    <input id="addnew-record" type="hidden" readonly value="Y" />
+    @Html.Hidden("dpoc-page-view", ViewData["DPOCPageView"].ToString())
+    <form id="addForm">
+        <div id="myOverlay"></div>
+        <div style="height:100%" class="my-form-font">
+            <div class="breadcrumb-background">
+                <div class="container">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb breadcrumb-background">
+                            <li class="breadcrumb-item"><a>@Html.ActionLink("Home", "index", "/", new { Area = "" }, new { @class = "breadcrumb-item-font" })</a></li>
+                            <li class="breadcrumb-item"><a>@Html.ActionLink("DPOC Search", "Index", "Home", new { Area = "DPOC" }, new { @class = "breadcrumb-item-font" })</a></li>
+                            <li class="breadcrumb-item active" style="color: black !important; cursor: initial;" aria-current="page">Add Detail</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+
+            <partial name="_DetailHeader" model="Model" view-data="ViewData" />
+            <partial name="_DetailTabs_AddNew" model="Model" view-data="ViewData" />
+
+        </div>
+        <br />
+        <br />
+    </form>
+}
+else
+{
+    <div class="container">
+        <div style="height:100%" class="my-form-font">
+            <partial name="_NoRecordFound" />
+        </div>
+        <br />
+        <br />
+    </div>
+}
+
+<script>
+    $(function () {
+        // Log User Access Hist for the page and logged in user
+        var pims_id = "@Model" != null ? "@Model.DPOC_HIERARCHY_KEY.ToStringNullSafe()" : "";
+
+        UserAccessHistController.add({
+            "MODULE_NAME": "DPOC Add Detail",
+            "USERACTION": "DPOC/Home/AddDetail?pims_id=" + pims_id,
+            "USERSELECTION": "DPOC/Home/AddDetail",
+            "LST_UPDT_DT": null,
+            "LST_UPDT_BY": MS_ID,
+            "PAGE_ID": "30",
+            "__RequestVerificationToken": $('meta[name="request-verification-token"]')[0].content
+
+        });
+    });
+</script>

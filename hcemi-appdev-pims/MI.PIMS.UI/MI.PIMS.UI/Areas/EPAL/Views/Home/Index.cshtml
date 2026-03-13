@@ -1,0 +1,712 @@
+﻿@inject MI.PIMS.UI.Services.MIAuthenticate.IMIAuthenticateService _miAuthenticateService
+@inject MI.PIMS.UI.Common.Helper _helper
+@using MI.PIMS.UI.Common
+
+@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    //EPAL Page view should be amongst AddDetail/EditDetail/DuplicateRecordDetail --> since Add New page can be opened from here, page view should be AddNew
+    ViewData["EPALPageView"] = @EPALPageView.AddNew.ToString();
+}
+@Html.Hidden("epal-page-view", ViewData["EPALPageView"].ToString())
+
+<script src="~/js/EPAL/Search.js" asp-append-version="true"></script>
+
+
+<style type="text/css">
+    .search-section {
+        font-size: 12px;
+    }
+
+    .k-dropdown .k-dropdown-wrap {
+        border-color: #e4e7eb;
+        color: #212529;
+        background-color: white;
+        transition: color .2s ease,background-color .2s ease,border-color .2s ease,box-shadow .2s ease;
+    }
+
+    .date-border {
+        border: solid 1px #BDBDBD; 
+        margin-left: 2px; 
+        margin-right: 2px; 
+        margin-top:-8px; 
+        padding:8px;
+    }
+
+    .edit-epal-icon{
+        cursor:pointer;font-size: 15px;margin-top: 4px;
+    }
+
+        .edit-epal-icon:hover {
+            transform: scale(1.3);
+        }
+
+    #btnAdvancedSearch:hover {
+        background-color: #F2F2F2
+    }
+</style>
+
+@{
+    var _UserInfo_T_Dto = (MI.PIMS.BO.Dtos.UserInfo_T_Dto)_miAuthenticateService.UserInfo_T_Dto(_helper.MS_ID);
+    var s = _UserInfo_T_Dto.APP_ROLEIDS;
+    string[] appRoles = s.Split(',');
+        <input type="hidden" readonly id="txtAppRoleIds" value="@_UserInfo_T_Dto.APP_ROLEIDS" />
+
+
+    var editableRoles = new List<string>
+    {
+        Convert.ToString((int)MI.PIMS.UI.Roles.EPALReadWrite),
+        Convert.ToString((int)MI.PIMS.UI.Roles.EPALAdmin),
+        Convert.ToString((int)MI.PIMS.UI.Roles.UMRReadWrite),
+        Convert.ToString((int)MI.PIMS.UI.Roles.UMRAdmin),
+        Convert.ToString((int)MI.PIMS.UI.Roles.CMPReadWrite),
+        Convert.ToString((int)MI.PIMS.UI.Roles.CMPAdmin),
+        Convert.ToString((int)MI.PIMS.UI.Roles.DonorRecordsReadWrite),
+        Convert.ToString((int)MI.PIMS.UI.Roles.DonorRecordsAdmin),
+        Convert.ToString((int)MI.PIMS.UI.Roles.ICHRAReadWrite),
+        Convert.ToString((int)MI.PIMS.UI.Roles.ICHRAAdmin),
+        Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin)
+    };
+
+    var showPencil = appRoles.Any(role => editableRoles.Contains(role));
+}
+
+<div class="breadcrumb-background">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-background">
+                <li class="breadcrumb-item"><a>@Html.ActionLink("Home", "index", "/", new { Area = "" }, new { @class = "breadcrumb-item-font" })</a></li>
+                <li class="breadcrumb-item active" style="color: black !important; cursor: initial;" aria-current="page">EPAL Search</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+
+<div class="container  search-section" style="padding-left:30px; padding-right:30px;">
+     <form id="searchForm">   
+    <div class="section-heading">
+        <div class="row">
+            <div class="col-10" style="font-size: 14px;">
+                EPAL Search
+            </div>
+            <div class="col-2 text-right" style="font-size: 14px;">
+                <div data-toggle="tooltip" title="Toggle the switch to Include Historical records in your search.">
+                        <span>Include Historical Records</span> &nbsp;
+                        @(Html.Kendo().Switch()
+                                .Name("switch")
+                                .Events(ev => ev.Change("SearchController.switch.onChange"))
+                                .HtmlAttributes(new { style = "width: 100%" })
+                                .Messages(c => c.Checked("YES").Unchecked("NO"))
+                            )
+                        <input type="hidden" readonly id="txtIncludeHistorical" />    
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="section-border">
+         <!-- Row 1 -->
+        <div class="form-row">
+            <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                <b><label for="msLOB">Business Segment:</label></b>
+                <input type="hidden" readonly id="txtLOB" />
+                    @(Html.Kendo().MultiSelect()
+                            .Name("msLOB")
+                            .DataTextField("VV_CD")
+                            .DataValueField("VV_CD")
+                            .Placeholder("-- Select One ---")
+                            //.AutoClose(false)
+                            .Filter(FilterType.Contains)
+                            //.TagMode(MultiSelectTagMode.Multiple)
+                            .Events(e =>
+                            {
+                                e.Change("SearchController.multiSelect.onChange_LOB");
+                            })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetAllPIMSHierarchyCodesXwalk", "Home", new { Area = "EPAL" }).Data("SearchController.multiSelect.param.APP_LOB");
+                                })
+                                .ServerFiltering(false);
+                            })
+                        )
+            </div>
+            <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                <b><label for="msEntity">Entity:</label></b>
+                 <input type="hidden" readonly id="txtEntity" />
+                    @(Html.Kendo().MultiSelect()
+                            .Name("msEntity")
+                            .DataTextField("COLUMN_NAME")
+                            .DataValueField("COLUMN_NAME")
+                            .Placeholder("-- Select One ---")
+                            //.AutoClose(false)
+                            .Filter(FilterType.Contains)
+                            //.TagMode(MultiSelectTagMode.Multiple)
+                            .Events(e =>
+                            {
+                                e.Change("SearchController.multiSelect.onChange_ENTITY");
+                            })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetAllPIMSHierarchyCodesXwalk", "Home", new { Area = "EPAL" }).Data("SearchController.multiSelect.param.APP_ENTITY");
+                                })
+                                .ServerFiltering(false);
+                            })
+                       )
+            </div>
+                <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                    <b><label for="msPlan">Plan:</label></b>
+                    <input type="hidden" readonly id="txtPlan" />
+                    @(Html.Kendo().MultiSelect()
+                            .Name("msPlan")
+                            .DataTextField("COLUMN_NAME")
+                            .DataValueField("COLUMN_NAME")
+                            .Placeholder("-- Select One ---")
+                            //.AutoClose(false)
+                            .Filter(FilterType.Contains)
+                            //.TagMode(MultiSelectTagMode.Multiple)
+                            .Events(e =>
+                            {
+                                e.Change("SearchController.multiSelect.onChange_PLAN");
+                            })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetAllPIMSHierarchyCodesXwalk", "Home", new { Area = "EPAL" }).Data("SearchController.multiSelect.param.APP_PLAN");
+                                })
+                                .ServerFiltering(false);
+                            })
+                        )
+
+                </div>
+                <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                <b><label for="msProduct">Product:</label></b>
+                <input type="hidden" readonly id="txtProduct" />
+                    @(Html.Kendo().MultiSelect()
+                                .Name("msProduct")
+                                .DataTextField("COLUMN_NAME")
+                                .DataValueField("COLUMN_NAME")
+                                .Placeholder("-- Select One ---")
+                                //.AutoClose(false)
+                                .Filter(FilterType.Contains)
+                                //.TagMode(MultiSelectTagMode.Multiple)
+                                .Events(e =>
+                                {
+                                    e.Change("SearchController.multiSelect.onChange_APP_PRODUCT");
+                                })
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetAllPIMSHierarchyCodesXwalk", "Home", new { Area = "EPAL" }).Data("SearchController.multiSelect.param.APP_PRODUCT");
+                                    })
+                                    .ServerFiltering(false);
+                                })
+                        )
+            </div>
+
+        </div>
+        <!-- Row 2 -->
+        <div class="form-row">
+            <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                <b><label for="msFundingArrangement">Funding Arrangement:</label></b>
+                 <input type="hidden" readonly id="txtFundingArrangement" />
+                    @(Html.Kendo().MultiSelect()
+                            .Name("msFundingArrangement")
+                            .DataTextField("COLUMN_NAME")
+                            .DataValueField("COLUMN_NAME")
+                            .Placeholder("-- Select One ---")
+                            //.AutoClose(false)
+                            .Filter(FilterType.Contains)
+                            //.TagMode(MultiSelectTagMode.Multiple)
+                            .Events(e =>
+                            {
+                                e.Change("SearchController.multiSelect.onChange_FUNDING_ARRANGEMENT");
+                            })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetAllPIMSHierarchyCodesXwalk", "Home", new { Area = "EPAL" }).Data("SearchController.multiSelect.param.APP_FUNDING_ARRANGEMENT");
+                                })
+                                .ServerFiltering(false);
+                            })
+                        )
+            </div>
+                <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                    <b><label for="txtProcedureCode">Procedure Code:</label></b>
+                    <input type="text" class="form-control" id="txtProcedureCode" value="">
+                </div>
+            <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                <b><label for="txtDrugName_Search">Drug Name:</label></b>
+                <input type="text" class="form-control" id="txtDrugName_Search" value="">
+            </div>
+            <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                <b><label for="msEPALStatus">Overall EPAL Status:</label></b>
+                 <input type="hidden" readonly id="txtEPALStatus" />
+                    @(Html.Kendo().MultiSelect()
+                            .Name("msEPALStatus")
+                            .DataTextField("STATUS_NAME")
+                            .DataValueField("STATUS_NAME")
+                            .Placeholder("-- Select One ---")
+                            //.AutoClose(false)
+                            .Filter(FilterType.Contains)
+                            //.TagMode(MultiSelectTagMode.Multiple)
+                            .Events(e =>
+                            {
+                                e.Change("SearchController.multiSelect.onChange_STATUS");
+                            })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetStatus", "Home", new { Area = "EPAL" });
+                                })
+                                .ServerFiltering(false);
+                            })
+                        )
+            </div>
+        </div>
+        <!-- Row 3 -->
+        <div class="form-row">
+            <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                <b><label for="msStandardCategory">HCEMI Reporting Category:</label></b>
+                <input type="hidden" readonly id="txtStandardCategory" />
+                <input type="hidden" readonly id="txtStandardCategoryFilterText" />
+                    @(Html.Kendo().MultiSelect()
+                            .AutoBind(false)
+                            .Name("msStandardCategory")
+                            .DataTextField("CATEGORY")
+                            .DataValueField("CATEGORY")
+                            .Placeholder("-- Type in to see list (at least type 3 characters) ---")
+                            .MinLength(3)
+                            .Filter(FilterType.Contains)
+                            .TagMode(MultiSelectTagMode.Multiple)
+                            .Events(e =>
+                            {
+                                e.Change("SearchController.multiSelect.onChange_StandardCategory").Filtering("SearchController.multiSelect.onFiltering_StandardCategory");
+                            })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetPIMSEPALCategoriesByType", "Home", new { Area = "EPAL" }).Data("SearchController.multiSelect.param.StandardCategory");
+                                })
+                                .ServerFiltering(true);
+                            })
+                        )
+            </div>
+            <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                    <b><label for="txtStandardSubCategory">HCEMI Reporting Subcategory:</label></b>
+                <input type="hidden" readonly id="txtStandardSubCategory" />
+                <input type="hidden" readonly id="txtStandardSubCategoryFilterText" />
+                    @(Html.Kendo().MultiSelect()
+                            .AutoBind(false)
+                            .Name("msStandardSubCategory")
+                            .DataTextField("CATEGORY")
+                            .DataValueField("CATEGORY")
+                            .Placeholder("-- Type in to see list (at least type 3 characters) ---")
+                            .MinLength(3)
+                            .Filter(FilterType.Contains)
+                            .TagMode(MultiSelectTagMode.Multiple)
+                            .Events(e =>
+                            {
+                                e.Change("SearchController.multiSelect.onChange_StandardSubCategory").Filtering("SearchController.multiSelect.onFiltering_StandardSubCategory");
+                            })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetPIMSEPALCategoriesByType", "Home", new { Area = "EPAL" }).Data("SearchController.multiSelect.param.StandardSubCategory");
+                                })
+                                .ServerFiltering(true);
+                            })
+                            )
+            </div>
+            <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                <b><label for="msAlternateCategory">Alternate Category:</label></b>
+                <input type="hidden" readonly id="txtAlternateCategory" />
+                <input type="hidden" readonly id="txtAlternateCategoryFilterText" />
+                    @(Html.Kendo().MultiSelect()
+                            .AutoBind(false)
+                            .Name("msAlternateCategory")
+                            .DataTextField("CATEGORY")
+                            .DataValueField("CATEGORY")
+                            .Placeholder("-- Type in to see list (at least type 3 characters) ---")
+                            .MinLength(3)
+                            .Filter(FilterType.Contains)
+                            .TagMode(MultiSelectTagMode.Multiple)
+                            .Events(e =>
+                            {
+                                e.Change("SearchController.multiSelect.onChange_AlternateCategory").Filtering("SearchController.multiSelect.onFiltering_AlternateCategory");
+                            })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetPIMSEPALCategoriesByType", "Home", new { Area = "EPAL" }).Data("SearchController.multiSelect.param.AlternateCategory");
+                                })
+                                .ServerFiltering(true);
+                            })
+                            )
+            </div>
+            <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                <b><label for="msAlternateSubCategory">Alternate SubCategory:</label></b>
+                <input type="hidden" readonly id="txtAlternateSubCategory" />
+                <input type="hidden" readonly id="txtAlternateSubCategoryFilterText" />
+                    @(Html.Kendo().MultiSelect()
+                            .AutoBind(false)
+                            .Name("msAlternateSubCategory")
+                            .DataTextField("CATEGORY")
+                            .DataValueField("CATEGORY")
+                            .Placeholder("-- Type in to see list (at least type 3 characters) ---")
+                            .MinLength(3)
+                            .Filter(FilterType.Contains)
+                            .TagMode(MultiSelectTagMode.Multiple)
+                            .Events(e =>
+                            {
+                                e.Change("SearchController.multiSelect.onChange_AlternateSubCategory").Filtering("SearchController.multiSelect.onFiltering_AlternateSubCategory");
+                            })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetPIMSEPALCategoriesByType", "Home", new { Area = "EPAL" }).Data("SearchController.multiSelect.param.AlternateSubCategory");
+                                })
+                                .ServerFiltering(true);
+                            })
+                            )
+            </div>
+        </div>
+        <!-- Row 4 -->
+        <div class="form-row">
+            <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                 <b><label for="txtPIMS_ID">PIMS ID:</label></b>
+                <input type="text" class="form-control" id="txtPIMS_ID" value="">
+            </div>
+            <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                 <b><label for="dpFromEffectiveDate">Overall Eff Date:</label></b>
+                   <div class="form-row">
+                        @(Html.Kendo().DatePicker()
+                                .Name("dpFromEffectiveDate")
+                                .Value("")
+                                .Format("MM/dd/yyyy")
+                                .ParseFormats(new string[] {"MMddyyyy",
+                                                    "MMddyy",
+                                                    "MM.dd.yyyy",
+                                                    "MM.dd.yy",
+                                                    "MM.d.yyyy",
+                                                    "M.d.yy",
+                                                    "M.d.yyyy",
+                                                    "MM/dd/yyyy",
+                                                    "MM/dd/yy",
+                                                    "MM/d/yyyy",
+                                                    "M/d/yy",
+                                                    "M/d/yyyy",
+                                                    "MM-dd-yyyy",
+                                                    "MM-dd-yy",
+                                                    "MM-d-yyyy",
+                                                    "M-d-yy",
+                                                    "M-d-yyyy"
+                                                            })
+                                .Events(events => events.Change("SearchController.datePicker.dpFromEffectiveDateChange"))
+                                .HtmlAttributes(new { style = "width: 100%; padding-left: 5px;padding-right: 5px;", title = "datepicker", @class = "form-to-update" })
+                            )
+
+                 </div>
+            </div>
+            <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                <b><label for="dpFromExpirationDate">Overall Exp Date:</label></b>
+                   <div class="form-row">
+                        @(Html.Kendo().DatePicker()
+                                .Name("dpFromExpirationDate")
+                                .Value("")
+                                .Format("MM/dd/yyyy")
+                                .ParseFormats(new string[] {"MMddyyyy",
+                                                    "MMddyy",
+                                                    "MM.dd.yyyy",
+                                                    "MM.dd.yy",
+                                                    "MM.d.yyyy",
+                                                    "M.d.yy",
+                                                    "M.d.yyyy",
+                                                    "MM/dd/yyyy",
+                                                    "MM/dd/yy",
+                                                    "MM/d/yyyy",
+                                                    "M/d/yy",
+                                                    "M/d/yyyy",
+                                                    "MM-dd-yyyy",
+                                                    "MM-dd-yy",
+                                                    "MM-d-yyyy",
+                                                    "M-d-yy",
+                                                    "M-d-yyyy"
+                                                            })
+                                .Events(events => events.Change("SearchController.datePicker.dpFromExpirationDateChange"))
+                                .HtmlAttributes(new { style = "width: 100%; padding-left: 5px;padding-right: 5px;", title = "datepicker", @class = "form-to-update" })
+                            )
+                    </div>
+            </div>
+            <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                <b><label for="dpEPALVerEffDate">EPAL Version Eff Date:</label></b>
+                   <div class="form-row">
+                        @(Html.Kendo().DatePicker()
+                                .Name("dpEPALVerEffDate")
+                                .Value("")
+                                .Format("MM/dd/yyyy")
+                                .ParseFormats(new string[] {"MMddyyyy",
+                                                    "MMddyy",
+                                                    "MM.dd.yyyy",
+                                                    "MM.dd.yy",
+                                                    "MM.d.yyyy",
+                                                    "M.d.yy",
+                                                    "M.d.yyyy",
+                                                    "MM/dd/yyyy",
+                                                    "MM/dd/yy",
+                                                    "MM/d/yyyy",
+                                                    "M/d/yy",
+                                                    "M/d/yyyy",
+                                                    "MM-dd-yyyy",
+                                                    "MM-dd-yy",
+                                                    "MM-d-yyyy",
+                                                    "M-d-yy",
+                                                    "M-d-yyyy"
+                                                            })
+                                .HtmlAttributes(new { style = "width: 100%; padding-left: 5px;padding-right: 5px;", title = "datepicker", @class = "form-to-update" })
+                            )
+                    </div>
+            </div>
+        </div>
+        <div id="divAdvancedSearch">
+        <!--============================
+            Start Advanced Search Here (User Story 131021/131022 MFQ 4/8/2025)
+        ===============================-->   
+
+            <div class="form-row">
+                <div class="form-group col-md-3 col-sm-3 col-lg-3">
+                    <b><label for="ddlSuspensionInd">Suspension Indicator:</label></b>
+                    @(Html.Kendo().DropDownList()
+                        .Name("ddlSuspensionInd")
+                        .DataTextField("VV_CD")
+                        .DataValueField("VV_CD_DESC")
+                        .OptionLabel("Type or Click for Dropdown")
+                        .HtmlAttributes(new { style = "width: 100%" })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("SearchController.dropdown.param.SUSP_IND");
+                            })
+                            .ServerFiltering(true);
+                        })
+                    )
+                </div>
+                <div class="form-group col-md-3 col-sm-3 col-lg-3">
+                    <b><label for="ddlSuspensionType">Suspension Type:</label></b>
+                    @(Html.Kendo().DropDownList()
+                        .Name("ddlSuspensionType")
+                        .DataTextField("VV_CD_DESC")
+                        .DataValueField("VV_CD")
+                        .OptionLabel("Type or Click for Dropdown")
+                        .HtmlAttributes(new { style = "width: 100%" })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("SearchController.dropdown.param.SUSP_TYPE");
+                            })
+                            .ServerFiltering(true);
+                        })
+                    )
+                </div>
+                <div class="form-group col-md-3 col-sm-3 col-lg-3">
+                    <b><label for="dpSuspensionEffDt">Suspension Effective Date:</label></b>
+                       <div class="form-row">
+                            @(Html.Kendo().DatePicker()
+                                .Name("dpSuspensionEffDt")
+                                .Value("")
+                                .Format("MM/dd/yyyy")
+                                .ParseFormats(new string[] {"MMddyyyy",
+                                        "MMddyy",
+                                        "MM.dd.yyyy",
+                                        "MM.dd.yy",
+                                        "MM.d.yyyy",
+                                        "M.d.yy",
+                                        "M.d.yyyy",
+                                        "MM/dd/yyyy",
+                                        "MM/dd/yy",
+                                        "MM/d/yyyy",
+                                        "M/d/yy",
+                                        "M/d/yyyy",
+                                        "MM-dd-yyyy",
+                                        "MM-dd-yy",
+                                        "MM-d-yyyy",
+                                        "M-d-yy",
+                                        "M-d-yyyy"
+                                })
+                                .HtmlAttributes(new { style = "width: 100%; padding-left: 5px;padding-right: 5px;", title = "datepicker", @class = "form-to-update" })
+                            )
+                        </div>
+                </div>
+            </div>
+        </div>
+        <!-- Row 5 -->
+        <div class="form-row">
+            <div class="form-group col-md-4 col-sm-4 col-lg-5">
+                <div class="text-left">
+                    <a id="btnAdvancedSearch" class="btn btn-md" href="#"> Advanced Search <i id="icon-down" class="fas fa-chevron-down"></i><i id="icon-up" class="fas fa-chevron-up"></i></a>
+                </div>
+            </div>
+            <div class="form-group col-md-7 col-sm-7 col-lg-7 text-left">
+                <button id="btnSearch" class="btn btn-primary noSubmit" title="Click to search records!"><i class="fas fa-search"></i> Search </button>
+                <button id="btnReset" class="btn btn-outline-primary noSubmit" title="Click to reset filters!"><i class="fas fa-times"></i> Reset </button>
+                    @if (_UserInfo_T_Dto != null)
+                    {
+                        if (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALReadWrite))
+                            || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALAdmin))
+                            || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin))
+                            || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRAdmin))
+                            || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRReadWrite))
+                            || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.DonorRecordsAdmin))
+                            || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.DonorRecordsReadWrite))
+                            || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.ICHRAAdmin))
+                            || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.ICHRAReadWrite))
+                        )
+                        {
+                            <button id="btnAddNew" class="btn btn-primary noSubmit"  data-toggle="modal" data-target="#addNewModal" data-backdrop="static" data-keyboard="false" title="Click to go Add New!"><i class="fas fa-plus-circle"></i> Add New </button>
+                        }
+                    }
+
+            </div>
+        </div>        
+        </div>
+    </form>
+        <br />
+        <div style="font-size:11px !important;">
+        @(
+            Html.Kendo().Grid<MI.PIMS.BO.Dtos.EPAL_Procedures_V_Dto>()
+                    .Name("grid_Search")
+                    .Columns(c =>
+                    {
+                        c.Bound(p => p.EPAL_HIERARCHY_KEY)
+                        .Title("PIMS ID")
+                        .ClientTemplate("<a href='javascript:void(0);' style='color:blue;' onclick=\"SearchController.methods.redirect('#= EPAL_HIERARCHY_KEY#,#= kendo.toString(kendo.parseDate(EPAL_VER_EFF_DT),'MM-dd-yyyy hh:mm:ss tt') #');\" title='Click to view details!' \\data-target='tooltip'\\>#= EPAL_HIERARCHY_KEY # </a>" +
+                                        (showPencil ? "<i class=\"edit-epal-icon k-icon k-i-pencil text-primary showPencil float-right\" onclick=\"SearchController.methods.redirect_edit('#= EPAL_HIERARCHY_KEY #, #= kendo.toString(kendo.parseDate(EPAL_VER_EFF_DT),'MM-dd-yyyy hh:mm:ss tt') #');\" title='Click to edit details!' \\data-target='tooltip'\\></i> " : "")
+                                        )
+                            .Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                            .HtmlAttributes(new { style = "text-align: center" }).Width(200);
+
+                        c.Bound(p => p.PROC_CD).Title("Proc<br />Code").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(65);
+                        c.Bound(p => p.EPAL_BUS_SEG_CD)
+                            .ClientTemplate("<span id='lblbusSegCd'>#= data.EPAL_BUS_SEG_CD#</span>")
+                            .Title("Bus<br />Seg")
+                            .Filterable(false)
+                            .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                            .HtmlAttributes(new { style = "text-align: center" })
+                            .Width(65);
+                        c.Bound(p => p.EPAL_ENTITY_CD)
+                        .ClientTemplate("<span id='lblEntity'>#= data.EPAL_ENTITY_CD#</span>")
+                        .Title("Entity").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(65);
+                        //c.Bound(p => p.EPAL_PRODUCT_CD).Title("Product").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(65);
+                        c.Bound(p => p.EPAL_PRODUCT_CD)
+                            .Title("Product")
+                            .Filterable(false)
+                            .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                            .HtmlAttributes(new { style = "text-align: center" })
+                            .Width(65)
+                            .ClientTemplate("<span id='lblEPAL_PRODUCT_CD'>#= data.EPAL_PRODUCT_CD#</span>");
+                        c.Bound(p => p.EPAL_PLAN_CD).Title("Plan").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(65);
+                        c.Bound(p => p.EPAL_FUND_ARNGMNT_CD).Title("FA").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(65);
+                        c.Bound(p => p.DRUG_NM).Title("Drug Name").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                        //c.Bound(p => p.EPAL_STATUS).Title("EPAL Status").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                        c.Bound(p => p.EPAL_STATUS_MB).Title("EPAL Status").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                        c.Bound(p => p.ALTRNT_SVC_CAT).Title("Alternate<br/>Category").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                        c.Bound(p => p.ALTRNT_SVC_SUBCAT).Title("Alternate<br/>Sub Category").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                        c.Bound(p => p.EPAL_VER_EFF_DT).Filterable(false)
+                    .Title("EPAL Ver <br />Eff Date")
+                    .ClientTemplate("#= (data.EPAL_VER_EFF_DT == null) ? ' ' : kendo.toString(kendo.parseDate(EPAL_VER_EFF_DT), 'MM/dd/yyyy hh:mm:ss tt') #")
+                    .HtmlAttributes(new { style = "text-align: center" })
+                    .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                    .Width(150);
+                        c.Bound(p => p.OVERALL_EFF_DT).Filterable(false)
+                    .Title("Overall<br/>Eff Date")
+                    .ClientTemplate("#= ( kendo.toString(kendo.parseDate(OVERALL_EFF_DT), 'MM/dd/yyyy') == '12/31/2999' || (data.OVERALL_EFF_DT == null)) ? ' ' : kendo.toString(kendo.parseDate(OVERALL_EFF_DT), 'MM/dd/yyyy') #")
+                    .HtmlAttributes(new { style = "text-align: center" })
+                    .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                    .Width(100);
+                        c.Bound(p => p.OVERALL_EXP_DT).Filterable(false)
+                    .Title("Overall<br/>Exp Date")
+                    .ClientTemplate("#= ( kendo.toString(kendo.parseDate(OVERALL_EXP_DT), 'MM/dd/yyyy') == '12/31/2999'  || (data.OVERALL_EXP_DT == null)) ? ' ' : kendo.toString(kendo.parseDate(OVERALL_EXP_DT), 'MM/dd/yyyy') #")
+                    .HtmlAttributes(new { style = "text-align: center" })
+                    .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                    .Width(100);
+                        //c.Bound(p => p.IS_CURRENT).Title("Current <br/> Record").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(70);
+                        c.Bound(p => p.INCLUDE_HISTORICAL).ClientTemplate("<span id='lblHistorical'>#= data.INCLUDE_HISTORICAL#</span>").Title("INCLUDE_HISTORICAL").Hidden(true);
+                        c.Bound(p => p.IS_CURRENT).ClientTemplate("<span id='lblIs_Current'>#= data.IS_CURRENT#</span>").Title("IS_CURRENT").Hidden(true);
+                        c.Bound(p => p.HIERARCHY_CODES_IS_ACTIVE).ClientTemplate("<span id='lblHierarchy'>#= data.HIERARCHY_CODES_IS_ACTIVE#</span>").Title("HIERARCHY_CODES_IS_ACTIVE").Hidden(true);
+                        c.Bound(p => p.IS_DONOR_RECORD).ClientTemplate("<span id='lblIsDonorRecord'>#= data.IS_DONOR_RECORD#</span>").Title("IS_DONOR_RECORD").Hidden(true);
+                  
+                    })
+                    .Resizable(resize => resize.Columns(true))
+                    .HtmlAttributes(new { style = "height: 100%" })
+                    .Sortable()
+                    .Events(e => e.ExcelExport("SearchController.grid.excelExport")
+                         .DataBound("SearchController.grid.onDataBound")
+                    )
+                    //.NoRecords()
+                    .Navigatable()
+                    .ToolBar(tools => tools.Excel())
+                    .Pageable(pageable => pageable
+                        .Refresh(true)
+                        .PreviousNext(true)
+                        .Numeric(true)
+                    )
+                    .AutoBind(false)
+                    .Scrollable()
+                    .Selectable()
+                    .Filterable()
+                    .Excel(excel => excel
+                      .AllPages(true)
+                    .FileName("ExportExcel.xlsx")
+                    .Filterable(true)
+                    .ProxyURL(Url.Action("Excel_Export_Save", "Grid"))
+                    )
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(100)
+                        .Read(read => read.Action("GetEPALProceduresSearch", "Home").Data("SearchController.grid.param"))
+                        .Events(ev => ev.RequestEnd("SearchController.grid.onGridRequestEnd"))
+                        .ServerOperation(false)
+                    )
+                )
+        </div>
+
+
+</div>
+
+@await Html.PartialAsync("_AddNewModal")
+
+<script type="text/javascript">
+$(document).ready(function(){
+    MIApp.Common.Enum.screenType = MIApp.Common.Enum.screenTypeValues.search;
+
+    UserAccessHistController.add({
+        "MODULE_NAME": "EPAL Search",
+        "USERACTION": "EPAL/Home/Index",
+        "USERSELECTION": "EPAL/Home/Index",
+        "LST_UPDT_DT": null,
+        "LST_UPDT_BY": MS_ID,
+        "PAGE_ID": "1",
+        "__RequestVerificationToken": $('meta[name="request-verification-token"]')[0].content
+
+    });
+});
+</script>
+
+

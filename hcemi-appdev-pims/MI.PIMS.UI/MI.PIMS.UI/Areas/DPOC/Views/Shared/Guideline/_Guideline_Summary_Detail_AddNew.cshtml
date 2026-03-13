@@ -1,0 +1,509 @@
+﻿@using Kendo.Mvc.UI
+@using MI.PIMS.UI.Common
+@using MI.PIMS.UI;
+
+@inject MI.PIMS.UI.Services.MIAuthenticate.IMIAuthenticateService _miAuthenticateService
+@inject MI.PIMS.UI.Common.Helper _helper
+
+@{
+    var _UserInfo_T_Dto = (MI.PIMS.BO.Dtos.UserInfo_T_Dto)_miAuthenticateService.UserInfo_T_Dto(_helper.MS_ID);
+    var s = _UserInfo_T_Dto.APP_ROLEIDS;
+    string[] appRoles = s.Split(',');
+
+}
+
+<input type="hidden" id="txtDPOC_HIERARCHY_KEY_GS" class="gs-fields" />
+<input type="hidden" id="txtDPOC_VER_EFF_DT_GS" class="gs-fields" />
+<input type="hidden" id="txtDPOC_PACKAGE_GS" class="gs-fields" />
+@* <input type="hidden" id="txtIQ_GDLN_ID_GS" class="gs-fields" /> *@
+<input type="hidden" id="txtIQ_GDLN_STATUS_GS" class="gs-fields" />
+<input type="hidden" id="txtIQ_GDLN_REL_DT_GS" class="gs-fields" />
+<input type="hidden" id="txtIQ_GDLN_PRODUCT_NM" class="gs-fields" />
+<input type="hidden" id="txtIQ_GDLN_PRODUCT_DESC" class="gs-fields" />
+<input type="hidden" id="txtIQ_GDLN_NM" class="gs-fields" />
+<input type="hidden" id="txtIQ_GDLN_DESC" class="gs-fields" />
+<input type="hidden" id="txtIQ_GDLN_RECOMMENDATION_DESC" class="gs-fields" />
+<input type="hidden" id="txtIQ_GDLN_EXP_DT" class="gs-fields" />
+<input type="hidden" id="txtDataRowId_GS" class="gs-fields" />
+
+@{
+    var readOnlyControl = !(appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.DPOCAdmin))
+                        || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.DPOCReadWrite))
+                        || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin)));
+}
+
+<div class="container">
+    @*****User Story 128895 MFQ 5/19/2025*****@
+    <div class="form-row ">
+        <div class="form-group col-md-6">
+            <label class="required">DPOC Release</label>
+            <input type="text" class="form-control gs-fields" id="txtDPOCRelease_GS" value="">
+        </div>
+        <div class="form-group col-md-6">
+            <label class="required">DPOC Release Version</label>
+            <input type="text" class="form-control gs-fields" id="txtDPOC_VER_NUM_GS" value="">
+        </div>
+    </div>
+    @*****END User Story 128895 MFQ 5/19/2025*****@
+    <div class="form-row ">
+        <div class="form-group col-md-6">
+            <label>IQ Reference</label>
+            <input type="text" class="form-control gs-fields" id="txtGS_IQ_Reference" value="" disabled="disabled">
+        </div>
+        <div class="form-group col-md-6">
+            <label>IQ Guideline ID</label>
+            <input type="text" class="form-control gs-fields" id="txtIQ_GDLN_ID_GS" value="" disabled="disabled">
+        </div>
+    </div>
+
+    <div class="form-row ">
+        <div class="form-group col-md-6">
+            <label id="lblGS_IQ_Version">IQ Version</label>
+            <input type="text" class="form-control gs-fields" id="txtGS_IQ_Version" value="" maxlength="50">
+        </div>
+        <div class="form-group col-md-6">
+            <label id="lblGS_IQCriteria">IQ Criteria</label>
+            @(Html.Kendo().DropDownList()
+                .Name("ddlGS_IQCriteria")
+                .DataTextField("VV_CD")
+                .DataValueField("VV_CD")
+                .OptionLabel("Type or Click for Dropdown")
+                .Filter(FilterType.Contains)
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-control gs-fields" })
+                .Enable(!@readOnlyControl)
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("DPOC_GuidelineSummaryController.controls.param.GSIQCriteria");
+                    })
+                    .ServerFiltering(false);
+                })
+                )
+        </div>
+    </div>
+
+    <div class="form-row ">
+        <div class="form-group col-md-6">
+            <label id="lblGS_StartDate" class="required">Guideline Start Date</label>
+            @(Html.Kendo().DatePicker()
+                .Name("dpGS_StartDate")
+                .Format("MM/dd/yyyy")
+                .ParseFormats(new string[] {"MMddyyyy",
+                    "MMddyy",
+                    "MM.dd.yyyy",
+                    "MM.dd.yy",
+                    "MM.d.yyyy",
+                    "M.d.yy",
+                    "M.d.yyyy",
+                    "MM/dd/yyyy",
+                    "MM/dd/yy",
+                    "MM/d/yyyy",
+                    "M/d/yy",
+                    "M/d/yyyy",
+                    "MM-dd-yyyy",
+                    "MM-dd-yy",
+                    "MM-d-yyyy",
+                    "M-d-yy",
+                    "M-d-yyyy"
+                })
+                .Enable(!@readOnlyControl)
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-control gs-fields" })
+                )
+        </div>
+        <div class="form-group col-md-6">
+            <label>Guideline End Date</label>
+            @(Html.Kendo().DatePicker()
+                .Name("dpGS_EndDate")
+                .Format("MM/dd/yyyy")
+                .ParseFormats(new string[] {"MMddyyyy",
+                    "MMddyy",
+                    "MM.dd.yyyy",
+                    "MM.dd.yy",
+                    "MM.d.yyyy",
+                    "M.d.yy",
+                    "M.d.yyyy",
+                    "MM/dd/yyyy",
+                    "MM/dd/yy",
+                    "MM/d/yyyy",
+                    "M/d/yy",
+                    "M/d/yyyy",
+                    "MM-dd-yyyy",
+                    "MM-dd-yy",
+                    "MM-d-yyyy",
+                    "M-d-yy",
+                    "M-d-yyyy"
+                })
+                .Enable(!@readOnlyControl)
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-control gs-fields" })
+                )
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+@*             <label>Medicare Associated Coverage Summary Title</label>
+            @(Html.Kendo().DropDownList()
+                .Name("ddlMedAssCovSumTitle")
+                .DataTextField("PLCY_NM")
+                .DataValueField("PLCY_POLICY_ID")
+                .OptionLabel("Type or Click for Dropdown")
+                .Filter(FilterType.Contains)
+                .HtmlAttributes(new { style = "width: 100%" })
+                .Events(events => events.Change("DPOC_GuidelineSummaryController.controls.onChangeKL_PLCY_NM"))
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetKLPolicies", "KLPolicies", new { Area = "DPOC" }).Data("DPOC_GuidelineSummaryController.controls.param.KL_PLCY_NM");
+                    })
+                    .ServerFiltering(false);
+                })
+            ) *@
+
+            <label>Medicare Associated Coverage Summary Title</label>
+            @(Html.Kendo().ComboBox()
+                .Name("ddlMedAssCovSumTitle")
+                        .DataTextField("PLCY_NM")
+                        .DataValueField("PLCY_POLICY_ID")
+                .Placeholder("Type or Click for Dropdown")
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-control gs-fields" })
+                .Events(events => events.Change("DPOC_GuidelineSummaryController.controls.onChangeKL_PLCY_NM"))
+                .Enable(!@readOnlyControl)
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetKLPolicies", "KLPolicies", new { Area = "DPOC" }).Data("DPOC_GuidelineSummaryController.controls.param.KL_PLCY_NM");
+                    })
+                    .ServerFiltering(false);
+                })
+            )
+        </div>
+        <div class="form-group col-md-6">
+            <label>Medicare Associated Coverage Summary ID</label>
+            <input type="text" data-toggle="tooltip" class="form-control" id="txtMedAssCovSumID" value="" maxlength="100" disabled>
+        </div>
+    </div>
+    <div class="form-row ">
+        <div class="form-group col-md-6">
+            <label>Medical Policy</label>
+            @(Html.Kendo().ComboBox()
+                .Name("ddlGS_MedicalPolicy")
+                .DataTextField("PLCY_NM")
+                .DataValueField("PLCY_POLICY_ID")
+                .Placeholder("Type or Click for Dropdown")                
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-control gs-fields" })
+                .Events(events => events.Change("DPOC_GuidelineSummaryController.controls.onGS_MedicalPolicyChange"))
+                .Enable(!@readOnlyControl)
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetInvPlcyLkp", "GuidelineSummary", new { Area = "DPOC" }).Data("DPOC_GuidelineSummaryController.controls.param.GS_MedicalPolicy");
+                    })
+                    .ServerFiltering(false);
+                })
+                )
+        </div>
+        <div class="form-group col-md-6">
+            <label>Medical Policy Version</label>
+            @(Html.Kendo().ComboBox()   
+                .Name("ddlGS_MedicalPolicyID")
+                .DataTextField("PLCY_POLICY_ID")
+                .DataValueField("PLCY_NM")
+                .Placeholder("Type or Click for Dropdown")
+                .Filter(FilterType.Contains)
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-control gs-fields" })
+                .Enable(!@readOnlyControl)
+                .Events(events => events.Change("DPOC_GuidelineSummaryController.controls.onGS_MedicalPolicyIDChange"))
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetInvPlcyLkp", "GuidelineSummary", new { Area = "DPOC" }).Data("DPOC_GuidelineSummaryController.controls.param.GS_MedicalPolicy");
+                    })
+                    .ServerFiltering(false);
+                })
+                )
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <label>Jurisdictions</label>
+                @(Html.Kendo().MultiSelect()
+                    .Name("msGSJurisdiction")
+                    .DataTextField("VV_CD")
+                    .DataValueField("VV_CD")
+                    .Placeholder("-- Select One ---")
+                                                        //.AutoClose(false)
+                    .Filter(FilterType.Contains)
+                    .TagMode(MultiSelectTagMode.Multiple)
+                    .Enable(!@readOnlyControl)
+                    .HtmlAttributes(new { style = "width: 100%", @class = "form-control gs-fields" })
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("DPOC_GuidelineSummaryController.controls.param.GSJurisdiction");
+                        })
+                        .ServerFiltering(false);
+                    }
+                    )
+                )
+            </div>
+        </div>
+
+    </div>
+    <div class="form-row ">
+        <div class="form-group col-md-12">
+            <label>Exclusions</label>
+            <input type="text" class="form-control gs-fields" id="txtGS_Exclusion" value="" maxlength="50" readonly="@readOnlyControl">
+        </div>
+@*         <div class="form-group col-md-6">
+            <label>Package Configuration Comments</label>
+            <input type="text" class="form-control gs-fields" id="txtGS_PackageConfigComments" value="" maxlength="1000" readonly="@readOnlyControl">
+        </div> *@
+    </div>
+    <!--OUT PATIENT-->
+    <div class="form-row ">
+        <div class="form-group col-md-4">
+            <label>Outpatient Rule Type</label>
+            @(Html.Kendo().DropDownList()
+                .Name("ddlGSOutPatTypeRule")
+                .DataTextField("RULE_TYPE_OUTPAT")
+                .DataValueField("RULE_TYPE_OUTCOME_OUTPAT")
+                .OptionLabel("Type or Click for Dropdown")
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-control gs-fields" })
+                .Filter(FilterType.Contains)
+                .Enable(!@readOnlyControl)
+                .Events(events => events.Change("DPOC_GuidelineSummaryController.controls.onOutPatTypeRuleChange"))
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetOutPatientTypeRules", "GuidelineSummary", new { Area = "DPOC" });
+                    })
+                    .ServerFiltering(false);
+                })
+                )
+        </div>
+        <div class="form-group col-md-4">
+            <label>Outpatient Rule Type Outcome</label>
+            @(Html.Kendo().DropDownList()
+                .Name("ddlGSOutPatOutcome")
+                .DataTextField("RULE_TYPE_OUTCOME_OUTPAT")
+                .DataValueField("RULE_TYPE_OUTPAT")
+                .Filter(FilterType.Contains)
+                .OptionLabel("Type or Click for Dropdown")
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-control gs-fields" })
+                .Enable(!@readOnlyControl)
+                .Events(events => events.Change("DPOC_GuidelineSummaryController.controls.onOutPatOutcomeChange"))
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetOutPatientTypeRules", "GuidelineSummary", new { Area = "DPOC" });
+                    })
+                    .ServerFiltering(false);
+                })
+                )
+        </div>
+        <div class="form-group col-md-4">
+            <label>Outpatient Rule Type Reason</label>
+            @(Html.Kendo().DropDownList()
+                .Name("ddlGSOutPatReason")
+                .DataTextField("RULE_TYPE_RSN_DESC")
+                .DataValueField("RULE_TYPE_RSN")
+                .OptionLabel("Type or Click for Dropdown")
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-control gs-fields" })
+                .Filter(FilterType.Contains)
+                .Enable(!@readOnlyControl)
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetRuleTypeReason", "GuidelineSummary", new { Area = "DPOC" });
+                    })
+                    .ServerFiltering(false);
+                })
+                )
+        </div>
+    </div>
+    <!--OUT PATIENT FACILITY-->
+    <div class="form-row ">
+        <div class="form-group col-md-4">
+            <label>Outpatient Facility Rule Type</label>
+            @(Html.Kendo().DropDownList()
+                .Name("ddlGSOutPatFacTypeRule")
+                .DataTextField("RULE_TYPE_OUTPAT_FCLTY")
+                .DataValueField("RULE_TYPE_OUTCOME_OUTPAT_FCLTY")
+                .OptionLabel("Type or Click for Dropdown")
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-control gs-fields" })
+                .Filter(FilterType.Contains)
+                .Enable(!@readOnlyControl)
+                .Events(events => events.Change("DPOC_GuidelineSummaryController.controls.onOutPatFacTypeRuleChange"))
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetOutPatientFacTypeRules", "GuidelineSummary", new { Area = "DPOC" });
+                    })
+                    .ServerFiltering(false);
+                })
+                )
+        </div>
+        <div class="form-group col-md-4">
+            <label>Outpatient Facility Rule Type Outcome</label>
+            @(Html.Kendo().DropDownList()
+                .Name("ddlGSOutPatFacOutcome")
+                .DataTextField("RULE_TYPE_OUTCOME_OUTPAT_FCLTY")
+                .DataValueField("RULE_TYPE_OUTPAT_FCLTY")
+                .OptionLabel("Type or Click for Dropdown")
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-control gs-fields" })
+                .Filter(FilterType.Contains)
+                .Enable(!@readOnlyControl)
+                .Events(events => events.Change("DPOC_GuidelineSummaryController.controls.onOutPatFacOutcomeChange"))
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetOutPatientFacTypeRules", "GuidelineSummary", new { Area = "DPOC" });
+                    })
+                    .ServerFiltering(false);
+                })
+                )
+        </div>
+        <div class="form-group col-md-4">
+            <label>Outpatient Facility Rule Type Reason</label>
+            @(Html.Kendo().DropDownList()
+                .Name("ddlGSOutPatFacReason")
+                .DataTextField("RULE_TYPE_RSN_DESC")
+                .DataValueField("RULE_TYPE_RSN")
+                .OptionLabel("Type or Click for Dropdown")
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-control gs-fields" })
+                .Filter(FilterType.Contains)
+                .Enable(!@readOnlyControl)
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetRuleTypeReason", "GuidelineSummary", new { Area = "DPOC" });
+                    })
+                    .ServerFiltering(false);
+                })
+                )
+        </div>
+    </div>
+    <!--IN-PATIENT-->
+    <div class="form-row ">
+        <div class="form-group col-md-4">
+            <label>Inpatient Rule Type</label>
+            @(Html.Kendo().DropDownList()
+                .Name("ddlGSInPatTypeRule")
+                .DataTextField("RULE_TYPE_INPAT")
+                .DataValueField("RULE_TYPE_OUTCOME_INPAT")
+                .OptionLabel("Type or Click for Dropdown")
+                .Filter(FilterType.Contains)
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-control gs-fields" })
+                .Enable(!@readOnlyControl)
+                .Events(events => events.Change("DPOC_GuidelineSummaryController.controls.onInPatTypeRuleChange"))
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetInPatientTypeRules", "GuidelineSummary", new { Area = "DPOC" });
+                    })
+                    .ServerFiltering(false);
+                })
+                )
+        </div>
+        <div class="form-group col-md-4">
+            <label>Inpatient Rule Type Outcome</label>
+            @(Html.Kendo().DropDownList()
+                .Name("ddlGSInPatOutcome")
+                .DataTextField("RULE_TYPE_OUTCOME_INPAT")
+                .DataValueField("RULE_TYPE_INPAT")
+                .OptionLabel("Type or Click for Dropdown")
+                .Filter(FilterType.Contains)
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-control gs-fields" })
+                .Enable(!@readOnlyControl)
+                .Events(events => events.Change("DPOC_GuidelineSummaryController.controls.onInPatOutcomeChange"))
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetInPatientTypeRules", "GuidelineSummary", new { Area = "DPOC" });
+                    })
+                    .ServerFiltering(false);
+                })
+                )
+        </div>
+        <div class="form-group col-md-4">
+            <label>Inpatient Rule Type Reason</label>
+            @(Html.Kendo().DropDownList()
+                .Name("ddlGSInPatReason")
+                .DataTextField("RULE_TYPE_RSN_DESC")
+                .DataValueField("RULE_TYPE_RSN")
+                .OptionLabel("Type or Click for Dropdown")
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-control gs-fields" })
+                .Filter(FilterType.Contains)
+                .Enable(!@readOnlyControl)
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetRuleTypeReason", "GuidelineSummary", new { Area = "DPOC" });
+                    })
+                    .ServerFiltering(false);
+                })
+                )
+        </div>
+    </div> 
+    <div class="form-row ">
+        <div class="form-group col-md-6">
+            <label>Guideline Age Min</label>
+            @{
+                var ageList = Enumerable.Range(0, 126).Select(i => i.ToString()).ToList();
+            }
+            @(Html.Kendo().DropDownList()
+                .Name("txtGS_AgeMin")
+                .BindTo(ageList)
+                .Enable(!@readOnlyControl)
+                .Value("0")
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+            )
+        </div>
+        <div class="form-group col-md-6">
+            <label>Guideline Age Max</label>
+            @(Html.Kendo().DropDownList()
+                .Name("txtGS_AgeMax")
+                .BindTo(ageList)
+                .Enable(!@readOnlyControl)
+                .Value("125")
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+            )
+            @* <input type="text" class="form-control gs-fields" id="txtGS_AgeMax" value="" maxlength="1000" @readOnlyControl> *@
+        </div>
+    </div>
+@*     <div class="form-row">
+        <div class="form-group col-md-12">
+            <label for="ddl_GSSOSProvTINExl">SOS Provider TIN Exclusion:</label>
+            <!--<input type="text" class="form-control gs-fields" id="txt_GSSOSProvTINExl" value="" readonly="readonly"> -->
+            @(Html.Kendo().DropDownList()
+                .Name("ddl_GSSOSProvTINExl")
+                .DataTextField("VV_CD")
+                .DataValueField("VV_CD")
+                .OptionLabel("Type or Click for Dropdown")                
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-control gs-fields" })
+                .Enable(!@readOnlyControl)
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetPIMSValidValues", "Home", new { Area = "DPOC" }).Data("DPOC_GuidelineSummaryController.controls.param.GSSOSProvTINExl");
+                    })
+                    .ServerFiltering(false);
+                })
+                )
+        </div>
+    </div> *@
+</div>   

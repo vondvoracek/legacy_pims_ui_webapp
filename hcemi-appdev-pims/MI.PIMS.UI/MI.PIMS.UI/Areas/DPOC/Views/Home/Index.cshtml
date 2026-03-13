@@ -1,0 +1,777 @@
+﻿@inject MI.PIMS.UI.Services.MIAuthenticate.IMIAuthenticateService _miAuthenticateService
+@inject MI.PIMS.UI.Common.Helper _helper
+@using MI.PIMS.UI.Common
+
+@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/DPOC/Detail.css" asp-append-version="true" />
+<script src="~/js/DPOC/DPOC_Search.js" asp-append-version="true"></script>
+
+
+<style type="text/css">
+    .search-section {
+        font-size: 12px;
+    }
+
+    .k-dropdown .k-dropdown-wrap {
+        border-color: #e4e7eb;
+        color: #212529;
+        background-color: white;
+        transition: color .2s ease,background-color .2s ease,border-color .2s ease,box-shadow .2s ease;
+    }
+
+    .k-grid-content {
+        min-height: 200px;
+    }
+
+    .date-border {
+        border: solid 1px #BDBDBD;
+        margin-left: 2px;
+        margin-right: 2px;
+        margin-top: -8px;
+        padding: 8px;
+    }
+
+    #btnAdvancedSearch:hover {
+        background-color: #F2F2F2
+    }
+
+    .k-input.k-invalid.valid-override:focus-within {
+        box-shadow: 0 0 0 0.25rem rgba(27, 110, 194, 0.25);
+    }
+
+    /*Override invalid border color which is not required here.
+            User Story 128873 MFQ 4/28/2025
+        */
+    .k-datepicker .k-picker-wrap.k-invalid, .k-timepicker .k-picker-wrap.k-invalid {
+        color: inherit;
+        border-color: rgba(0, 0, 0, 0.08) !important;
+    }
+</style>
+
+@{
+    var _UserInfo_T_Dto = (MI.PIMS.BO.Dtos.UserInfo_T_Dto)_miAuthenticateService.UserInfo_T_Dto(_helper.MS_ID);
+    var s = _UserInfo_T_Dto.APP_ROLEIDS;
+    string[] appRoles = s.Split(',');
+}
+
+<div class="breadcrumb-background">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-background">
+                <li class="breadcrumb-item"><a>@Html.ActionLink("Home", "index", "/", new { Area = "" }, new { @class = "breadcrumb-item-font" })</a></li>
+                <li class="breadcrumb-item active" style="color: black !important; cursor: initial;" aria-current="page">DPOC Search</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+
+<div class="container  search-section" style="padding-left:30px; padding-right:30px;">
+    <form id="searchForm">
+        <div class="section-heading">
+            <div class="row">
+                <div class="col-10" style="font-size: 14px;">
+                    DPOC Search
+                </div>
+                <div class="col-2 text-right" style="font-size: 14px;">
+                    <div data-toggle="tooltip" title="Toggle the switch to Include Historical records in your search.">
+                        <span>Include Historical Records</span> &nbsp;
+                        @(Html.Kendo().Switch()
+                            .Name("switch")
+                            .Events(ev => ev.Change("DPOC_SearchController.switch.onChange"))
+                            .HtmlAttributes(new { style = "width: 100%" })
+                            .Messages(c => c.Checked("YES").Unchecked("NO"))
+                            )
+                        <input type="hidden" readonly id="txtIncludeHistorical" />
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="section-border">
+
+            <!-- New Filters -->
+            <!-- Row 1 -->
+            <div class="form-row">
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="txtDPOCID">DPOC ID:</label>  <label for="txtDPOCID" style="color:red; font-style:italic;"> (Case Sensitive) </label> </b>
+                    <input type="text" class="form-control" id="txtDPOCID" value="" maxlength="100">
+                </div>
+
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="txtLOB">Business Segment:</label></b>
+                    <input type="hidden" class="form-control" id="txtLOB" value="">
+                    <input type="hidden" class="form-control" id="txtLOBFilterText" value="">
+
+                    @(Html.Kendo().MultiSelect()
+                        .Name("msLOB")
+                        .DataTextField("CD")
+                        .DataValueField("Desc")
+                        .Placeholder("Type or Click for Dropdown")
+                        .Filter(FilterType.Contains)
+                        .Events(e =>
+                        {
+                            e.DataBound("onDatabound_MultiSelect").Change("DPOC_SearchController.multiSelect.onChange_LOB");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetBusSegCd", "DPOCHierarchyCodes", new { Area = "DPOC" });
+                            })
+                            .ServerFiltering(false);
+                        })
+                        )
+
+                </div>
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="txtEntity">Entity:</label></b>
+                    <input type="hidden" class="form-control" id="txtEntity" value="">
+                    <input type="hidden" class="form-control" id="txtEntityFilterText" value="">
+                    @(Html.Kendo().MultiSelect()
+                        .Name("msEntity")
+                        .DataTextField("CD")
+                        .DataValueField("Desc")
+                        .Placeholder("Type or Click for Dropdown")
+                        //.AutoClose(false)
+                        .Filter(FilterType.Contains)
+                        .TagMode(MultiSelectTagMode.Multiple)
+                        .Events(e =>
+                        {
+                            e.DataBound("onDatabound_MultiSelect").Change("DPOC_SearchController.multiSelect.onChange_ENTITY");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetEntityCd", "DPOCHierarchyCodes", new { Area = "DPOC" }).Data("DPOC_SearchController.multiSelect.param.ENTITY");
+                            })
+                            .ServerFiltering(false);
+                        })
+                        )
+                </div>
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="msProduct">Product:</label></b>
+                    @(Html.Kendo().MultiSelect()
+                        .Name("msProduct")
+                        .Placeholder("Type or Click for Dropdown")
+                        .Filter(FilterType.Contains)
+                        .TagMode(MultiSelectTagMode.Multiple)
+                        .Events(e =>
+                        {
+                            e.DataBound("onDatabound_MultiSelect").Change("DPOC_SearchController.multiSelect.onChange_PRODUCT");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetProductCd", "DPOCHierarchyCodes", new { Area = "DPOC" }).Data("DPOC_SearchController.multiSelect.param.PRODUCT");
+                            })
+                            .ServerFiltering(false);
+                        })
+                        )
+
+                </div>
+                <div class="form-group col-sm-3 col-md-3 col-lg-3">
+                    <b><label for="txtProcedureCode">Procedure Code:</label>  <label for="txtProcedureCodeText" style="color:red; font-style:italic;"> (Case Sensitive) </label></b>
+                    <input type="text" class="form-control" id="txtProcedureCodeText" />
+                </div>
+
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+
+                    <b><label for="ddlIQGuidelineID">IQ Guideline ID:</label></b>
+                    <input type="hidden" readonly id="txtIQGuidelineID" />
+                    <input type="hidden" readonly id="txtIQGuidelineIDFilterText" />
+
+                    @(Html.Kendo().DropDownList()
+                        .Name("ddlIQGuidelineID")
+                        .DataTextField("IQ_GDLN_ID")
+                        .DataValueField("IQ_GDLN_ID")
+                        .OptionLabel("Type at least 3 Characters for Drop Down")
+                        .Filter(FilterType.Contains)
+                        .MinLength(3)
+                        .HtmlAttributes(new { style = "width: 100%" })
+                        .Events(e =>
+                        {
+                            e.DataBound("DPOC_SearchController.dropdown.onDatabound_IQGuidelineID");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetGuideLineIds", "GuidelineSummary", new { Area = "DPOC" });
+                            })
+                            .ServerFiltering(true); // Must be true for filtering to work
+                        })
+                    )
+                </div>
+
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="msIQVersion">IQ Version:</label></b>
+                    <input type="hidden" readonly id="txtIQVersion" />
+                    <input type="hidden" readonly id="txtIQVersionFilterText" />
+                    @(Html.Kendo().DropDownList()
+                        .Name("ddlIQVersion")
+                        .DataTextField("IQ_GDLN_VERSION")
+                        .DataValueField("IQ_GDLN_VERSION")
+                        .OptionLabel("Type at least 3 Characters for Drop Down")
+                        .Filter(FilterType.Contains)
+                        .MinLength(3)
+                        .HtmlAttributes(new { style = "width: 100%" })
+                        .Events(e =>
+                        {
+                            e.DataBound("DPOC_SearchController.dropdown.onDatabound_IQVersion"); //
+                        })
+                        .DataSource(source =>
+                        {
+                            source
+                            .Ajax()
+                            .Read("GetGuideLineVersions", "GuidelineSummary", new { Area = "DPOC" })
+                            .PageSize(20);
+                        })
+                        .Virtual(v => v.ItemHeight(26).ValueMapper("DPOC_SearchController.dropdown.IQ_GDLN_VERSIONValueMapper"))
+                    )
+                </div>
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="msIQCriteria">IQ Criteria:</label></b>
+                    <input type="hidden" readonly id="txtIQCriteria" />
+                    @(
+                        Html.Kendo().MultiSelect()
+                        .Name("msIQCriteria")
+                        .DataTextField("VV_CD")
+                        .DataValueField("VV_CD_DESC")
+                        .Placeholder("Type or Click for Dropdown")
+                        .Filter(FilterType.Contains)
+                        .Events(e =>
+                        {
+                            e.DataBound("onDatabound_MultiSelect").Change("DPOC_SearchController.multiSelect.onChange_IQ_CRITERIA");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetPIMSValidValues", "Home", new { Area = "DPOC" }).Data("DPOC_SearchController.multiSelect.param.IQ_CRITERIAs"); //User Story 128794 MFQ
+                            })
+                            .ServerFiltering(false);
+                        })
+                        )
+                </div>
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="msIQReference">IQ Reference:</label></b>
+                    <input type="hidden" readonly id="txtIQReference" />
+                    <input type="hidden" readonly id="txtIQReferenceFilterText" />
+                    @(Html.Kendo().MultiSelect()
+                        .Name("msIQReference")
+                        .DataTextField("IQ_GDLN_NM")
+                        .DataValueField("IQ_GDLN_NM")
+                        .Placeholder("Type at least 3 Characters for Drop Down")
+                        .Filter(FilterType.Contains)
+                        .Events(e =>
+                        {
+                            e.DataBound("DPOC_SearchController.multiSelect.onDatabound_IQ_REFERENCE");//.Change("DPOC_SearchController.multiSelect.onChange_IQ_REFERENCE");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetGuideLineRulesList", "GuidelineSummary", new { Area = "DPOC" }).Data("DPOC_SearchController.multiSelect.param.IQ_REFERENCE");
+                            })
+                            .ServerFiltering(false);
+                        })
+                        )
+                </div>
+
+            </div>
+            <!-- Row 2 -->
+            <div class="form-row">
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="dpDPOCStartDate">DPOC Start Date:</label></b>
+                    @(Html.Kendo().DatePicker()
+                        .Name("dpDPOCStartDate")
+                        //.Value("")
+                        .Format("MM/dd/yyyy")
+                        .ParseFormats(new string[] {"MMddyyyy",
+                            "MMddyy",
+                            "MM.dd.yyyy",
+                            "MM.dd.yy",
+                            "MM.d.yyyy",
+                            "M.d.yy",
+                            "M.d.yyyy",
+                            "MM/dd/yyyy",
+                            "MM/dd/yy",
+                            "MM/d/yyyy",
+                            "M/d/yy",
+                            "M/d/yyyy",
+                            "MM-dd-yyyy",
+                            "MM-dd-yy",
+                            "MM-d-yyyy",
+                            "M-d-yy",
+                            "M-d-yyyy"
+                        })
+                        .HtmlAttributes(new { style = "width: 100%;", title = "datepicker", @class = "form-to-update" })
+                    )
+                </div>
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="txtDPOCPackage">DPOC Package:</label></b>
+                    <input type="hidden" readonly id="txtDPOCPackage" />
+                    <input type="hidden" readonly id="txtDPOCPackageFilterText" />
+                    @(Html.Kendo().MultiSelect()
+                        .Name("msDPOCPackage")
+                        .DataTextField("VV_CD_DESC")
+                        .DataValueField("VV_CD_DESC")
+                        .Placeholder("Type or Click for Dropdown")
+                        .Filter(FilterType.Contains)
+                        //.TagMode(MultiSelectTagMode.Multiple)
+                        .Events(e =>
+                        {
+                            e.DataBound("onDatabound_MultiSelect");//.Change("DPOC_SearchController.multiSelect.onChange_DPOC_PACKAGE");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetPIMSValidValues", "Home", new { Area = "DPOC" }).Data("DPOC_SearchController.multiSelect.param.DPOC_PACKAGE");
+                            })
+                            .ServerFiltering(false);
+                        })
+                        )
+                </div>
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="txtDPOCRelease">DPOC Release:</label></b>
+                    <input type="hidden" readonly id="txtDPOCRelease" />
+                    <input type="hidden" readonly id="txtDPOCReleaseFilterText" />
+                    @(Html.Kendo().MultiSelect()
+                        .Name("msDPOCRelease")
+                        .Placeholder("Type or Click for Dropdown")
+                        .Filter(FilterType.Contains)
+                        .TagMode(MultiSelectTagMode.Multiple)
+                        .Events(e =>
+                        {                            
+                            e.DataBound("onDatabound_MultiSelect").Change("DPOC_SearchController.multiSelect.onChange_DPOC_RELEASE");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetDPOCRelease", "DPOCInventories", new { Area = "DPOC" });
+                            })
+                            .ServerFiltering(false);
+                        })
+                        )
+                </div>
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="txtDPOCEligible">DPOC Eligible:</label></b>
+                    <input type="hidden" readonly id="txtDPOCEligible" />
+                    <input type="hidden" readonly id="txtDPOCEligibleFilterText" />
+
+                    @(Html.Kendo().DropDownList() //User Story 128868 MFQ 3/3/2025
+                        .Name("msDPOCEligible")
+                        .DataTextField("VV_CD_DESC")
+                        .DataValueField("VV_CD")
+                        .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                        .OptionLabel("Type or Click for Dropdown")
+                        .Events(e =>
+                        {
+                            e.DataBound("onDatabound_DropDown").Change("DPOC_SearchController.multiSelect.onChange_DPOCEligible");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetPIMSValidValues", "Home", new { Area = "EPAL" }).Data("DPOC_SearchController.dropdown.param.DPOC_ELIGIBLE_IND");
+                            })
+                            .ServerFiltering(false);
+                        })
+                        )
+                </div>
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="txtDPOCImplemented">DPOC Implemented:</label></b>
+                    <input type="hidden" readonly id="txtDPOCImplemented" />
+                    <input type="hidden" readonly id="txtDPOCImplementedFilterText" />
+                    @(Html.Kendo().MultiSelect()
+                        .Name("msDPOCImplemented")
+                        .DataTextField("VV_CD_DESC")
+                        .DataValueField("VV_CD")
+                        .Placeholder("Type or Click for Dropdown")
+                        .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                        .Events(e =>
+                        {
+                            e.DataBound("onDatabound_MultiSelect").Change("DPOC_SearchController.multiSelect.onChange_DPOCImplemented");
+                        })
+                        .DataSource(source =>
+                        {
+                            source.Read(read =>
+                            {
+                                read.Action("GetPIMSValidValues", "Home", new { Area = "DPOC" }).Data("DPOC_SearchController.multiSelect.param.DPOC_IMPLEMENTED_IND");
+                            })
+                            .ServerFiltering(false);
+                        })
+                        )
+
+                </div>
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <b><label for="msPAStatus">DPOC Version Eff Date:</label></b>
+                    @(Html.Kendo().DatePicker()
+                        .Name("dpDPOCVerEffDate")
+                        //.Value("")
+                        .Format("MM/dd/yyyy")
+                        .ParseFormats(new string[] {
+                            "MMddyyyy",
+                            "MMddyy",
+                            "MM.dd.yyyy",
+                            "MM.dd.yy",
+                            "MM.d.yyyy",
+                            "M.d.yy",
+                            "M.d.yyyy",
+                            "MM/dd/yyyy",
+                            "MM/dd/yy",
+                            "MM/d/yyyy",
+                            "M/d/yy",
+                            "M/d/yyyy",
+                            "MM-dd-yyyy",
+                            "MM-dd-yy",
+                            "MM-d-yyyy",
+                            "M-d-yy",
+                            "M-d-yyyy"
+                        })
+                        .HtmlAttributes(new { style = "width: 100%; padding-left: 5px;padding-right: 5px;", title = "datepicker", @class = "form-to-update valid-null" })
+                    )
+                </div>
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    <div>
+                        <a id="btnAdvancedSearch" class="btn btn-md" href="#"><i id="icon-up" class="fas fa-chevron-up"></i> <i id="icon-down" class="fas fa-chevron-down"></i> Advanced Search</a>
+                    </div>
+                </div>
+                <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                </div>
+            </div>
+            <!-- Row 4 -->
+            <div id="divAdvancedSearch">
+                <!--============================
+                    Start Advanced Search Here
+                ===============================-->
+                <div class="form-row">
+                    <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                        <b>
+                            <label for="msOutpatientRuleTypeOutcome">
+                                Outpatient Rule Type Outcome:
+                            </label>
+                        </b>
+                        <input type="hidden" readonly id="txtOutpatientRuleTypeOutcome" />
+                        <input type="hidden" readonly id="txtOutpatientRuleTypeOutcomeFilterText" />
+                        <!-- 21 -->
+                        @(Html.Kendo().MultiSelect()
+                            .Name("msOutpatientRuleTypeOutcome")
+                            .DataTextField("VV_CD_DESC")
+                            .DataValueField("VV_CD")
+                            .Placeholder("Type or Click for Dropdown")
+                            .Filter(FilterType.Contains)
+                            .TagMode(MultiSelectTagMode.Multiple)
+                            .Events(e =>
+                            {
+                                e.DataBound("onDatabound_MultiSelect").Change("DPOC_SearchController.multiSelect.onChange_RULE_TYPE_OUTCOME_OUTPAT");
+                            })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetPIMSValidValues", "Home", new { Area = "DPOC", p_VV_SET_NAME = "DPOC_RULE_TYPE", p_BUS_SEG_CD = "OP" });
+                                })
+                                .ServerFiltering(false);
+                            })
+                            )
+                    </div>
+                    <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                        <b>
+                            <label for="txtOutpatientFacilityRuleTypeOutcome">
+                                Outpatient Facility Rule Type Outcome:
+                            </label>
+                        </b>
+                        <input type="hidden" readonly id="txtOutpatientFacilityRuleTypeOutcome" />
+                        <input type="hidden" readonly id="txtOutpatientFacilityRuleTypeOutcomeFilterText" />
+                        <!-- 23 -->
+                        @(Html.Kendo().MultiSelect()
+                            .Name("msOutpatientFacilityRuleTypeOutcome")
+                            .DataTextField("VV_CD_DESC")
+                            .DataValueField("VV_CD")
+                            .Placeholder("Type or Click for Dropdown")
+                            .Filter(FilterType.Contains)
+                            .TagMode(MultiSelectTagMode.Multiple)
+                            .Events(e =>
+                            {
+                                e.DataBound("onDatabound_MultiSelect").Change("DPOC_SearchController.multiSelect.onChange_RULE_TYPE_OUTCOME_OUTPAT_FCLTY");
+                            })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetPIMSValidValues", "Home", new { Area = "DPOC", p_VV_SET_NAME = "DPOC_RULE_TYPE", p_BUS_SEG_CD = "OPF" });
+                                })
+                                .ServerFiltering(false);
+                            })
+                            )
+                    </div>
+
+                    <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                        <b>
+                            <label for="txtInpatientRuleTypeOutcome">
+                                Inpatient Rule Type Outcome:
+                            </label>
+                        </b>
+                        <input type="hidden" readonly id="txtInpatientRuleTypeOutcome" />
+                        <input type="hidden" readonly id="txtInpatientRuleTypeOutcomeFilterText" />
+                        <!-- 25 -->@*User Story 128890 MFQ 4/29/2025*@
+                        @(Html.Kendo().MultiSelect()
+                            .Name("msInpatientRuleTypeOutcome")
+                            .DataTextField("VV_CD_DESC")
+                            .DataValueField("VV_CD_DESC")
+                            .Placeholder("Type or Click for Dropdown")
+                            //.AutoClose(false)
+                            .Filter(FilterType.Contains)
+                            .TagMode(MultiSelectTagMode.Multiple)
+                            .Events(e =>
+                            {
+                                e.DataBound("onDatabound_MultiSelect").Change("DPOC_SearchController.multiSelect.onChange_RULE_TYPE_OUTCOME_INPAT");
+                            })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetPIMSValidValues", "Home", new { Area = "DPOC", p_VV_SET_NAME = "DPOC_RULE_TYPE", p_BUS_SEG_CD = "IP" });
+                                })
+                                .ServerFiltering(false);
+                            })
+                            )
+                    </div>
+                    <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                        <b><label for="msJurisdiction">Jurisdiction:</label></b>
+                        <input type="hidden" readonly id="txtJurisdiction" />
+                        <input type="hidden" readonly id="txtJurisdictionFilterText" />
+                        <!-- 27 -->
+                        @(
+                            Html.Kendo().MultiSelect()
+                            .Name("msJurisdiction")
+                            .DataTextField("VV_CD")
+                            .DataValueField("VV_CD")
+                            .Placeholder("Type or Click for Dropdown")
+                            //.AutoClose(false)
+                            .Filter(FilterType.Contains)
+                            .TagMode(MultiSelectTagMode.Multiple)
+                            .Events(e =>
+                            {
+                                e.DataBound("onDatabound_MultiSelect").Change("DPOC_SearchController.multiSelect.onChange_JURISDICTIONS");
+                            })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetPIMSValidValues", "Home", new { Area = "DPOC" }).Data("DPOC_SearchController.multiSelect.param.DPOC_JURISDICTIONS");
+                                })
+                                .ServerFiltering(false);
+                            })
+                            )
+                    </div>
+                    <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                        <b><label for="txtAlternateCategory">Alternate Category:</label>  <label for="msAlternateCategory" style="color:red; font-style:italic;"> (Proc Code Criteria Req.) </label> </b>
+                        <input type="hidden" readonly id="txtAlternateCategory" />
+                        <input type="hidden" readonly id="txtAlternateCategoryFilterText" />
+                        @(Html.Kendo().MultiSelect()
+                            .AutoBind(false)
+                            .Name("msAlternateCategory")
+                            .DataTextField("altrnt_svc_cat")
+                            .DataValueField("altrnt_svc_cat")
+                            .Placeholder("Type or Click for Dropdown")
+                            //.MinLength(3)
+                            .Filter(FilterType.Contains)
+                            .TagMode(MultiSelectTagMode.Multiple)
+                            .Events(e =>
+                            {
+                                e.DataBound("onDatabound_MultiSelect").Change("DPOC_SearchController.multiSelect.onChange_AlternateCategory");
+                            })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetAlternateCategory", "DPOCInventories", new { Area = "DPOC" }).Data("DPOC_SearchController.multiSelect.param.AlternateCategory");
+                                })
+                                .ServerFiltering(true);
+                            })
+                            )
+                    </div>
+                    <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                        <b><label for="txtAlternateSubcategory">Alternate Subcategory:</label></b>
+                        <input type="hidden" readonly id="txtAlternateSubcategory" />
+                        <input type="hidden" readonly id="txtAlternateSubCategoryFilterText" />
+                        @(Html.Kendo().MultiSelect()
+                            .AutoBind(false)
+                            .Name("msAlternateSubCategory")
+                            .DataTextField("altrnt_svc_subcat")
+                            .DataValueField("altrnt_svc_subcat")
+                            .Placeholder("Type or Click for Dropdown")
+                            //.MinLength(3)
+                            .Filter(FilterType.Contains)
+                            .TagMode(MultiSelectTagMode.Multiple)
+                            .Events(e =>
+                            {
+                                e.DataBound("onDatabound_MultiSelect").Change("DPOC_SearchController.multiSelect.onChange_AlternateSubCategory");
+                            })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetAlternateSubCategory", "DPOCInventories", new { Area = "DPOC" }).Data("DPOC_SearchController.multiSelect.param.AlternateSubCategory");
+                                })
+                                .ServerFiltering(true);
+                            })
+                            )
+                    </div>
+                    <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                        <b><label for="msFundingArrangment">Funding Arrangement:</label></b>
+                        @(Html.Kendo().MultiSelect()
+                            .Name("msFundingArrangment")
+                            .Placeholder("Type or Click for Dropdown")
+                            .Filter(FilterType.Contains)
+                            .TagMode(MultiSelectTagMode.Multiple)
+                            .Events(e =>
+                            {
+                                e.DataBound("onDatabound_MultiSelect").Change("DPOC_SearchController.multiSelect.onChange_FUNDING_ARRANGEMENT");
+                            })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                    read.Action("GetFundingArrangement", "DPOCHierarchyCodes", new { Area = "DPOC" }).Data("DPOC_SearchController.multiSelect.param.FUNDING_ARRANGEMENT");
+                                })
+                                .ServerFiltering(false);
+                            })
+                        )
+                </div>
+                </div>
+                <!-- Row 5 -->
+                <div class="form-row">
+
+                    <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    </div>
+                    <div class="form-group col-sm-2 col-md-2 col-lg-2">
+                    </div>
+                </div>
+
+            </div>
+            <br />
+
+            <div class="form-row">
+
+                <div class="form-group col-md-12 col-sm-12 col-lg-12 text-center">
+
+                    <button id="btnSearch"  type="submit" class="btn btn-primary noSubmit" title="Click to search records!"><i class="fas fa-search"></i> Search </button>
+                    <button id="btnReset" type="button" class="btn btn-outline-primary noSubmit" title="Click to reset filters!"><i class="fas fa-times"></i> Reset </button>
+                    @if (_UserInfo_T_Dto != null)
+                    {
+                        if (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.DPOCReadWrite))
+                        || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.DPOCAdmin))
+                        || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin))
+                        )
+                        {
+                            <button id="btnAddNew" type="button" class="btn btn-primary noSubmit" data-toggle="modal" data-target="#addNewModal" data-backdrop="static" data-keyboard="false" title="Click to go Add New!"><i class="fas fa-plus-circle"></i> Add New </button>
+                        }
+
+                    }
+
+                </div>
+            </div>
+        </div>
+    </form>
+    <br />
+    <div style="font-size:11px !important;">
+        @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.DPOC_Inventories_V_Dto>()
+            .Name("grid_Search")
+            .Columns(c =>
+            {
+                c.Bound(p => p.DPOC_HIERARCHY_KEY)
+                .Title("DPOC ID")
+                .ClientTemplate(
+                "<a href='javascript:void(0);' style='color:blue;' onclick=\"DPOC_SearchController.methods.redirect('#=DPOC_HIERARCHY_KEY#,#=kendo.toString(kendo.parseDate(DPOC_VER_EFF_DT),'MM-dd-yyyy hh:mm:ss tt')#,#=DPOC_PACKAGE#');\" title='Click to view details!' \\data-target='tooltip'\\>#= DPOC_HIERARCHY_KEY # </a>" +
+                ((appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.DPOCReadWrite))
+                || (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.DPOCAdmin))
+                || (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin))))
+                ) ? "#if(IS_CURRENT == 'Y'){# <i class=\"edit-epal-icon k-icon k-i-pencil text-primary float-right\" onclick=\"DPOC_SearchController.methods.redirect_edit('#=DPOC_HIERARCHY_KEY#, #=kendo.toString(kendo.parseDate(DPOC_VER_EFF_DT),'MM-dd-yyyy hh:mm:ss tt')#,#=DPOC_PACKAGE#');\" title='Click to edit details!' \\data-target='tooltip'\\></i> #}#" : "")
+                )
+                .Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                .HtmlAttributes(new { style = "text-align: center" })
+                .Width(200);
+                c.Bound(p => p.PROC_CD).Title("Proc<br />Code").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(85);
+                c.Bound(p => p.DPOC_EFF_DT).Filterable(false)
+                .Title("DPOC<br/>Start Date")
+                .ClientTemplate("#= ( kendo.toString(kendo.parseDate(DPOC_EFF_DT), 'MM/dd/yyyy') == '12/31/2999' || (data.DPOC_EFF_DT == null)) ? ' ' : kendo.toString(kendo.parseDate(DPOC_EFF_DT), 'MM/dd/yyyy') #")
+                .HtmlAttributes(new { style = "text-align: center" })
+                .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                .Width(100);
+                c.Bound(p => p.DPOC_PACKAGE).Title("DPOC Package").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                //c.Bound(p => p.DPOC_RELEASE).Title("DPOC Release").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(100);
+                c.Bound(p => p.DPOC_ELIGIBLE_IND).Title("DPOC Eligible").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(80);
+                c.Bound(p => p.DPOC_IMPLEMENTED_IND).Title("DPOC Implemented").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                c.Bound(p => p.DPOC_VER_EFF_DT).Filterable(false)
+                .Title("DPOC Ver <br />Eff Date")
+                .ClientTemplate("#= (data.DPOC_VER_EFF_DT == null) ? ' ' : kendo.toString(kendo.parseDate(DPOC_VER_EFF_DT), 'MM/dd/yyyy hh:mm:ss tt') #")
+                .HtmlAttributes(new { style = "text-align: center" })
+                .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                .Width(150);
+            })
+            .Resizable(resize => resize.Columns(true))
+            .HtmlAttributes(new { style = "height: 100%" })
+            .Sortable()
+            .Events(e => e.ExcelExport("DPOC_SearchController.grid.excelExport"))
+            .NoRecords()
+            .Navigatable()
+            .ToolBar(tools => tools.Excel())
+            .Pageable(pageable => pageable
+            .Refresh(true)
+            .PreviousNext(true)
+            .Numeric(true)
+            )
+            .AutoBind(false)
+            .Scrollable()
+            .Selectable()
+            .Filterable()
+            .Excel(excel => excel
+            .AllPages(true)
+            .FileName("ExportExcel.xlsx")
+            .Filterable(true)
+            .ProxyURL(Url.Action("Excel_Export_Save", "Grid"))
+            )
+            .DataSource(dataSource => dataSource
+            .Ajax()
+            .PageSize(100)
+            .Read(read => read.Action("GetDPOCSearch", "Home").Data("DPOC_SearchController.grid.param"))
+            .Events(ev => ev.RequestEnd("DPOC_SearchController.grid.onGridRequestEnd"))
+            )
+            )
+    </div>
+
+
+</div>
+
+@await Html.PartialAsync("_AddNewModal")
+
+<script type="text/javascript">
+    $(function () {
+        MIApp.Common.Enum.screenType = MIApp.Common.Enum.screenTypeValues.search;
+
+        UserAccessHistController.add({
+            "MODULE_NAME": "DPOC Search",
+            "USERACTION": "DPOC/Home/Index",
+            "USERSELECTION": "DPOC/Home/Index",
+            "LST_UPDT_DT": null,
+            "LST_UPDT_BY": MS_ID,
+            "PAGE_ID": "14",
+            "__RequestVerificationToken": $('meta[name="request-verification-token"]')[0].content
+        });
+    });
+</script>
+
+

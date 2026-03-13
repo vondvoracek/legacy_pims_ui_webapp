@@ -1,0 +1,74 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="breadcrumb-background">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-background">
+                <li class="breadcrumb-item"><a>@Html.ActionLink("Home", "index", "/", new { Area = "" }, new { @class = "breadcrumb-item-font" })</a></li>
+                <li class="breadcrumb-item" style="color:black !important" aria-current="page">Help</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<div class="container">
+    <div class="col-md-12 col-sm-12 col-lg-12">
+        <div class="bd-example bd-example-tabs">
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <a class="nav-item nav-link active" id="supportTab-tab" data-toggle="tab" href="#supportTab" role="tab" aria-controls="supportTab" aria-selected="true">Support</a>
+                    <a class="nav-item nav-link" id="trainingTab-tab" data-toggle="tab" href="#trainingTab" role="tab" aria-controls="trainingTab" aria-selected="false">Training</a>
+                    <a class="nav-item nav-link" id="releasesTab-tab" data-toggle="tab" href="#releasesTab" role="tab" aria-controls="releasesTab" aria-selected="false">Releases</a>
+                </div>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="supportTab" role="tabpanel" aria-labelledby="supportTab-tab">
+                    <div style="padding-top:50px; padding-left:15px;">
+                        For administration support, please click on the link to send an email to <a target="_blank" href="mailto:SCANS_Support_DL@ds.uhc.com?subject=SCANS Exchange Admin Support">SCANS Exchange Admin Support.</a>
+                        <br />
+                        <br />
+                        For other questions or concerns, please click on the link to send an email to <a target="_blank" href="mailto:SCANS_Support_DL@ds.uhc.com?subject=SCANS Exchange Technical Inquiry">HCE Medical Informatics.</a>
+                        <br />
+                        <br />
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="trainingTab" role="tabpanel" aria-labelledby="trainingTab-tab">
+                    <div style="padding-top:50px; padding-left:15px;">
+                        <ul style="padding-left: 40px; background-color:inherit;">
+                            <li><a target="_blank" href="~/documents/SCANS_Exchange_SECURE_Access_v1.2.pdf">Request SECURE Exchange Access</a></li>
+             
+                            <li><a target="_blank" href="~/documents/SCANS_Exchange_User_Guide_v1.01.pdf">SCANS Exchange User Guide</a></li>
+
+                            @*<li><a target="_blank" href="#">SCANS Exchange Reports User Guide</a></li>*@
+                        </ul>
+                    </div>
+                </div>
+         
+                <div class="tab-pane fade" id="releasesTab" role="tabpanel" aria-labelledby="releasesTab-tab">
+                    <div style="padding-top:50px; padding-left:15px;">
+                        <span>Holding area for releases..</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function() {
+        UserAccessHistController.add({
+            "MODULE_NAME": "Help",
+            "USERACTION": "Help/Home/Index",
+            "USERSELECTION": "Help/Home/AddNew",
+            "LST_UPDT_DT": null,
+            "LST_UPDT_BY": MS_ID,
+            "PAGE_ID": "5",
+            "__RequestVerificationToken": $('meta[name="request-verification-token"]')[0].content
+
+        });
+    });
+</script>

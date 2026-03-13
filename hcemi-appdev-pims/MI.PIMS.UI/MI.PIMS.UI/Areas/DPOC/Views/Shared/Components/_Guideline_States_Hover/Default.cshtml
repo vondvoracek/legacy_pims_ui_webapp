@@ -1,0 +1,44 @@
+﻿@using Kendo.Mvc.UI
+@using MI.PIMS.BO.Dtos;
+@model DPOC_Gdln_Param_Dto;
+
+<script src="~/js/DPOC/_DPOC_GuidelineState.js" asp-append-version="true"></script>
+
+<style>
+    .position-absolute {
+        position: absolute !important;
+    }
+</style>
+<input type="hidden" id="hv-iq-gdln-id" value="@Model.p_IQ_GDLN_ID" />
+@Html.Hidden("txtGDLN_DTQ_SYS_SEQ")
+<div class="container">
+    @(
+        Html.Kendo().Grid<MI.PIMS.BO.Dtos.DPOC_Inv_Gdln_Appl_To_States_T_Dto>()
+        .Name("grid_GSStateInfo_Hover")
+        .AutoBind(false)
+        .Columns(c =>
+        {
+            c.Bound(p => p.STATE_NAME).Title("State").EditorTemplateName("State_CD").ClientTemplate("#:STATE_NAME#").Filterable(false).HeaderHtmlAttributes(new { title = "The state that the prior auth applies to.", style = "text-align: center; font-weight:bold;" }).HtmlAttributes(new { style = "text-align: center" });
+            c.Bound(p => p.ATS_INCL_EXCL_CD).Hidden(true);
+            c.Bound(p => p.ATS_INCL_EXCL_CD_DESC).Title("Include/Excludes").Filterable(false).HeaderHtmlAttributes(new { title = "Denotes if the status of state is either included or excluded." }).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(120);
+            c.Bound(p => p.STATE_CD).Hidden(true);
+        })
+        .Resizable(resize => resize.Columns(true))
+        .HtmlAttributes(new { style = "height: 400px;" })
+        .Scrollable()
+        .Sortable()
+        .Pageable(pageable => pageable.Refresh(false))
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .PageSize(10)
+            .Read(read => read.Action("GetByGuidelineConfigID", "GuidelineSummary").Data("gsStatesHoverController.params"))
+            .ServerOperation(false)
+            .Model(model =>
+            {
+                model.Field(c => c.STATE_NAME);
+                model.Field(c => c.ATS_INCL_EXCL_CD);
+                model.Field(c => c.ATS_INCL_EXCL_CD_DESC);
+            }
+        ))
+     )
+</div>

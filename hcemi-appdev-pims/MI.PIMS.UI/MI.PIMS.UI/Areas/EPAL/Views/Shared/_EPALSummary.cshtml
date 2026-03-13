@@ -1,0 +1,357 @@
+﻿@model MI.PIMS.BO.Dtos.EPAL_Procedures_V_Dto
+@using Kendo.Mvc.UI
+
+<input type="hidden" id="EPAL_EXP_DT" class="EPAL_EXP_DT" value="@Model.OVERALL_EXP_DT"/>
+
+<div class="container tab-section">
+    <h5>
+        EPAL Summary
+    </h5>     
+    <hr />
+    <!-- Row 1 -->
+    <div class="form-row my-row-padding">
+        <label for="txtCodeStatus" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">Procedure Code Status:</label>
+        <div id="divCodeStatus" class="col-lg-2" data-toggle="tooltip">
+            @*<input type="text" data-toggle="tooltip" class="form-control" id="txtCodeStatus" value="@Model.PROC_CD_STATUS" readonly="readonly">*@
+            <span style="height: 25px; display: inline-block; vertical-align: text-bottom; width: 100%; padding-top: 5px;" class="label-tag-@(@Model.PROC_CD_STATUS == "Valid" ? "green": "red")">@Model.PROC_CD_STATUS</span>
+        </div>
+    </div>
+    <!-- Row 2 -->
+    <div class="form-row my-row-padding">
+        <label class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">HCEMI Reporting Category:</label>
+        <div class="col-lg-2">
+            <input type="text"  data-toggle="tooltip" class="form-control" id="txtStandardCategory" value="@Model.STNDRD_SVC_CAT" readonly>
+        </div>
+        <label class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">HCEMI Reporting Subcategory:</label>
+        <div class="col-lg-2">
+            <input type="text"  data-toggle="tooltip" class="form-control" id="txtStandardSubCategory" value="@Model.STNDRD_SVC_SUBCAT" readonly>
+        </div>
+        <label for="txtCodeType" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">Procedure Code Type:</label>
+        <div class="col-lg-2">
+            <input type="text" data-toggle="tooltip" class="form-control" id="txtCodeType" value="@Model.PROC_CD_TYPE" readonly="readonly">
+        </div>
+    </div>
+    <!-- Row 3 -->
+    <div class="form-row my-row-padding">
+        <label class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight"> Alternate Category: </label>
+        <div class="col-lg-2">
+            <input type="text"  data-toggle="tooltip" class="form-control" id="txtAlternateCategory" value="@Model.ALTRNT_SVC_CAT" readonly />
+        </div>
+        <label class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">Alternate Sub Category:</label>
+        <div class="col-lg-2">
+            <input type="text"  data-toggle="tooltip" class="form-control" id="txtAlternateSubCategory" value="@Model.ALTRNT_SVC_SUBCAT" readonly />
+        </div>
+        <label for="txtCodeDescription" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">Procedure Code Description:</label>
+        <div class="col-lg-2">
+            <textarea class="form-control" data-toggle="tooltip" id="txtCodeDescription" rows="3" readonly="readonly">@Model.PROC_CD_DESC</textarea>
+        </div>
+    </div>    
+    <!-- Row 4 -->
+    <div class="form-row my-row-padding">
+        <label id="lblPriorAuth" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">Prior Auth:</label>
+        <div id="divPriorAuth" class="col-lg-2" data-toggle="tooltip">
+            <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtPriorAuth" name="txtPriorAuth" value="@Model.PRIOR_AUTH_IND">
+        </div>
+        <label for="dpPAEffectiveDate" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">PA Effective Date:</label>
+        <div id="divPAEffectiveDate" class="col-lg-2" data-toggle="tooltip">
+            @(Html.Kendo().DatePicker()
+                .Name("dpPAEffectiveDate")
+                .Value(@Model.PRIOR_AUTH_EFF_DT)
+                .Format("MM/dd/yyyy")
+                .ParseFormats(new string[] {"MMddyyyy",
+                    "MMddyy",
+                    "MM.dd.yyyy",
+                    "MM.dd.yy",
+                    "MM.d.yyyy",
+                    "M.d.yy",
+                    "M.d.yyyy",
+                    "MM/dd/yyyy",
+                    "MM/dd/yy",
+                    "MM/d/yyyy",
+                    "M/d/yy",
+                    "M/d/yyyy",
+                    "MM-dd-yyyy",
+                    "MM-dd-yy",
+                    "MM-d-yyyy",
+                    "M-d-yy",
+                    "M-d-yyyy"
+                })
+                .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                )
+        </div>
+        <label for="dpPAExpirationDate" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">PA Expiration Date:</label>
+        <div id="divPAExpirationDate" class="col-lg-2" data-toggle="tooltip">
+            @(Html.Kendo().DatePicker()
+                .Name("dpPAExpirationDate")
+                .Value(@Model.PRIOR_AUTH_EXP_DT)
+                .Format("MM/dd/yyyy")
+                .ParseFormats(new string[] {"MMddyyyy",
+                    "MMddyy",
+                    "MM.dd.yyyy",
+                    "MM.dd.yy",
+                    "MM.d.yyyy",
+                    "M.d.yy",
+                    "M.d.yyyy",
+                    "MM/dd/yyyy",
+                    "MM/dd/yy",
+                    "MM/d/yyyy",
+                    "M/d/yy",
+                    "M/d/yyyy",
+                    "MM-dd-yyyy",
+                    "MM-dd-yy",
+                    "MM-d-yyyy",
+                    "M-d-yy",
+                    "M-d-yyyy"
+                })
+                .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                .HtmlAttributes(new { style = "width: 100%", title = "PA_PROC_EXP_DT from EPAL_PA_PROCEDURES_T table", @class = "form-to-update" })
+                )
+        </div>
+    </div>
+    <!-- Row 5 -->
+    <div class="form-row my-row-padding">
+        <label id="lblPreDetermination" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">Pre-Determination:</label>
+        <div id="divPreDetermination" class="col-lg-2" data-toggle="tooltip">
+            <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtPreDetermination" name="txtPreDetermination" value="@Model.PRE_DET_IND">
+        </div>
+        <label for="divPreDeterminationEffDate" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">Pre Determination Effective Date:</label>
+        <div id="divPreDeterminationEffDate" class="col-lg-2" data-toggle="tooltip">
+            @(Html.Kendo().DatePicker()
+                .Name("dpPreDeterminationEffDate")
+                .Min(Convert.ToDateTime("01/01/1900"))
+                .Value(@Model.PRE_DET_EFF_DT)
+                .Format("MM/dd/yyyy")
+                .ParseFormats(new string[] {"MMddyyyy",
+                    "MMddyy",
+                    "MM.dd.yyyy",
+                    "MM.dd.yy",
+                    "MM.d.yyyy",
+                    "M.d.yy",
+                    "M.d.yyyy",
+                    "MM/dd/yyyy",
+                    "MM/dd/yy",
+                    "MM/d/yyyy",
+                    "M/d/yy",
+                    "M/d/yyyy",
+                    "MM-dd-yyyy",
+                    "MM-dd-yy",
+                    "MM-d-yyyy",
+                    "M-d-yy",
+                    "M-d-yyyy"
+                })
+                .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                )
+        </div>
+        <label for="divPreDeterminationExpDate" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">Pre Determination Expiration Date:</label>
+        <div id="divPreDeterminationExpDate" class="col-lg-2" data-toggle="tooltip">
+            @(Html.Kendo().DatePicker()
+                .Name("dpPreDeterminationExpDate")
+                .Value(@Model.PRE_DET_EXP_DT)
+                .Format("MM/dd/yyyy")
+                .ParseFormats(new string[] {"MMddyyyy",
+                    "MMddyy",
+                    "MM.dd.yyyy",
+                    "MM.dd.yy",
+                    "MM.d.yyyy",
+                    "M.d.yy",
+                    "M.d.yyyy",
+                    "MM/dd/yyyy",
+                    "MM/dd/yy",
+                    "MM/d/yyyy",
+                    "M/d/yy",
+                    "M/d/yyyy",
+                    "MM-dd-yyyy",
+                    "MM-dd-yy",
+                    "MM-d-yyyy",
+                    "M-d-yy",
+                    "M-d-yyyy"
+                })
+                .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                )
+        </div>
+    </div>
+    <!-- Row 6 -->
+    <div class="form-row my-row-padding">
+        <label id="lblAdvNotification" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">Advanced Notification:</label>
+        <div id="divAdvNotification" class="col-lg-2" data-toggle="tooltip">
+            <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtAdvNotification" name="txtAdvNotification" value="@Model.ADV_NTFCTN_IND">
+        </div>
+        <label for="divAdvNotificationEffDate" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">Advanced Notification Effective Date:</label>
+        <div id="divAdvNotificationEffDate" class="col-lg-2" data-toggle="tooltip">
+            @(Html.Kendo().DatePicker()
+                .Name("dpAdvNotificationEffDate")
+                .Min(Convert.ToDateTime("01/01/1900"))
+                .Value(@Model.ADV_NTFCTN_EFF_DT)
+                .Format("MM/dd/yyyy")
+                .ParseFormats(new string[] {"MMddyyyy",
+                    "MMddyy",
+                    "MM.dd.yyyy",
+                    "MM.dd.yy",
+                    "MM.d.yyyy",
+                    "M.d.yy",
+                    "M.d.yyyy",
+                    "MM/dd/yyyy",
+                    "MM/dd/yy",
+                    "MM/d/yyyy",
+                    "M/d/yy",
+                    "M/d/yyyy",
+                    "MM-dd-yyyy",
+                    "MM-dd-yy",
+                    "MM-d-yyyy",
+                    "M-d-yy",
+                    "M-d-yyyy"
+                })
+                .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                )
+        </div>
+        <label for="divAdvNotificationExpDate" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">Advanced Notification Expiration Date:</label>
+        <div id="divAdvNotificationExpDate" class="col-lg-2" data-toggle="tooltip">
+            @(Html.Kendo().DatePicker()
+                .Name("dpAdvNotificationExpDate")
+                .Value(@Model.ADV_NTFCTN_EXP_DT)
+                .Format("MM/dd/yyyy")
+                .ParseFormats(new string[] {"MMddyyyy",
+                    "MMddyy",
+                    "MM.dd.yyyy",
+                    "MM.dd.yy",
+                    "MM.d.yyyy",
+                    "M.d.yy",
+                    "M.d.yyyy",
+                    "MM/dd/yyyy",
+                    "MM/dd/yy",
+                    "MM/d/yyyy",
+                    "M/d/yy",
+                    "M/d/yyyy",
+                    "MM-dd-yyyy",
+                    "MM-dd-yy",
+                    "MM-d-yyyy",
+                    "M-d-yy",
+                    "M-d-yyyy"
+                })
+                .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+             )
+        </div>
+    </div>
+    <!-- Row 7 -->
+    <div class="form-row my-row-padding">
+        <label for="txtDrugReviewAtLaunch" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">Drug Review At Launch:</label>
+        <div class="col-lg-2">
+            <input type="text" class="form-control" data-toggle="tooltip" id="txtDrugReviewAtLaunch" disabled="disabled" value="@Model.DRUG_RVW_AT_LAUNCH_IND">
+        </div>
+        <label for="divDRALEffDate" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">Drug Review at Launch Eff Date:</label>
+        <div id="divDRALEffDate" class="col-lg-2" data-toggle="tooltip">
+            @(Html.Kendo().DatePicker()
+                .Name("dpDRALEffDate")
+                .Min(Convert.ToDateTime("01/01/1900"))
+                .Value(@Model.DRAL_EFF_DT)
+                .Format("MM/dd/yyyy")
+                .ParseFormats(new string[] {"MMddyyyy",
+                    "MMddyy",
+                    "MM.dd.yyyy",
+                    "MM.dd.yy",
+                    "MM.d.yyyy",
+                    "M.d.yy",
+                    "M.d.yyyy",
+                    "MM/dd/yyyy",
+                    "MM/dd/yy",
+                    "MM/d/yyyy",
+                    "M/d/yy",
+                    "M/d/yyyy",
+                    "MM-dd-yyyy",
+                    "MM-dd-yy",
+                    "MM-d-yyyy",
+                    "M-d-yy",
+                    "M-d-yyyy"
+                })
+                .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+                )
+        </div>
+        <label for="divDRALExpDate" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">Drug Review At Launch Exp Date:</label>
+        <div id="divDRALExpDate" class="col-lg-2" data-toggle="tooltip">
+            @(Html.Kendo().DatePicker()
+                .Name("dpDRALExpDate")
+                .Value(@Model.DRAL_EXP_DT)
+                .Format("MM/dd/yyyy")
+                .ParseFormats(new string[] {"MMddyyyy",
+                    "MMddyy",
+                    "MM.dd.yyyy",
+                    "MM.dd.yy",
+                    "MM.d.yyyy",
+                    "M.d.yy",
+                    "M.d.yyyy",
+                    "MM/dd/yyyy",
+                    "MM/dd/yy",
+                    "MM/d/yyyy",
+                    "M/d/yy",
+                    "M/d/yyyy",
+                    "MM-dd-yyyy",
+                    "MM-dd-yy",
+                    "MM-d-yyyy",
+                    "M-d-yy",
+                    "M-d-yyyy"
+                })
+                .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+                .HtmlAttributes(new { style = "width: 100%", @class = "form-to-update" })
+             )
+        </div>
+    </div>
+    <!-- Row 8 -->
+    <div class="form-row my-row-padding">
+        <label for="ddlPAMinAge" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">EPAL Requirement Min Age:</label> @*User Story 130954*@
+        <div class="col-lg-2">
+            @(Html.Kendo().DropDownList()
+                .Name("ddlPAMinAge")
+                .BindTo(new List<string>() {
+                      "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20",
+                      "21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39",
+                      "40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58",
+                      "59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77",
+                      "78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96",
+                      "97","98","99",
+                  })
+                .OptionLabel("------")
+                .Value(@Model.PRIOR_AUTH_AGE_MIN) 
+                .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+               .HtmlAttributes(new { style = "width: 100%", @class= "form-to-update" })
+            )
+        </div>
+        <label for="ddlPAMaxAge" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">EPAL Requirement Max Age:</label> @*User Story 130954*@
+        <div class="col-lg-2">
+            @(Html.Kendo().DropDownList()
+                .Name("ddlPAMaxAge") 
+                .BindTo(new List<string>() {
+                      "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20",
+                      "21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39",
+                      "40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58",
+                      "59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77",
+                      "78","79","80","81","82","83","84","85","86","87","88","89","90","91","92","93","94","95","96",
+                      "97","98","99",
+                  })
+                .OptionLabel("------")
+                .Value(@Model.PRIOR_AUTH_AGE_MAX)         
+                .Enable(((string)ViewData["PageType"] == @Roles.EPALReadOnly.ToString() ? false : true))
+               .HtmlAttributes(new { style = "width: 100%", @class= "form-to-update" })
+            )
+        </div>
+    </div>
+    <!-- Row 9 -->
+    <div class="form-row my-row-padding">
+        <label for="txtDxCodeRequirments" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">Dx Code Requirements:</label>
+        <div class="col-lg-2">
+            <input type="text" data-toggle="tooltip" class="form-control" id="txtDxCodeRequirements" readonly value="">
+        </div>
+
+        <label for="txtSource"  data-toggle="tooltip" class="col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight">Source:</label>
+        <div class="col-lg-2">
+            <input type="text"  data-toggle="tooltip" class="form-control" id="txtSource" value="@Model.EPAL_ORIGIN_TAB" readonly="readonly">
+        </div>
+    </div>
+</div>
+
+

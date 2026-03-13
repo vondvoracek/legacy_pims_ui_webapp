@@ -1,0 +1,31 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "Forbidden ICHRA Record";
+    Layout = "~/Views/Shared/_LayoutErrorHandler.cshtml";
+}
+
+<div id="error-type">
+    <div class="error-type">
+        <div class="error-type-number"></div>
+        @*    <h1>403</h1>*@
+        <h2>Forbidden access to ICHRA Record</h2>
+        <br />
+
+        <span style="font-size: 14px;">
+            You do not have access rights to this ICHRA record page in PIMS.
+            <br /> <br />
+            For administration support, please send an email to <b>PIMS_Operations_Team@ds.uhc.com</b>
+            <br /> <br />
+            or
+            <br /> <br />
+            click the link below.
+            <br />
+        </span>
+        <a style="font-size:14px; text-decoration:underline" target="_blank" href="mailto:PIMS_Operations_Team@ds.uhc.com?subject=PIMS Support">PIMS Operations Team</a>
+
+        <br />   <br />
+
+        <button id="btnGoBack" type="submit" onclick="history.back()" class="btn btn-primary noSubmit" title="Click to Return to previous page!"> Return to previous page</button>
+        @*<a href="javascript:void()" id="backToHome">Back to home</a>*@
+    </div>
+</div>

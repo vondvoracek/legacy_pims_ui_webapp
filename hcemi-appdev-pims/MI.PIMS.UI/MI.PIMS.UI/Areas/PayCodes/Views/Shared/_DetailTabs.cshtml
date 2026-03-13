@@ -1,0 +1,114 @@
+﻿@{
+    //ViewData["PageType"] = ViewData["PageType"];
+}
+
+@model MI.PIMS.BO.Dtos.PayCode_Procedures_T_Dto
+@if (@ViewData["Title"].ToString() == "Add Detail" || ViewData["Title"].ToString() == "Duplicate Record Detail")
+{
+    <div class="container detail-tab-section">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="PayCodeSummary-tab" data-toggle="tab" href="#PayCodeSummary" role="tab" aria-controls="PayCodeSummary" aria-selected="true">Pay Code  Summary</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="EPALPayCodeSummary-tab" data-toggle="tab" href="#EPALPayCodeSummary" role="tab" aria-controls="EPALPayCodeSummary" aria-selected="false">EPAL Pay Code  Summary</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="additionalInformation-tab" data-toggle="tab" href="#additionalInformation" role="tab" aria-controls="additionalInformation" aria-selected="false">Additional Information</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="changeHistory-tab" data-toggle="tab" href="#changeHistory" role="tab" aria-controls="changeHistory" aria-selected="false">Change History</a>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="PayCodeSummary" role="tabpanel" aria-labelledby="PayCodeSummary-tab">
+                <partial name="_PayCodeSummary" model="Model" view-data="ViewData" />
+            </div>
+            <div class="tab-pane fade" id="EPALPayCodeSummary" role="tabpanel" aria-labelledby="EPALPayCodeSummary-tab">
+                <partial name="_EPALPayCodeSummary" model="Model" view-data="ViewData" />
+            </div>
+            <div class="tab-pane fade" id="additionalInformation" role="tabpanel" aria-labelledby="additionalInformation-tab">
+                <partial name="_AdditionalInformation" view-data="ViewData" />
+            </div>
+            <div class="tab-pane fade" id="changeHistory" role="tabpanel" aria-labelledby="changeHistory-tab">
+                <partial name="_ChangeHistory" view-data="ViewData" />
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container detail-tab-section">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="PayCodeSummary-tab" data-toggle="tab" href="#PayCodeSummary" role="tab" aria-controls="PayCodeSummary" aria-selected="true">Pay Code  Summary</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="EPALPayCodeSummary-tab" data-toggle="tab" href="#EPALPayCodeSummary" role="tab" aria-controls="EPALPayCodeSummary" aria-selected="false">EPAL Pay Code  Summary</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="additionalInformation-tab" data-toggle="tab" href="#additionalInformation" role="tab" aria-controls="additionalInformation" aria-selected="false">Additional Information</a>
+            </li>
+
+            <li class="nav-item" role="presentation">
+                <a class="nav-link required" id="changeHistory-tab" data-toggle="tab" href="#changeHistory" role="tab" aria-controls="changeHistory" aria-selected="false">Change History</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="historicalInformation-tab" data-toggle="tab" href="#historicalInformation" role="tab" aria-controls="historicalInformation" aria-selected="false">Historical Information</a>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="PayCodeSummary" role="tabpanel" aria-labelledby="PayCodeSummary-tab">
+                <partial name="_PayCodeSummary" model="Model" view-data="ViewData" />
+            </div>
+            <div class="tab-pane fade" id="EPALPayCodeSummary" role="tabpanel" aria-labelledby="EPALPayCodeSummary-tab">
+                <partial name="_EPALPayCodeSummary" model="Model" view-data="ViewData" />
+            </div>
+            <div class="tab-pane fade" id="additionalInformation" role="tabpanel" aria-labelledby="additionalInformation-tab">
+                <partial name="_AdditionalInformation" view-data="ViewData" />
+            </div>
+            <div class="tab-pane fade" id="changeHistory" role="tabpanel" aria-labelledby="changeHistory-tab">
+                <partial name="_ChangeHistory" view-data="ViewData" />
+            </div>
+            <div class="tab-pane fade" id="historicalInformation" role="tabpanel" aria-labelledby="historicalInformation-tab">
+                <partial name="_HistoricalInformation" view-data="ViewData" />
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    $(document).ready(function () {
+        const tabs = myTab.querySelectorAll(".nav-item");
+        tabs.forEach(tab => {
+            tab.addEventListener('click', (event) => {
+                const appInsightsClient = new TelemetryLogger();
+                //var pageView = ViewData["Title"].ToString();
+                var pageView = '@Html.Raw(ViewData["Title"])';
+                var pageType;
+                switch(pageView){
+                    case "Add Detail":
+                        pageType = "PayCodeAdd";
+                        break;
+                    case "Edit Detail":
+                        pageType = "PayCodeEdit";
+                        break;
+                    case "Add New":
+                        pageType = "PayCodewNew";
+                        break;
+                    case "Duplicate Record Detail":
+                        pageType = "PayCodeDuplicate";
+                        break;
+                    case "View Detail":
+                    default:
+                        pageType = "PayCodeView";
+                }
+                if(appInsightsClient.isAppInsightsEnabled("Client." + pageType)) {
+                    var tabStr = event.target.innerText;
+                    const logProperties = new LogInfo(event.target.id, MS_ID, "Page View " + pageType + " " + tabStr + " Tab click");
+                    appInsightsClient.trackEvent('Client.' + pageType + '.' + tabStr.replaceAll(' ', ''), logProperties);
+                }
+            });
+        });
+    });
+</script>

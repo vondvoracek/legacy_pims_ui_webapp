@@ -1,0 +1,78 @@
+﻿@model MI.PIMS.BO.Dtos.EPAL_Procedures_V_Dto
+@using Kendo.Mvc.UI
+@using MI.PIMS.UI.Common
+@{
+    ViewData["Title"] = "View Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    ViewData["PageType"] = @Roles.EPALReadOnly.ToString();
+    ViewData["EPALPageView"] = @EPALPageView.ViewDetail.ToString();
+}
+
+
+@if (Model != null)
+{
+    @Html.Hidden("epal-page-view", ViewData["EPALPageView"].ToString())
+    <div style="height:100%" class="my-form-font">
+        <div class="breadcrumb-background">
+            <div class="container">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb breadcrumb-background">
+                        <li class="breadcrumb-item"><a>@Html.ActionLink("Home", "index", "/", new { Area = "" }, new { @class = "breadcrumb-item-font" })</a></li>
+                        <li class="breadcrumb-item"><a>@Html.ActionLink("EPAL Search", "Index", "Home", new { Area = "EPAL" }, new { @class = "breadcrumb-item-font" })</a></li>
+                        <li class="breadcrumb-item active" style="color: black !important; cursor: initial;" aria-current="page">View Detail</li>
+                                              
+                    </ol>
+                </nav>
+                @if(!String.IsNullOrEmpty(Model.dateErrorString)){
+                    <div style="width: 99%;text-align: left;white-space: pre-line;font-size:14px;margin-top: -15px;margin-left: 5px;padding-top: 10px;margin-bottom: 9px;padding-bottom: 10px;" class="date-error-string label-tag-red">@Model.dateErrorString</div>                            
+                }                  
+            </div>
+        </div>
+
+        @*@await Html.PartialAsync("_DetailHeader", Model)*@
+        @*@await Html.PartialAsync("_DetailTabs", Model)*@                       
+        <partial name="_DetailHeader" model="Model" view-data="ViewData" />
+        <partial name="_DetailTabs" model="Model" view-data="ViewData" />
+    </div>
+    <br />
+    <br /> 
+}
+
+else
+{
+    <div class="container">
+    <div style="height:100%" class="my-form-font">
+        @*@await Html.PartialAsync("_NoRecordsFound")*@
+        <partial name="_NoRecordsFound"/>
+    </div>
+    <br />
+    <br />
+    </div> 
+}
+
+<link rel="stylesheet" href="~/css/EPAL/Detail.css" asp-append-version="true"/>
+<script src="~/js/EPAL/Detail.js" asp-append-version="true"></script>
+<script src="~/js/EPAL/DetailToolTips.js" asp-append-version="true"></script>
+
+
+<script>
+    $(function() {
+
+        // Log User Access Hist for the page and logged in user
+        var pims_id = "@Model" != null ? "@Model.EPAL_HIERARCHY_KEY.ToStringNullSafe()": "";
+
+        UserAccessHistController.add({
+            "MODULE_NAME": "EPAL",
+            "USERACTION": "EPAL/Home/ViewDetail?pims_id=" + pims_id,
+            "USERSELECTION": "EPAL/Home/ViewDetail",
+            "LST_UPDT_DT": null,
+            "LST_UPDT_BY": MS_ID,
+            "PAGE_ID": "4",
+            "__RequestVerificationToken": $('meta[name="request-verification-token"]')[0].content
+
+        });
+    });
+</script>

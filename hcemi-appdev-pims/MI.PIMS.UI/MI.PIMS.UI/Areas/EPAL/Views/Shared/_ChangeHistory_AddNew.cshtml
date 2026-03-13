@@ -1,0 +1,97 @@
+﻿@model MI.PIMS.BO.Dtos.EPAL_Procedures_V_Dto
+@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "ChangeHistory";
+}
+<script src="~/js/EPAL/ChangeHistory.js" asp-append-version="true"></script>
+@inject MI.PIMS.UI.Services.MIAuthenticate.IMIAuthenticateService _miAuthenticateService
+@inject MI.PIMS.UI.Common.Helper _helper
+
+@{
+    var _UserInfo_T_Dto = (MI.PIMS.BO.Dtos.UserInfo_T_Dto)_miAuthenticateService.UserInfo_T_Dto(_helper.MS_ID);
+    var s = _UserInfo_T_Dto.APP_ROLEIDS;
+    string[] appRoles = s.Split(',');
+
+}
+
+<div class="container tab-section">
+    <h5>
+        Change History
+    </h5>
+    <hr />
+    <div class="form-row my-row-padding">
+
+        <div class="col-lg-6">
+            <div>
+                <label for="txtChangeSource" class="text-lg-right text-sm-left col-form-label font-modal-weight required">Change Source (Limit 50 Character Max):</label>
+            </div>
+            <textarea class="form-control" data-toggle="tooltip" id="txtChangeSource" maxlength="50" name="txtChangeSource" rows="5" @(appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALReadWrite))
+                                                                                                                                      || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALAdmin))
+                                                                                                                                      || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPAdmin))
+                                                                                                                                      || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPReadWrite))
+                                                                                                                                      || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.ICHRAAdmin))
+                                                                                                                                      || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.ICHRAReadWrite))
+                                                                                                                                      || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRAdmin))
+                                                                                                                                      || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRReadWrite))
+                                                                                                                                      || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin)) ? "" : "readonly='readonly'")>@Model.CHANGE_REQ_ID</textarea>
+        </div>
+
+        <div class="col-lg-6">
+            <div>
+                <label for="txtChangeDesc" class="text-lg-right text-sm-left col-form-label font-modal-weight required">Change Description (Limit 500 Character Max):</label>
+            </div>
+            <textarea class="form-control" data-toggle="tooltip" id="txtChangeDesc" maxlength="500" name="txtChangeDesc" rows="5" @(appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALReadWrite))
+                                                                                                                                  || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALAdmin))
+                                                                                                                                  || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPAdmin))
+                                                                                                                                  || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.CMPReadWrite))
+                                                                                                                                  || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.ICHRAAdmin))
+                                                                                                                                  || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.ICHRAReadWrite))
+                                                                                                                                  || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRAdmin))
+                                                                                                                                  || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRReadWrite))
+                                                                                                                                  || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin)) ? "" : "readonly='readonly'")>@Model.CHANGE_DESC</textarea>
+        </div>
+
+
+    </div>
+    <br />
+    <form id="frmChangeHistory">
+
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <div style="font-size:11px !important;">
+                    @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.EPAL_Procedures_AssoCodes_T_ChangeHistory_Dto>
+                    ()
+                    .Name("grid_ChangeHistory")
+                    .Columns(c => {
+                    c.Bound(p => p.CHANGEBY).Title("Change By").Filterable(false).HeaderHtmlAttributes(new {title = "Change By."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                    c.Bound(p => p.CHANGEDATE).Title("Change Date").Filterable(false).HeaderHtmlAttributes(new {title = "The date the record was changed or initiated."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                    c.Bound(p => p.CHANGESOURCE).Title("Change Source").Filterable(false).HeaderHtmlAttributes(new {title = "The source from which the change was requested."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                    c.Bound(p => p.CHANGEDESCRIPTION).Title("Change Description").HeaderHtmlAttributes(new {title = "The description of the change that was performed to the record."}).Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                    c.Bound(p => p.ChangeType).Title("Change Type").Filterable(false).HeaderHtmlAttributes(new {title = "The type of record that the change or entry was performed on in the system."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+
+                    })
+                    .Resizable(resize => resize.Columns(true))
+                    .HtmlAttributes(new { style = "height: 75%" })
+                    .Sortable()
+                    .NoRecords()
+                    .Navigatable()
+                    .Pageable(pageable => pageable
+                    .Refresh(true)
+                    .PreviousNext(true)
+                    .Numeric(true)
+                    )
+                    //.AutoBind(false)
+                    .Scrollable()
+                    .Selectable()
+                    .Filterable()
+                    .DataSource(dataSource => dataSource
+                    .Ajax()
+                    .PageSize(100)
+                    .Read(read => read.Action("ChangeHistory", "Home").Data("ChangeHistoryController.grid.param")))
+                    )
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+

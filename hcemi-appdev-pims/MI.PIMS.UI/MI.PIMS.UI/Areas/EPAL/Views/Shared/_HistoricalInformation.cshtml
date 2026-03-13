@@ -1,0 +1,127 @@
+﻿@inject MI.PIMS.UI.Services.MIAuthenticate.IMIAuthenticateService _miAuthenticateService
+@inject MI.PIMS.UI.Common.Helper _helper
+@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "EPAL - Historical Information";
+}
+
+@{
+    var _UserInfo_T_Dto = (MI.PIMS.BO.Dtos.UserInfo_T_Dto)_miAuthenticateService.UserInfo_T_Dto(_helper.MS_ID);
+    var s = _UserInfo_T_Dto.APP_ROLEIDS;
+    string[] appRoles = s.Split(',');
+    <input type="hidden" readonly id="txtAppRoleIds" value="@_UserInfo_T_Dto.APP_ROLEIDS" />
+}
+
+
+
+<style>
+.edit-epal-icon{
+    cursor:pointer;font-size: 15px;margin-top: 4px;
+}
+
+.edit-epal-icon:hover {
+    transform: scale(1.3);
+}
+</style>
+
+<script src="~/js/EPAL/_HistoricalInformation.js" asp-append-version="true"></script>
+
+<div class="container tab-section">
+    <h5>
+        Historical Information
+    </h5>
+    <hr />
+    <form id="frmHistoricalInformation">
+
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <div style="font-size:11px !important;">
+                    @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.EPAL_Procedures_V_Dto>()
+                        .Name("grid_HistoricalInformation")
+                        .Columns(c => {
+@*                                c.Bound(p => p.EPAL_HIERARCHY_KEY)
+                                    .Title("PIMS ID")
+                                    .ClientTemplate(
+                                        "<a href='javascript:void(0);' style='color:blue;' onclick=\"_HistoricalInformationController.methods.redirect('#= EPAL_HIERARCHY_KEY#,#= kendo.toString(kendo.parseDate(EPAL_VER_EFF_DT),'MM-dd-yyyy hh:mm:ss tt') #');\" title='Click to view details!' \\data-target='tooltip'\\>#= EPAL_HIERARCHY_KEY # </a>" +
+                                        (_UserInfo_T_Dto.APP_ROLEID != (int)MI.PIMS.UI.Roles.EPALReadOnly ? "#if(IS_CURRENT == 'Y' && HIERARCHY_CODES_IS_ACTIVE!='Inactive'){# <i class=\"edit-epal-icon k-icon k-i-pencil text-primary float-right\" onclick=\"_HistoricalInformationController.methods.redirect_edit('#= EPAL_HIERARCHY_KEY #, #= kendo.toString(kendo.parseDate(EPAL_VER_EFF_DT),'MM-dd-yyyy hh:mm:ss tt') #');\" title='Click to edit details!' \\data-target='tooltip'\\></i> #}#"  : "")                        
+                                    )
+                                    .Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                                    .HtmlAttributes(new { style = "text-align: center" }).Width(200);*@
+                            c.Bound(p => p.EPAL_HIERARCHY_KEY)
+                                .Title("PIMS ID")
+                                .ClientTemplate(
+                                    "<a href='javascript:void(0);' style='color:blue;' onclick=\"_HistoricalInformationController.methods.redirect('#= EPAL_HIERARCHY_KEY#,#= kendo.toString(kendo.parseDate(EPAL_VER_EFF_DT),'MM-dd-yyyy hh:mm:ss tt') #');\" title='Click to view details!' \\data-target='tooltip'\\>#= EPAL_HIERARCHY_KEY # </a>" +
+                                ((appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALReadWrite))
+                                || (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.EPALAdmin))
+                                || (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRAdmin))
+                                || (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.UMRReadWrite))
+                                || (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin))))))
+                                ) ? "<i class=\"edit-epal-icon k-icon k-i-pencil text-primary showPencil float-right\" onclick=\"_HistoricalInformationController.methods.redirect_edit('#= EPAL_HIERARCHY_KEY #, #= kendo.toString(kendo.parseDate(EPAL_VER_EFF_DT),'MM-dd-yyyy hh:mm:ss tt') #');\" title='Click to edit details!' \\data-target='tooltip'\\></i> " : "")
+                                )
+                        .Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                        .HtmlAttributes(new { style = "text-align: center" }).Width(200);
+
+                            c.Bound(p => p.PROC_CD).Title("Procedure Code").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(120);
+                            c.Bound(p => p.EPAL_BUS_SEG_CD).Title("Business <br /> Segment").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(120);
+                            c.Bound(p => p.EPAL_ENTITY_CD).Title("Entity").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(100);
+                            c.Bound(p => p.EPAL_PRODUCT_CD).Title("Product").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(100);
+                            c.Bound(p => p.EPAL_PLAN_CD).Title("Plan").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                            c.Bound(p => p.EPAL_FUND_ARNGMNT_CD).Title("Funding <br /> Arrangement").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150);
+                            c.Bound(p => p.DRUG_NM).Title("Drug Name").Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(150); 
+                            c.Bound(p => p.EPAL_VER_EFF_DT).Filterable(false)
+                                .Title("EPAL Ver <br />Eff Date")
+                                .ClientTemplate("#= (data.EPAL_VER_EFF_DT == null) ? ' ' : kendo.toString(kendo.parseDate(EPAL_VER_EFF_DT), 'MM/dd/yyyy hh:mm:ss tt') #")
+                                .HtmlAttributes(new { style = "text-align: center" })
+                                .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                                .Width(150);                        
+                            c.Bound(p => p.OVERALL_EFF_DT).Filterable(false)
+                                .Title("Overall<br/>Eff Date")
+                                .ClientTemplate("#= ( kendo.toString(kendo.parseDate(OVERALL_EFF_DT), 'MM/dd/yyyy') == '12/31/2999' || (data.OVERALL_EFF_DT == null)) ? ' ' : kendo.toString(kendo.parseDate(OVERALL_EFF_DT), 'MM/dd/yyyy') #")
+                                .HtmlAttributes(new { style = "text-align: center" })
+                                .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                                .Width(150);
+                            c.Bound(p => p.OVERALL_EXP_DT).Filterable(false)
+                                .Title("Overall<br/>Exp Date")
+                                .ClientTemplate("#= ( kendo.toString(kendo.parseDate(OVERALL_EXP_DT), 'MM/dd/yyyy') == '12/31/2999'  || (data.OVERALL_EXP_DT == null)) ? ' ' : kendo.toString(kendo.parseDate(OVERALL_EXP_DT), 'MM/dd/yyyy') #")
+                                .HtmlAttributes(new { style = "text-align: center" })
+                                .HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" })
+                                .Width(150);
+                         c.Bound(p => p.IS_CURRENT)
+                                    .ClientTemplate("#if(IS_CURRENT=='Y') {#<i style='color:teal;' class='fas fa-check-circle 3x'></i> #} else {# <i style='color:red;' class='fas fa-times 3x'></i> #} #")
+                                    .Title("<b>Current <br/>Record</b>")
+                                    .Width(80)
+                                    .HtmlAttributes(new { style = "text-align:center" })
+                                    .HeaderHtmlAttributes(new { style = "text-align:center" })
+                                    .Filterable(false);
+                            c.Bound(p => p.INCLUDE_HISTORICAL).ClientTemplate("<span id='lblHistorical'>#= data.INCLUDE_HISTORICAL#</span>").Title("INCLUDE_HISTORICAL").Hidden(true);
+                            c.Bound(p => p.IS_CURRENT).ClientTemplate("<span id='lblIs_Current'>#= data.IS_CURRENT#</span>").Title("IS_CURRENT").Hidden(true);
+                            c.Bound(p => p.HIERARCHY_CODES_IS_ACTIVE).ClientTemplate("<span id='lblHierarchy'>#= data.HIERARCHY_CODES_IS_ACTIVE#</span>").Title("HIERARCHY_CODES_IS_ACTIVE").Hidden(true);
+
+                        })
+                        .Resizable(resize => resize.Columns(true))
+                        .HtmlAttributes(new { style = "height: 100%" })
+                        .Sortable()
+                        .NoRecords()
+                        .Navigatable()
+                        .Events(e => e.DataBound("_HistoricalInformationController.grid.onDataBound")
+                        )
+                       @* .ToolBar(tools => tools.Excel())*@
+                        .Pageable(pageable => pageable
+                            .Refresh(true)
+                            .PreviousNext(true)
+                            .Numeric(true)
+                        )
+                        .AutoBind(true)
+                        .Scrollable()
+                        .Selectable()
+                        .Filterable()                        
+                        .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(100)
+                        .Read(read => read.Action("GetEPALProceduresHist", "Home", new { Area = "EPAL"}).Data("_HistoricalInformationController.grid.param")))
+                    )
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

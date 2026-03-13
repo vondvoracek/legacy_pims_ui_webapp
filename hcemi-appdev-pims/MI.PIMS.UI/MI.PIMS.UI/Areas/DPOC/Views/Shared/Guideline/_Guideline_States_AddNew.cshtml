@@ -1,0 +1,73 @@
+﻿@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "StateInfo";
+}
+<script src="~/js/DPOC/_DPOC_GuidelineState.js" asp-append-version="true"></script>
+
+<style>
+    .position-absolute {
+        position: absolute !important;
+    }
+</style>
+
+<div class="container">
+    <div class="form-row my-row-padding">
+        <label class="col-md-3 text-lg-left text-sm-left col-form-label font-modal-weight required">State Include/Exclude</label>
+        <div class="col-md-6">
+            @(Html.Kendo().DropDownList()
+                .Name("ddlStateInclExcl")
+                .DataTextField("DESC")
+                .DataValueField("INCL_EXCL_CD")
+                .OptionLabel("Type or Click for Dropdown")
+                .HtmlAttributes(new { style = "width: 100%" })
+                //.Events(events => events.Change("StateInfoController.onChangeddlStateInclExcl"))
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetInclExclCDs", "Home", new { Area = "EPAL" });
+                    })
+                    .ServerFiltering(false);
+                })
+                )
+        </div>
+    </div>
+    @(
+        Html.Kendo().Grid<MI.PIMS.BO.Dtos.DPOC_Inv_Gdln_Appl_To_States_T_Dto>()
+        .Name("grid_GSStateInfo")
+        .AutoBind(false)
+        .Columns(c =>
+        {
+            c.Bound(p => p.STATE_NAME).Title("State").EditorTemplateName("State_CD").ClientTemplate("#:STATE_NAME#").Filterable(false).HeaderHtmlAttributes(new { title = "The state that the prior auth applies to.", style = "text-align: center; font-weight:bold;" }).HtmlAttributes(new { style = "text-align: center" });
+            c.Bound(p => p.ATS_INCL_EXCL_CD).Hidden(true);
+            c.Command(command => command.Custom(" ").Template("<a class='btn btn-default btn-outline-primary noSubmit grid-column-button gsstate-info-delete'  href='javascript:void(0);' title='Click to delete this row!' \\data-target='tooltip'\\><i  class=\"k-icon k-i-delete\"></i></a>")).Width(50);
+            c.Bound(p => p.STATE_CD).Hidden(true);
+        })
+        .ToolBar(toolbar =>
+        {
+            toolbar.Create();
+        })
+        .Editable(editable => editable.Mode(GridEditMode.InCell).DisplayDeleteConfirmation(false))
+        .Events(events => events.DataBound("StateInfoController.grid.onDataBound"))
+        //.HtmlAttributes(new { style = "height: 400px;" })
+        .Scrollable(s => s.Enabled(false))
+        .Sortable()
+        .Pageable(pageable => pageable.Refresh(false))
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .PageSize(10)
+            .Read(read => read.Action("GetByGuidelineConfigID", "GuidelineSummary").Data("StateInfoController.grid.param"))
+            .ServerOperation(false)
+            .Model(model =>
+                {                    
+                    model.Field(c => c.STATE_NAME);
+                    model.Field(c => c.ATS_INCL_EXCL_CD).DefaultValue("");
+                    model.Field(c => c.ATS_INCL_EXCL_CD_DESC).DefaultValue("");
+                }
+        ))
+    )
+</div>
+<div class="window-footer dpoc-guideline-state-footer">
+    <button type="button" class="btn btn-primary btn-sm dpoc-guideline-config-state-widget-window-save" onclick="StateInfoController.update();"><i class="fas fa-save"></i> Update</button>
+    <button type="button" class="btn btn-default btn-sm dpoc-guideline-config-state-widget-window-close" onclick="gsStateWindow.close();" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+</div>

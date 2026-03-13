@@ -1,0 +1,376 @@
+﻿@inject MI.PIMS.UI.Services.MIAuthenticate.IMIAuthenticateService _miAuthenticateService
+@inject MI.PIMS.UI.Common.Helper _helper
+@model MI.PIMS.BO.Dtos.PayCode_Procedures_T_Dto
+@{
+    var _UserInfo_T_Dto = (MI.PIMS.BO.Dtos.UserInfo_T_Dto)_miAuthenticateService.UserInfo_T_Dto(_helper.MS_ID);
+    var s = _UserInfo_T_Dto.APP_ROLEIDS;
+    string[] appRoles = s.Split(',');
+}
+<div class="container  search-section" style="padding-left:30px; padding-right:30px;">
+    <div class="section-heading">
+        <div class="row">
+            <div class="col-md-7 col-sm-7 col-lg-7">
+                <div style="font-size: 14px; margin-top:4px; ">
+                  
+
+                    @if (@ViewData["Title"].ToString() == "Duplicate Record Detail")
+                    {
+                        <div style="font-size: 14px; margin-top:4px; ">
+                            Pay Code Detail &nbsp; <span style="font-size: 11px; font-style: italic;">(Copied from PIMS Pay Code ID:</span>
+                            <a id="btnGotoDetail" style="font-size: 11px; font-style: italic;" title="Click to edit details" href="javascript:void(0)">@Model.PAYC_HIERARCHY_KEY</a>)
+                            <input id="hidden-PAYC_HIERARCHY_KEY" type="hidden" readonly value="@Model.PAYC_HIERARCHY_KEY" />
+                        </div>
+                    }
+                    else
+                    {
+                        <label>Pay Code Detail &nbsp;</label>
+
+                        @if (@Model.PAYC_STATUS.ToUpper().Contains("INACTIVE"))
+                        {
+                            <label class="label-tag-red">@Model.PAYC_STATUS</label>
+                        }
+                        else
+                        {
+                            <label class="label-tag-green">@Model.PAYC_STATUS</label>
+                        }
+
+                    }
+
+
+
+                    &nbsp;
+                    @if (@Model.IS_CURRENT == "N")
+                    {
+                        <label class="label-tag-orange">HISTORICAL RECORD</label>
+                    }
+
+                    <input type="hidden" id="showHistoricalUpdateButton" readonly value="@ViewBag.ShowHistoricalUpdateButton.ToString()" />
+                </div>
+            </div>
+            <div class="col-md-5 col-sm-5 col-lg-5 text-lg-right text-md-right text-sm-right">
+
+
+            @if ((@Model.IS_CURRENT == "Y" || @ViewData["Title"].ToString() == "Add Detail") && (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.PayCodeReadWrite))
+              || (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.PayCodeAdmin))
+              || (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin))))
+              ))
+                {
+                    @if (@ViewData["Title"].ToString() != "View Detail")
+                    {
+                        @if (ViewBag.ShowDeleteButton != false)
+                        {
+                            <button id="btnDelete" data-toggle="modal" data-target="#deleteModal" data-backdrop="static" data-keyboard="false" class="btn btn-danger noSubmit" title="Click to delete record!"><i class="fas fa-trash-alt"></i> Delete Version  </button>
+                        }
+
+                        <button id="btnSave" data-toggle="tooltip" class="btn btn-primary noSubmit" @(@ViewData["Title"].ToString() != "Add Detail" ? "disabled='disabled'" : "") title="Click to save record!"><i class="fas fa-save"></i> Save </button>
+                    }
+                    @if (@ViewData["Title"].ToString() != "View Detail")
+                    {
+                        <button id="btnReset" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" disabled="disabled" title="Click reset to revert changes!"><i class="fas fa-times-circle"></i> Reset </button>
+                    }
+                    @if (@ViewData["Title"].ToString() == "View Detail")
+                    {
+                        <button id="btnGoToEdit" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to edit this record!"><i class="fas fa-pencil-alt"></i> Edit Record </button>
+                    }
+                    @if (@ViewData["Title"].ToString() == "View Detail" || @ViewData["Title"].ToString() == "Edit Detail")
+                    {
+                        <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                    }
+                    @if (@ViewData["Title"].ToString() == "Edit Detail")
+                    {
+                        <button id="btnViewOnly" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to View Only!"><i class="fas fa-book-open"></i> View Only </button>
+                    }
+                }
+
+                else if ((@Model.IS_CURRENT == "N" || @ViewData["Title"].ToString() == "Add Detail") && (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.PayCodeReadWrite))
+                    || (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.PayCodeAdmin))
+                    || (appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin))))
+                ))
+                {
+                    @if (@ViewData["Title"].ToString() != "View Detail")
+                    {
+                        @if (ViewBag.ShowDeleteButton != false)
+                        {
+                            <button id="btnDelete" data-toggle="modal" data-target="#deleteModal" data-backdrop="static" data-keyboard="false" class="btn btn-danger noSubmit" title="Click to delete record!"><i class="fas fa-trash-alt"></i> Delete Version  </button>
+                        }
+
+                        @if (ViewBag.ShowHistoricalUpdateButton == true)
+                        {
+                            <button id="btnSaveHistoric" data-toggle="tooltip" class="btn btn-primary noSubmit" title="Click to save record!"><i class="fas fa-save"></i> Save Historical Version </button>
+                        }
+                    }
+                    @if (@ViewData["Title"].ToString() != "View Detail")
+                    {
+                        <button id="btnReset" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" disabled="disabled" title="Click reset to revert changes!"><i class="fas fa-times-circle"></i> Reset </button>
+                    }
+                    @if (@ViewData["Title"].ToString() == "View Detail")
+                    {
+                        <button id="btnGoToEdit" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to edit this record!"><i class="fas fa-pencil-alt"></i> Edit Record </button>
+                    }
+                    @if (@ViewData["Title"].ToString() == "View Detail" || @ViewData["Title"].ToString() == "Edit Detail")
+                    {
+                        <button id="btnDuplicateCopy" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to duplicate / copy record!"><i class="fas fa-copy"></i> Duplicate / Copy </button>
+                    }
+                    @if (@ViewData["Title"].ToString() == "Edit Detail")
+                    {
+                        <button id="btnViewOnly" data-toggle="tooltip" class="btn btn-outline-primary noSubmit" title="Click to View Only!"><i class="fas fa-book-open"></i> View Only </button>
+                    }
+                }
+
+
+            </div>
+        </div>
+    </div>
+
+    @if (Model != null)
+    {
+        @if (@ViewData["Title"].ToString() == "Duplicate Record Detail")
+        {            
+            <script>var pageMode = 1;</script>
+            <div class="section-border">
+                <div>
+                    <input type="hidden" readonly id="txtFunding" value="@Model.PAYC_FUND_ARNGMNT_CD" />
+                    <div class="form-row">                        
+                        <label for="txtPIMSID" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Pay Code ID:</label>
+                        <div class="col-lg-2 cell-padding">
+                            <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtPIMSID" name="txtPIMSID" value="">
+                        </div>
+                        <label for="txtBusinessSegment" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight required">Business Segment:</label>
+                        <div class="col-lg-2 cell-padding">
+                            <input type="text" data-toggle="tooltip" class="form-control" hidden id="txtBusinessSegment" name="txtBusinessSegment" value="@Model.PAYC_BUS_SEG_CD">
+                            @(Html.Kendo().DropDownList()
+                            .Name("ddlLOB")
+                            .DataTextField("VV_CD")
+                            .DataValueField("VV_CD")
+                            .OptionLabel("------")
+                            .Filter(FilterType.Contains)
+                            .HtmlAttributes(new { style = "width: 100%" })
+                            .Events(e =>
+                            {
+                                e.Change("PayCodeSummaryController.dropdown.onChange_LOB");
+                            })
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                {
+                                   read.Action("GetAllPayCodeHierarchyCodesXwalk", "Home", new { Area = "PayCodes" }).Data("PayCodeSummaryController.dropdown.param.All_APP_LOB");
+                                });
+                            })
+                        )
+                        </div>
+                        <label for="txtEntity" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight required">Entity:</label>
+                        <div class="col-lg-2 cell-padding">
+                            <input type="text" data-toggle="tooltip" class="form-control" hidden id="txtEntity" name="txtEntity" value="@Model.PAYC_ENTITY_CD">
+                            @(Html.Kendo().DropDownList()
+                                .Name("ddlEntity")
+                                .DataTextField("COLUMN_NAME")
+                                .DataValueField("COLUMN_NAME")
+                                .OptionLabel("------")
+                                .AutoBind(false)
+                                .Events(e =>
+                                {
+                                    e.Change("PayCodeSummaryController.dropdown.onChange_Entity");
+                                })
+                                .Filter(FilterType.Contains)
+                                .HtmlAttributes(new { style = "width: 100%" })
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetAllPayCodeHierarchyCodesXwalk", "Home", new { Area = "PayCodes" }).Data("PayCodeSummaryController.dropdown.param.All_APP_ENTITY");
+                                    })
+                                    .ServerFiltering(true);
+                                })
+                                )
+                        </div>
+                        <label for="txtProcedureCode" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Procedure Code:</label>
+                        <div class="col-lg-2 cell-padding">
+                            <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtProcedureCode" name="txtProcedureCode" value="@Model.PAYC_PROC_CD">
+                        </div>
+                    </div>
+                    <br />
+                    <div class="form-row">
+                        <label class="cell-padding col-lg-2 text-lg-right text-sm-left col-form-label font-modal-weight"></label>
+                        <div class="col-lg-1 cell-padding">
+                            
+                        </div>
+                        <label for="txtPlan" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight required">Plan:</label>
+                        <div class="col-lg-2 cell-padding">
+                            <input type="text" data-toggle="tooltip" class="form-control" hidden id="txtPlan" name="txtPlan" value="@Model.PAYC_PLAN_CD">
+                            @(Html.Kendo().DropDownList()
+                                .Name("ddlPlan")
+                                .DataTextField("COLUMN_NAME")
+                                .DataValueField("COLUMN_NAME")
+                                .OptionLabel("------")
+                                .AutoBind(false)
+                                .Events(e =>
+                                {
+                                    e.Change("PayCodeSummaryController.dropdown.onChange_Plan");
+                                })
+                                .Filter(FilterType.Contains)
+                                .HtmlAttributes(new { style = "width: 100%" })
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetAllPayCodeHierarchyCodesXwalk", "Home", new { Area = "PayCodes" }).Data("PayCodeSummaryController.dropdown.param.All_APP_PLAN");
+                                    })
+                                    .ServerFiltering(true);
+                                })
+                                )
+                        </div>
+                        <label for="txtProduct" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight required">Product:</label>
+                        <div class="col-lg-2 cell-padding">
+                            <input type="text" data-toggle="tooltip" class="form-control" hidden id="txtProduct" name="txtProduct" value="@Model.PAYC_PRODUCT_CD">
+                            @(Html.Kendo().DropDownList()
+                                .Name("ddlProduct")
+                                .DataTextField("COLUMN_NAME")
+                                .DataValueField("COLUMN_NAME")
+                                .OptionLabel("------")
+                                .Filter(FilterType.Contains)
+                                .AutoBind(false)
+                                .Events(e =>
+                                {
+                                    e.Change("PayCodeSummaryController.dropdown.onChange_Product");
+                                })
+                                .HtmlAttributes(new { style = "width: 100%" })
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("GetAllPayCodeHierarchyCodesXwalk", "Home", new { Area = "PayCodes" }).Data("PayCodeSummaryController.dropdown.param.All_APP_PRODUCT");
+                                    })
+                                    .ServerFiltering(true);
+                                })
+                                )
+                        </div>
+
+
+                    </div>
+
+                </div>
+            </div>
+        }
+        else{
+            <script>var pageMode = 0;</script>
+            <div class="section-border">
+                <div>
+                    <input type="hidden" readonly id="txtFunding" value="@Model.PAYC_FUND_ARNGMNT_CD" />
+                    <div class="form-row">
+                        <label for="txtPIMSID" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Pay Code ID:</label>
+                        <div class="col-lg-2 cell-padding">
+                            <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtPIMSID" name="txtPIMSID" value="@Model.PAYC_HIERARCHY_KEY">
+                        </div>
+                        <label for="txtBusinessSegment" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Business Segment:</label>
+                        <div class="col-lg-2 cell-padding">
+                            <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtBusinessSegment" name="txtBusinessSegment" value="@Model.PAYC_BUS_SEG_CD">
+                        </div>
+                        <label for="txtEntity" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Entity:</label>
+                        <div class="col-lg-2 cell-padding">
+                            <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtEntity" name="txtEntity" value="@Model.PAYC_ENTITY_CD">
+                        </div>
+                        <label for="txtProcedureCode" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Procedure Code:</label>
+                        <div class="col-lg-2 cell-padding">
+                            <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtProcedureCode" name="txtProcedureCode" value="@Model.PAYC_PROC_CD">
+                        </div>
+                    </div>
+                    <br />
+                    <div class="form-row">
+                        <label for="txtPayCodeVersionEffectiveDate" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Pay Code Version Eff Date:</label>
+                        <div class="col-lg-2 cell-padding">
+                            <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtPayCodeVersionEffectiveDate" name="txtPayCodeVersionEffectiveDate" value="@Model.PAYC_VER_EFF_DT?.ToString("MM/dd/yyyy hh:mm:ss tt")">
+                        </div>
+                        <label for="txtPlan" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Plan:</label>
+                        <div class="col-lg-2 cell-padding">
+                            <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtPlan" name="txtPlan" value="@Model.PAYC_PLAN_CD">
+                        </div>
+                        <label for="txtProduct" class="cell-padding col-lg-1 text-lg-right text-sm-left col-form-label font-modal-weight">Product:</label>
+                        <div class="col-lg-2 cell-padding">
+                            <input type="text" data-toggle="tooltip" class="form-control" readonly id="txtProduct" name="txtProduct" value="@Model.PAYC_PRODUCT_CD">
+                        </div>
+
+
+                    </div>
+
+                </div>
+            </div>
+        }  
+}
+ </div>
+
+@if (ViewBag.ShowDeleteButton != false)
+{
+    @await Html.PartialAsync("_DeleteModal")
+}
+
+
+<script>
+    $(function () {
+
+        // Log User Access Hist for the page and logged in user
+        var current_title = $(document).attr('title');
+        var page = "";
+        var pims_id = "";
+
+        if (current_title.indexOf("Edit") >= 0) {
+            page="EditDetail"
+            pims_id = $("#txtPIMSID").val();
+        }
+        else if (current_title.indexOf("View") >= 0) {
+            page = "ViewDetail"
+            pims_id = $("#txtPIMSID").val();
+        }
+
+        else if (current_title.indexOf("Duplicate") >= 0) {
+            page = "DuplicateRecord"
+            pims_id = $("#btnGotoDetail").text(); 
+        }
+         
+
+        UserAccessHistController.add({
+            "MODULE_NAME": "PayCodes",
+            "USERACTION": "PayCodes/Home/" + page + "?pims_id=" + pims_id,
+            "USERSELECTION": "PayCodes/Home/" + page,
+            "LST_UPDT_DT": null,
+            "LST_UPDT_BY": MS_ID,
+            "PAGE_ID": "29",
+            "__RequestVerificationToken": $('meta[name="request-verification-token"]')[0].content
+
+        });
+    });
+
+    $(document).ready(function () {
+        const headerContainer = document.getElementsByClassName("container search-section")[0];
+        const buttons = headerContainer.querySelectorAll("button")
+        buttons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const appInsightsClient = new TelemetryLogger();
+                //var pageView = ViewData["Title"].ToString();
+                var pageView = '@Html.Raw(ViewData["Title"])';
+                var pageType;
+                switch(pageView){
+                    case "Add Detail":
+                        pageType = "PayCodeAdd";
+                        break;
+                    case "Edit Detail":
+                        pageType = "PayCodeEdit";
+                        break;
+                    case "Add New":
+                        pageType = "PayCodeNew";
+                        break;
+                    case "Duplicate Record Detail":
+                        pageType = "PayCodeDuplicate";
+                        break;
+                    case "View Detail":
+                    default:
+                        pageType = "PayCodeView";
+                }
+                if(appInsightsClient.isAppInsightsEnabled("Client." + pageView)) {
+                    var buttonStr = event.target.innerText;
+                    const logProperties = new LogInfo(event.target.id, MS_ID, pageType + " " + buttonStr + " Tab click");
+                    appInsightsClient.trackEvent('Client.' + pageType + '.' + buttonStr.replaceAll(' ', ''), logProperties);
+                }
+            });
+        });
+    });
+</script>

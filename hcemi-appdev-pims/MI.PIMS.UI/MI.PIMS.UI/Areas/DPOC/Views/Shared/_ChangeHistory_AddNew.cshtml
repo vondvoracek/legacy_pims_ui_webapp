@@ -1,0 +1,85 @@
+﻿@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "DPOC Change History";
+}
+
+<script src="~/js/DPOC/_DPOC_ChangeHistory.js" asp-append-version="true"></script>
+@inject MI.PIMS.UI.Services.MIAuthenticate.IMIAuthenticateService _miAuthenticateService
+@inject MI.PIMS.UI.Common.Helper _helper
+
+@{
+    var _UserInfo_T_Dto = (MI.PIMS.BO.Dtos.UserInfo_T_Dto)_miAuthenticateService.UserInfo_T_Dto(_helper.MS_ID);
+    var s = _UserInfo_T_Dto.APP_ROLEIDS;
+    string[] appRoles = s.Split(',');
+}
+
+<div class="container tab-section">
+    <h5>
+        Change History
+    </h5>
+    <hr />
+    <div class="form-row my-row-padding">
+
+        <div class="col-lg-6">
+            <div>
+                <label for="txtChangeSource" class="text-lg-right text-sm-left col-form-label font-modal-weight required">Change Source (Limit 50 Character Max):</label>
+            </div>
+            <textarea class="form-control" data-toggle="tooltip" id="txtChangeSource" maxlength="50" name="txtChangeSource" rows="5" 
+                @(appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.DPOCReadWrite))
+                || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.DPOCAdmin))
+                || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin)) ? "" : "readonly='readonly'")></textarea>
+        </div>
+
+        <div class="col-lg-6">
+            <div>
+                <label for="txtChangeDesc" class="text-lg-right text-sm-left col-form-label font-modal-weight required">Change Description (Limit 500 Character Max):</label>
+            </div>
+            <textarea class="form-control" data-toggle="tooltip" id="txtChangeDesc" maxlength="500" name="txtChangeDesc" rows="5"
+                @(appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.DPOCReadWrite))
+                || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.DPOCAdmin))
+                || appRoles.Contains(Convert.ToString((int)MI.PIMS.UI.Roles.SuperAdmin)) ? "" : "readonly='readonly'")></textarea>
+        </div>
+    </div>
+    <br />
+    <form id="frmChangeHistory">
+
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <div style="font-size:11px !important;">
+                    @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.DPOC_ChangeHistory_Dto>()
+                        .Name("grid_ChangeHistory")
+                        .Columns(c => {
+                            c.Bound(p => p.CHANGEBY).Title("Change By").Filterable(false).HeaderHtmlAttributes(new {title = "Change By."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                            c.Bound(p => p.DPOC_VER_EFF_DT).Title("DPOC Version Eff Date").Filterable(false).HeaderHtmlAttributes(new { title = "The dpoc version effective date." }).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                            c.Bound(p => p.CHANGEDATE).Title("Change Date").Filterable(false).HeaderHtmlAttributes(new {title = "The date the record was changed or initiated."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                            c.Bound(p => p.CHANGESOURCE).Title("Change Source").Filterable(false).HeaderHtmlAttributes(new {title = "The source from which the change was requested."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                            c.Bound(p => p.CHANGEDESCRIPTION).Title("Change Description").HeaderHtmlAttributes(new {title = "The description of the change that was performed to the record."}).Filterable(false).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                            c.Bound(p => p.ChangeType).Title("Change Type").Filterable(false).HeaderHtmlAttributes(new {title = "The type of record that the change or entry was performed on in the system."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                            c.Bound(p => p.RECORD_ENTRY_METHOD).Title("Record Entry Method").Filterable(false).HeaderHtmlAttributes(new { title = "The entry method used to add the data in the system." }).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: center" }).Width(200);
+                        })
+                        .Resizable(resize => resize.Columns(true))
+                        .HtmlAttributes(new { style = "height: 400px;" })
+                        .Events(events => events.DataBound("ChangeHistoryController.grid.onDataBound"))
+                        .Sortable()
+                        .NoRecords()
+                        .Navigatable()
+                        .Pageable(pageable => pageable
+                            .Refresh(true)
+                            .PreviousNext(true)
+                            .Numeric(true)
+                        )                        
+                        .Scrollable()
+                        .Selectable()
+                        .Filterable()
+                        .DataSource(dataSource => dataSource
+                            .Ajax()
+                            .PageSize(50)
+                            .Read(read => read.Action("GetDPOCChangeHistoryByPIMSID", "Home", new { Area = "DPOC" }).Data("ChangeHistoryController.grid.param"))
+                        )
+                    )
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+

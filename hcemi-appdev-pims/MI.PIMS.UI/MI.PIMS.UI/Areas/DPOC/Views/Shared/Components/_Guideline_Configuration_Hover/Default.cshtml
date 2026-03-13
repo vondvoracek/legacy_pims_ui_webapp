@@ -1,0 +1,65 @@
+﻿@using Kendo.Mvc.UI;
+@using MI.PIMS.BO.Dtos;
+@model DPOC_Gdln_Param_Dto;
+
+<script src="~/js/DPOC/_DPOC_Configuration.js" asp-append-version="true"></script>
+
+<input type="hidden" id="hv-iq-gdln-id" value="@Model.p_IQ_GDLN_ID" />
+
+<div class="container">
+    @(
+        Html.Kendo().Grid<DPOC_INV_DTQS_V_Dto>()
+        .Name("grid_config_hover")
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.GDLN_DTQ_SYS_SEQ).Hidden(true);
+            columns.Bound(p => p.DTQ_IQ_GDLN_ID).Hidden(true);
+            columns.Bound(p => p.STATES_INCL_EXCL_CD).Hidden(true);
+            columns.Bound(p => p.POS_APPL).Title("POS Codes").Sortable(false).EditorTemplateName("POS_APPL").EditorTemplateName("POS_APPL").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(100);
+            columns.Bound(p => p.POS_INCL_EXCL_CD).Hidden(true);
+            columns.Bound(p => p.POS_INCL_EXCL_DESC).Title("POS<br/>Include/Exclude").EditorTemplateName("POS_INCL_EXCL_CD").ClientTemplate("#: POS_INCL_EXCL_DESC != null ? POS_INCL_EXCL_DESC : '' #").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(100);
+            columns.Bound(p => p.STATES_APPL).Editable("nonEditable").Title("States")
+            .ClientTemplate(
+            "# if(STATES_APPL.length > 0){#" +
+            "#=STATES_APPL.replace(/\\|/g, ',')#" +
+            "# } #"
+            )
+            .HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(100);
+            columns.Bound(p => p.STATES_INCL_EXCL_CD).Hidden(true);
+            columns.Bound(p => p.STATES_INCL_EXCL_DESC).Title("State<br/>Include/Exclude").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;max-length:50;" }).Width(130);
+            columns.Bound(d => d.DTQ_NM).Title("DTQ Name").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;max-length:50;" }).Width(130);
+            columns.Bound(d => d.TGT_DTQ).Title("Target DTQ").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(130);
+            columns.Bound(d => d.TGT_DTQ_VERSION).Title("Target DTQ<br/>Version").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(130);
+            columns.Bound(d => d.HOLDING_DTQ).Title("Holding DTQ").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(130);
+            columns.Bound(d => d.HOLDING_DTQ_VERSION).Title("Holding DTQ<br/>Version").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(130);
+            columns.Bound(d => d.RULE_COMMENTS).Title("Rule Comments").HeaderHtmlAttributes(new { style = "vertical-align:text-top;background:white;font-weight:bold;" }).Width(150);            
+        })
+        .Resizable(resize => resize.Columns(true))
+        .HtmlAttributes(new { style = "height: 400px;" })
+        .Scrollable()
+        .Sortable()
+        .Pageable(pageable => pageable.Refresh(false))
+        .Events(events => events.DataBound("DPOC_ConfigController.grid.onDataBound"))
+        .DataSource(dataSource => dataSource
+            .Ajax()
+            .PageSize(100)
+        .Read(read => read.Action("GetConfigurations", "GuidelineSummary", new { Area = "DPOC" }).Data("gsConfigHoverController.params"))
+            .Model(model =>
+            {
+                model.Field(c => c.GDLN_DTQ_SYS_SEQ);
+                model.Field(c => c.DTQ_IQ_GDLN_ID);
+                model.Field(c => c.POS_APPL);
+                model.Field(c => c.STATES_APPL).Editable(false);
+                model.Field(c => c.POS_INCL_EXCL_CD);
+                model.Field(c => c.POS_INCL_EXCL_DESC);
+                model.Field(c => c.DTQ_NM);
+                model.Field(c => c.TGT_DTQ);
+                model.Field(c => c.TGT_DTQ_VERSION);
+                model.Field(c => c.HOLDING_DTQ);
+                model.Field(c => c.HOLDING_DTQ_VERSION);
+                model.Field(c => c.COMMENTS);
+            })        
+        )
+        .AutoBind(false)
+    )
+</div>

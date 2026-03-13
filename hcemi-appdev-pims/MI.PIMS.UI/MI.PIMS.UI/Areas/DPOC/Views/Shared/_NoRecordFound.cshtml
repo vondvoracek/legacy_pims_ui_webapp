@@ -1,0 +1,25 @@
+﻿<div style="padding:15px;">
+    <br />
+    <h3>No record found. Please select another record. </h3>
+    <br />
+    For administration support, please click on the link to send an email to <a target="_blank" href="mailto:PIMS_Operations_Team@ds.uhc.com?subject=PIMS Support">PIMS Support.</a>
+    <br />  <br /><br />
+    <button id="btnReturn" class="btn btn-primary" title="Click to return to main page!"><i class="fas fa-undo-alt"></i> Return to Search </button>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#btnReturn").click(function () {
+            Swal.fire({
+                title: 'Redirecting..',
+                text: 'Redirecting to search screen, please wait..',
+                timerProgressBar: true,
+                allowOutsideClick: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                    window.location.href = VIRTUAL_DIRECTORY + "/DPOC";
+                }
+            })
+        });
+    });
+</script>

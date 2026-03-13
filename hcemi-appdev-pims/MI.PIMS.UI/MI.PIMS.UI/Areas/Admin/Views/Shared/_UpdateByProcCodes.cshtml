@@ -1,0 +1,104 @@
+﻿@using Kendo.Mvc.UI
+@using MI.PIMS.UI.Areas.Admin.Models;
+
+<!--UBPC = Update by Procedure Code-->
+
+<script src="~/js/Admin/_CategoryUpdate.js" asp-append-version="true"></script>
+
+<div class="modal fade updateByProcCodeModal" id="updateByProcCodeModal" tabindex="-1" role="dialog" aria-labelledby="updateByProcCodeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form id="formUBPC" onsubmit="return false;">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateByProcCodeModalLabel">Bulk Insert by Proc Code</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="width: 50px;margin-left: 0px;">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Row 1 -->
+                    <div class="form-row my-row-padding">
+                        <div class="col-lg-5">
+                            <label for="ProcedureCode_UBPC" class="text-lg-right text-sm-left col-form-label font-modal-weight required">Procedure Code:</label>
+                            <div>
+                                <input type="text" class="form-control" id="ProcedureCode_UBPC" placeholder="Press Enter to add into below list to save"/>
+                            </div>
+                            <div>
+                                @(Html.Kendo().ListView<ProcedureCodes_UBPCTO>()
+                                    .Name("lsvProcedureCodesUBPC")
+                                    .TagName("div")
+                                    .ClientTemplateId("lsvProcedureCodesUBPC_Template")
+                                   
+                                    .HtmlAttributes(new { style = "height:250px;overflow-y:auto" })
+                                    .AutoBind(false)
+                                 )
+                                <script type="text/x-kendo-tmpl" id="lsvProcedureCodesUBPC_Template">
+                                    <div>
+                                        <span class="badge badge-primary ml-2">#:PROC_CD#</span>
+                                    </div>
+                                </script>
+                            </div>
+                        </div>
+                        <div class="col-lg-7">
+                            <div class="form-row my-row-padding">
+                                <input type="hidden" id="AlternateCategory_UBPC_Old" />
+                                <label for="AlternateCategory_UBPC:" class="col-lg-5 text-lg-right text-sm-left col-form-label font-modal-weight required">New Alternate Category:</label>
+                                <div class="col-lg-7">
+                                    @(Html.Kendo().DropDownList()
+                                        .Name("AlternateCategory_UBPC")
+                                        .DataTextField("RET_VAL")
+                                        .DataValueField("RET_VAL")
+                                        .OptionLabel("---Select Specialty---")
+                                        .HtmlAttributes(new { style = "width: 100%" })
+                                        .Events(e =>
+                                        {
+                                            e.Change("_categoryUpdateController.multiSelect.onChange_AlternateCategory").Filtering("_categoryUpdateController.multiSelect.onFiltering_AlternateCategory");
+                                        })
+                                        .DataSource(source =>
+                                        {
+                                            source.Read(read =>
+                                            {
+                                                read.Action("GetSpecialtyCombination", "Home", new { Area = "Admin" }).Data("_categoryUpdateController.dropdown.param.ALTERNATE_CATEGORY");
+                                            });
+                                        })
+                                        )
+                                </div>
+                            </div>
+                            <!-- Row 4 -->
+                            <div class="form-row my-row-padding">
+                                <input type="hidden" id="AlternateSubCategory_UBPC_Old" />
+                                <label for="AlternateSubCategory_UBPC:" class="col-lg-5 text-lg-right text-sm-left col-form-label font-modal-weight">New Alternate Sub Category:</label>
+                                <div class="col-lg-7">
+                                    @(Html.Kendo().DropDownList()
+                                        .Name("AlternateSubCategory_UBPC")
+                                        .DataTextField("RET_VAL")
+                                        .DataValueField("RET_VAL")
+                                        .OptionLabel("---Select Specialty---")
+                                        .HtmlAttributes(new { style = "width: 100%" })
+                                        .Events(e =>
+                                        {
+                                            e.Change("_categoryUpdateController.multiSelect.onChange_AlternateSubCategory").Filtering("_categoryUpdateController.multiSelect.onFiltering_AlternateSubCategory");
+                                        })
+                                        .DataSource(source =>
+                                        {
+                                            source.Read(read =>
+                                            {
+                                                read.Action("GetSpecialtyCombination", "Home", new { Area = "Admin" }).Data("_categoryUpdateController.dropdown.param.ALTERNATE_SUB_CATEGORY");
+                                            })
+                                            .ServerFiltering(true);
+                                        })
+                                        )
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="btnValidateUBPC" class="btn btn-primary noSubmit btnValidateUBPC" title="Click to validate record!"><i class="fas fa-save"></i> Validate </button>
+                    <button type="reset" id="btnResetUBPC" class="btn btn-secondary">Reset</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

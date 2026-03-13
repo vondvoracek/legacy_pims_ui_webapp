@@ -1,0 +1,117 @@
+﻿
+@{
+    //ViewData["PageType"] = ViewData["PageType"];    
+}
+
+@model MI.PIMS.BO.Dtos.EPAL_Procedures_V_Dto
+<div class="container detail-tab-section">
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="EPALSummary-tab" data-toggle="tab" href="#EPALSummary" role="tab" aria-controls="EPALSummary" aria-selected="true">EPAL Summary</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="EPALReviewIndicators-tab" data-toggle="tab" href="#EPALReviewIndicators" role="tab" aria-controls="EPALReviewIndicators" aria-selected="false">EPAL Review Indicators</a>
+        </li>
+@*        <li class="nav-item" role="presentation">
+            <a class="nav-link design-missing" id="DPOC-tab" data-toggle="tab" href="#DPOC" role="tab" aria-controls="DPOC" aria-selected="false">DPOC</a>
+        </li>*@
+         <li class="nav-item" role="presentation">
+            <a class="nav-link" id="assocCodesPolicy-tab" data-toggle="tab" href="#assocCodesPolicy" role="tab" aria-controls="assocCodesPolicy" aria-selected="false">Assoc Codes</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="stateInfo-tab" data-toggle="tab" href="#stateInfo" role="tab" aria-controls="stateInfo" aria-selected="false">State Info</a>
+        </li>
+
+@*        <li class="nav-item" role="presentation">
+            <a class="nav-link design-missing" id="medPolicy-tab" data-toggle="tab" href="#medPolicy" role="tab" aria-controls="medPolicy" aria-selected="false">Med Policy</a>
+        </li>*@
+@*        <li class="nav-item" role="presentation">
+            <a class="nav-link design-missing" id="medPolicyCodes-tab" data-toggle="tab" href="#medPolicyCodes" role="tab" aria-controls="medPolicyCodes" aria-selected="false">Med Policy Codes</a>
+        </li>*@
+@*        <li class="nav-item" role="presentation">
+            <a class="nav-link design-missing" id="guidelines-tab" data-toggle="tab" href="#guidelines" role="tab" aria-controls="guidelines" aria-selected="false">Guidelines</a>
+        </li>*@
+@*        <li class="nav-item" role="presentation">
+            <a class="nav-link design-missing" id="guidelineCodes-tab" data-toggle="tab" href="#guidelineCodes" role="tab" aria-controls="guidelineCodes" aria-selected="false">Guideline Codes</a>
+        </li>*@
+@*        <li class="nav-item" role="presentation">
+            <a class="nav-link design-missing" id="guidelineRecommended-tab" data-toggle="tab" href="#guidelineRecommended" role="tab" aria-controls="guidelineRecommended" aria-selected="false">Guideline Recommended</a>
+        </li>*@
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="additionalInformation-tab" data-toggle="tab" href="#additionalInformation" role="tab" aria-controls="additionalInformation" aria-selected="false">Additional Information</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="changeHistory-tab" data-toggle="tab" href="#changeHistory" role="tab" aria-controls="changeHistory" aria-selected="false">Change History</a>
+       @* </li>
+                <li class="nav-item" role="presentation">
+            <a class="nav-link" id="addDiag-tab" data-toggle="tab" href="#AddDiag" role="tab" aria-controls="AddDiag" aria-selected="false">Add DiagCodes</a>
+        </li>
+
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="Testing-tab" data-toggle="tab" href="#Testing" role="tab" aria-controls="Testing" aria-selected="false">SampleCode</a>
+        </li>*@
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="EPALSummary" role="tabpanel" aria-labelledby="EPALSummary-tab">
+            <partial name="_EPALSummary" model="Model" view-data="ViewData" />            
+        </div>
+        <div class="tab-pane fade" id="EPALReviewIndicators" role="tabpanel" aria-labelledby="EPALReviewIndicators-tab">
+            <partial name="_EPALReviewIndicators" model="Model" view-data="ViewData" />  
+        </div>
+@*        <div class="tab-pane fade" id="DPOC" role="tabpanel" aria-labelledby="DPOC-tab">
+            @await Html.PartialAsync("_DPOC")
+        </div>
+        <div class="tab-pane fade" id="assocCodesPolicy" role="tabpanel" aria-labelledby="assocCodesPolicy-tab">
+            <partial name="_AssocCodesPolicy" view-data="ViewData" />
+        </div>*@
+         <div class="tab-pane fade" id="assocCodesPolicy" role="tabpanel" aria-labelledby="assocCodesPolicy-tab">
+            <partial name="_AssocCodesPolicy_AddNew" model="Model" view-data="ViewData" />
+        </div>
+        <div class="tab-pane fade" id="stateInfo" role="tabpanel" aria-labelledby="stateInfo-tab">
+            <partial name="_StateInfo_AddNew" view-data="ViewData" />  
+        </div>
+
+@*        <div class="tab-pane fade" id="medPolicy" role="tabpanel" aria-labelledby="medPolicy-tab">
+            @await Html.PartialAsync("_MedPolicy")
+        </div>*@
+@*        <div class="tab-pane fade" id="medPolicyCodes" role="tabpanel" aria-labelledby="medPolicyCodes-tab">
+            @await Html.PartialAsync("_MedPolicyCodes")
+        </div>*@
+@*        <div class="tab-pane fade" id="guidelines" role="tabpanel" aria-labelledby="guidelines-tab">
+            @await Html.PartialAsync("_Guidelines")
+        </div>*@
+@*        <div class="tab-pane fade" id="guidelineCodes" role="tabpanel" aria-labelledby="guidelineCodes-tab">
+            @await Html.PartialAsync("_GuidelineCodes")
+        </div>*@
+@*        <div class="tab-pane fade" id="guidelineRecommended" role="tabpanel" aria-labelledby="guidelineRecommended-tab">
+            @await Html.PartialAsync("_GuidelineRecommend")
+        </div>*@
+        <div class="tab-pane fade" id="additionalInformation" role="tabpanel" aria-labelledby="additionalInformation-tab">
+            <partial name="_AdditionalInformation" view-data="ViewData" /> 
+        </div>
+        <div class="tab-pane fade" id="changeHistory" role="tabpanel" aria-labelledby="changeHistory-tab">
+            <partial name="_ChangeHistory" view-data="ViewData" /> 
+        </div>
+        @*<div class="tab-pane fade" id="AddDiag" role="tabpanel" aria-labelledby="addDiag-tab">
+            <partial name="_AddDiag" view-data="ViewData" /> 
+        </div>
+        <div class="tab-pane fade" id="Testing" role="tabpanel" aria-labelledby="Testing-tab">
+            <partial name="_Testing" view-data="ViewData" /> 
+        </div>*@
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        const tabs = myTab.querySelectorAll(".nav-item");
+        tabs.forEach(tab => {
+            tab.addEventListener('click', (event) => {
+                const appInsightsClient = new TelemetryLogger();
+                if(appInsightsClient.isAppInsightsEnabled("Client.EPALEdit")) {
+                    var tabStr = event.target.innerText;
+                    const logProperties = new LogInfo(event.target.id, MS_ID, "EPAL Edit Detail " + tabStr + " Tab click");
+                    appInsightsClient.trackEvent('Client.EPALEdit.' + tabStr.replaceAll(' ', ''), logProperties);
+                }
+            });
+        });
+    });
+</script>

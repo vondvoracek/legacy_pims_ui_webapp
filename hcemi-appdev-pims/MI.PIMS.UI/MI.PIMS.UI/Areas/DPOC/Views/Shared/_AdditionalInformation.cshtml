@@ -1,0 +1,34 @@
+﻿@using Kendo.Mvc.UI
+
+<div class="container tab-section">
+    <h5>
+        Notes
+    </h5>
+    <hr />
+    <div class="form-row my-row-padding">
+@*         <div class="col-lg-5">
+            <div>
+                <label for="txtAdditionalRequirements" class="text-lg-right text-sm-left col-form-label font-modal-weight">Additional Requirements (Limit 500 Character Max):</label>
+            </div>
+            <textarea class="form-control" data-toggle="tooltip" id="txtAdditionalRequirements" maxlength="500" name="txtAdditionalRequirements" rows="5" @((string)ViewData["PageType"] == @Roles.DPOCReadOnly.ToString() ? "readonly='readonly'" : "")></textarea>
+            <br />
+            <div>
+                <label for="txtAdditionalRequirementsHistory" class="text-lg-right text-sm-left col-form-label font-modal-weight">Additional Requirements History:</label>
+            </div>
+            <textarea class="form-control" rows="10" id="txtAdditionalRequirementsHistory" name="txtAdditionalRequirementsHistory" style="resize: none; " readonly>@ViewBag.AdditionalRequirements</textarea>
+        </div>
+        <div class="col-lg-1">
+        </div> *@
+        <div class="col-lg-12">
+            <div>
+                <label for="txtNote" class="text-lg-right text-sm-left col-form-label font-modal-weight">Note (Limit 500 Character Max):</label>
+            </div>
+            <textarea class="form-control" data-toggle="tooltip" id="txtNote" maxlength="500" name="txtNote" rows="5" @((string)ViewData["PageType"] == @Roles.DPOCReadOnly.ToString() ? "readonly='readonly'" : "")></textarea>
+            <br />
+            <div>
+                <label for="txtNoteHistory" class="text-lg-right text-sm-left col-form-label font-modal-weight">Note History:</label>
+            </div>
+            <textarea class="form-control" rows="10" id="txtNoteHistory" name="txtNoteHistory" style="resize: none; " readonly>@ViewBag.Notes</textarea>
+        </div>
+    </div>
+</div>

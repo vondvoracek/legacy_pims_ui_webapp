@@ -1,0 +1,188 @@
+﻿@model MI.PIMS.BO.Dtos.DPOC_Inventories_V_Dto
+@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "AssocCodes";
+}
+<script src="~/js/EPAL/AssocCodes.js" asp-append-version="true"></script>
+
+<form id="frmAssocCodes">
+    <input type="hidden" id="hidden-EPAL_HIERARCHY_KEY" name="hidden-EPAL_HIERARCHY_KEY" value="@Model.EPAL_HIERARCHY_KEY" />
+    <div class="container tab-section">
+        <h5>
+            Associated Codes View
+        </h5>
+        <hr />
+
+        <style>
+            #tabstrip-left > .k-content {
+                overflow: visible;
+            }
+
+        </style>
+
+        @(Html.AntiForgeryToken())
+        @(Html.Kendo().TabStrip()
+            .Name("tabstrip-left")
+            .TabPosition(TabStripTabPosition.Left)
+            .Animation(animation =>
+            {
+                animation.Open(config =>
+                {
+                    config.Fade(FadeDirection.In);
+                });
+            })
+            .HtmlAttributes(new { style = "height: 425px"  })
+            .Scrollable(false)
+            .SelectedIndex(0)
+            .Items(items =>
+            {
+                items.Add().Text("Diagnosis List")
+                        .Content(@<text>
+                            @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.EPAL_Procs_Diagnoses_V_Dto>()
+                                .Name("grid_DiagList")
+                                .Columns(c => {
+                                    c.Bound(p => p.LIST_NAME).Title("Diagnosis List").Width(400).Filterable(false).HeaderHtmlAttributes(new {title = "Diagnosis List."}).HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });                                    
+                                    c.Bound(p => p.INCL_EXCL_CD_DESC).Title("Include/Exclude").Width(200).Filterable(false).HeaderHtmlAttributes(new {title = "Denotes if the status of Diagnosis is either included or excluded"}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" }).Width(120);
+                                    c.Bound(p => p.PROG_MGD_BY).Title("Program Managed By").HeaderHtmlAttributes(new {title = "Program Managed By"}).HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                })                              
+                                .Resizable(resize => resize.Columns(true))
+                                .HtmlAttributes(new { style = "height: 400px;" })    
+                                .Scrollable()
+                                .Sortable()
+                                .DataSource(dataSource => dataSource
+                                    .Ajax()
+                                    .Model(model =>
+                                    {
+                                        model.Id(c => c.EPAL_HIERARCHY_KEY);
+                                    })
+                                    .PageSize(20)
+                                    .Read(read => read.Action("GetDiagnosisVList", "Home", new { Area = "EPAL"}).Data("DiagListController.grid.param"))
+                                )
+                            )
+                        </text>);
+                items.Add().Text("Diagnosis Codes")
+                        .Content(@<text>
+                            @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.EPAL_Procedures_AssoCodes_V_DiagCodes_Dto>()
+                                .Name("grid_DiagCodes")
+                                .Columns(c => {
+                                    c.Bound(p => p.LIST_NAME).Title("Diagnosis List").Width(400).Filterable(false).HeaderHtmlAttributes(new {title = "Diagnosis List."}).HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                    c.Bound(p => p.DIAG_CD).Title("Diagnosis Code").Width(150).Filterable(false).HeaderHtmlAttributes(new {title = "Diagnosis Codes."}).HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                    c.Bound(p => p.DIAG_CD_DESC).Title("Diagnosis Description").HeaderHtmlAttributes(new {title = "Diagnosis Codes."}).HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                    c.Bound(p => p.DIAG_CD_TYPE).Title("ICD Version").Filterable(false).HeaderHtmlAttributes(new {title = "ICD_Version."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" }).Width(100);
+                                    c.Bound(p => p.INCL_EXCL_CD_DESC).Title("Include/Exclude").Width(200).Filterable(false).HeaderHtmlAttributes(new {title = "Denotes if the status of Diagnosis is either included or excluded"}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                    c.Bound(p => p.PROG_MGD_BY).Title("Program Managed By").HeaderHtmlAttributes(new {title = "Program Managed By"}).HeaderHtmlAttributes(new { style = "text-align: left; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                })                              
+                                .Resizable(resize => resize.Columns(true))
+                                .HtmlAttributes(new { style = "height: 400px;" })    
+                                .Scrollable()
+                                .Sortable()
+                                .DataSource(dataSource => dataSource
+                                    .Ajax()
+                                    .Model(model =>
+                                    {
+                                        model.Id(c => c.DIAG_CD);
+                                    })
+                                    .PageSize(1000)
+                                    .Read(read => read.Action("GetDiagCodes", "Home", new { Area = "EPAL"}).Data("DiagCodesController.grid.param"))
+                                )
+                            )
+                        </text>);
+
+                items.Add().Text("Revenue Codes")
+                        .Content(@<text>
+                            @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.EPAL_Procedures_AssoCodes_V_RevCodes_Dto>()
+                                .Name("grid_RevCodes")
+                                .Columns(c => {
+                                    c.Bound(p => p.REV_CD).Title("Revenue Codes").Width(150).Filterable(false).HeaderHtmlAttributes(new {title = "Revenue Code."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                    c.Bound(p => p.REV_CD_DESC).Title("Revenue Description").Filterable(false).HeaderHtmlAttributes(new {title = "Revenue Description."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                    c.Bound(p => p.INCL_EXCL_CD_DESC).Title("Include/Exclude").Width(200).Filterable(false).HeaderHtmlAttributes(new {title = "Denotes if the status of Revenue Code is either included or excluded"}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                })
+                                .Resizable(resize => resize.Columns(true))
+                                .HtmlAttributes(new { style = "height: 400px;" })    
+                                .Scrollable()
+                                .Sortable()
+                                .DataSource(dataSource => dataSource
+                                    .Ajax()
+                                    .PageSize(1000)
+                                    .Read(read => read.Action("GetRevCodes", "Home", new { Area = "EPAL"}).Data("RevCodesController.grid.param"))
+                                )
+                            )
+                        </text>);
+
+                items.Add().Text("POS Codes")
+                        .Content(@<text>
+                            @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.EPAL_Procedures_AssoCodes_V_AllocatedPlaces_Dto>()
+                                .Name("grid_AllocatedPlaces")
+                                .Columns(c => {
+                                    c.Bound(p => p.CODE).Title("POS Codes").Width(150).Filterable(false).HeaderHtmlAttributes(new {title = "Place of Service Codes."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                    c.Bound(p => p.ALLWD_PLC_OF_SVC).Title("POS Description").Filterable(false).HeaderHtmlAttributes(new {title = "The places of service where the code is authorized to be rendered for the prior auth."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                    c.Bound(p => p.INCL_EXCL_CD_DESC).Title("Include/Exclude").Width(200).Filterable(false).HeaderHtmlAttributes(new {title = "Denotes if the status of Place of service is either included or excluded"}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                })
+                                .Resizable(resize => resize.Columns(true))
+                                .HtmlAttributes(new { style = "height: 400px;" })    
+                                .Scrollable()
+                                .Sortable()
+                                //.NoRecords()
+                                .DataSource(dataSource => dataSource
+                                    .Ajax()
+                                    .PageSize(1000)
+                                    .Read(read => read.Action("GetAllocatedPlaces", "Home", new { Area = "EPAL"}).Data("AllocatedPlacesController.grid.param"))
+                                )
+                            )
+                        </text>);
+
+                items.Add().Text("Modifier Codes")
+                        .Content(@<text>
+                            @(Html.Kendo().Grid<MI.PIMS.BO.Dtos.EPAL_Procedures_Modifier_Dto>()
+                                .Name("grid_Modifiers")
+                                .Columns(c => {
+                                    c.Bound(p => p.MODIFIER).Title("Modifier Codes").Width(150).Filterable(false).HeaderHtmlAttributes(new {title = "Modifier."}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                    c.Bound(p => p.MOD_DESC).Title("Modifier Description").Filterable(false).HeaderHtmlAttributes(new {title = "Modifier Description"}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                    c.Bound(p => p.INCL_EXCL_CD_DESC).Title("Include/Exclude").Width(200).Filterable(false).HeaderHtmlAttributes(new {title = "Denotes if the status of Modifier is either included or excluded"}).HeaderHtmlAttributes(new { style = "text-align: center; font-weight:bold" }).HtmlAttributes(new { style = "text-align: left" });
+                                })
+                                .Resizable(resize => resize.Columns(true))
+                                .HtmlAttributes(new { style = "height: 400px;" })    
+                                .Scrollable()
+                                .Sortable()
+                                .DataSource(dataSource => dataSource
+                                    .Ajax()
+                                    .PageSize(1000)
+                                    .Read(read => read.Action("GetEPALProceduresModifiers", "Home", new { Area = "EPAL"}).Data("ModifiersController.grid.param")))
+                            )
+                        </text>);
+    
+            })
+        )        
+    </div>
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+            var gridElement = $("#grid_DiagCodes");
+            var dataArea = gridElement.find(".k-grid-content");
+            gridElement.height("305px");
+            dataArea.height("255px");
+
+            var gridElement = $("#grid_RevCodes");
+            var dataArea = gridElement.find(".k-grid-content");
+            gridElement.height("305px");
+            dataArea.height("255px");
+
+            var gridElement = $("#grid_AllocatedPlaces");
+            var dataArea = gridElement.find(".k-grid-content");
+            gridElement.height("305px");
+            dataArea.height("255px");
+
+            var gridElement = $("#grid_Modifiers");
+            var dataArea = gridElement.find(".k-grid-content");
+            gridElement.height("305px");
+            dataArea.height("255px");            
+        });
+    </script>
+</form>
+
+
+
+
+
+
+
